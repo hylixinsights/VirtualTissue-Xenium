@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# macOS / editors
+.DS_Store
+.Rhistory
+.vscode/
+.idea/
+
+# DATA AND RESULTS NEVER BELONG IN THIS REPOSITORY
+# Raw Xenium output, prepared bundles, simulation results and journals can be
+# large, can contain unpublished data, and are reproducible from the notebooks.
+data/
+raw/
+outputs/
+results/
+runs/
+*.h5
+*.h5ad
+*.parquet
+*.zarr.zip
+*.tar.gz
+*.npz
+simulation_input_*/
+simulation_input_*.zip
+*_results.zip
+jev_journal.jsonl
+episode.json.gz
+cell_boundaries.csv
+
+# Secrets: never commit an API key
+.env
+.env.*
+*.key
+secrets*.json

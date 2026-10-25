@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VirtualTissue Replay</title>
+<style>
+:root{
+  --bg:#0a0e1a; --panel:#111729; --panel2:#161d33; --line:#232c47; --text:#e7ebf5; --muted:#8d97b3; --faint:#5d6684;
+  --accent:#3fd0c9; --warn:#ff5a6a; --gold:#f2c14e;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text)}
+body{display:flex;flex-direction:column;min-height:100vh;font-size:13px;line-height:1.4}
+header{display:flex;align-items:baseline;gap:14px;padding:14px 18px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px}
+header h1 span{color:var(--accent)}
+header .sub{color:var(--muted);font-size:12.5px}
+header .badge{margin-left:auto;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:0}
+#stage{position:relative;min-height:520px;overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;cursor:grab;display:block}
+#map.dragging{cursor:grabbing}
+#tooltip{position:absolute;pointer-events:none;background:rgba(10,14,26,.92);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;display:none;max-width:260px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#tooltip b{font-weight:600}
+.overlay-tools{position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap}
+.overlay-tools label{display:flex;align-items:center;gap:6px;background:rgba(17,23,41,.88);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--muted);font-size:12px}
+select,button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:4px 8px}
+button{cursor:pointer}
+button:hover,select:hover{border-color:#36426a}
+aside{border-left:1px solid var(--line);background:var(--panel);overflow-y:auto;padding:14px 14px 24px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 128px)}
+aside h2{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin:0 0 8px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.tile .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.tile .k{font-size:11px;color:var(--muted)}
+#legend{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+.leg{display:flex;align-items:center;gap:7px;padding:3px 4px;border-radius:6px;cursor:pointer;user-select:none}
+.leg:hover{background:var(--panel2)}
+.leg.off{opacity:.35}
+.leg i{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15) inset}
+.leg .n{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+#chart{width:100%;height:110px;display:block}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12px;color:#c9d0e4}
+.keys div{display:flex;align-items:center;gap:6px}
+#feed{display:flex;flex-direction:column;gap:4px;max-height:190px;overflow:auto}
+.ev{display:flex;gap:8px;font-size:12px;color:#c9d0e4}
+.ev time{color:var(--faint);min-width:44px;font-variant-numeric:tabular-nums}
+.ev i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
+#inspector{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:80px}
+#inspector .title{font-size:14px;font-weight:650;display:flex;align-items:center;gap:8px}
+#inspector .title i{width:12px;height:12px;border-radius:50%}
+#inspector .meta{color:var(--muted);font-size:12px;margin:2px 0 8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12px;margin-bottom:8px}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+.bars{display:flex;flex-direction:column;gap:2px;margin:6px 0 10px}
+.bar{display:grid;grid-template-columns:150px 1fr 30px;align-items:center;gap:6px;font-size:10.5px;color:#c3cbe0}
+.bar .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .track{height:7px;background:#0d1222;border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;border-radius:4px}
+.bar .num{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.dec{border-top:1px solid var(--line);padding:6px 0;font-size:12px}
+.dec .head{display:flex;justify-content:space-between;gap:8px}
+.dec .head b{font-weight:600}
+.dec .probs{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.dec .p{display:grid;grid-template-columns:130px 1fr 34px;gap:6px;align-items:center;font-size:10.5px;color:var(--muted)}
+.dec .p .track{height:5px;background:#0d1222;border-radius:3px;overflow:hidden}
+.dec .p .fill{height:100%;background:var(--accent)}
+.hint{color:var(--faint);font-size:12px}
+footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex-direction:column;gap:6px;background:var(--panel)}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#play{width:84px;font-weight:600;background:var(--accent);color:#04201f;border:none}
+#clock{font-variant-numeric:tabular-nums;font-size:15px;font-weight:650;min-width:92px}
+#phase{color:var(--muted);font-size:12px}
+.timeline{position:relative;height:30px}
+#strip{position:absolute;left:0;right:0;top:0;height:12px;width:100%}
+#seek{position:absolute;left:0;right:0;top:12px;width:100%;margin:0;accent-color:var(--accent)}
+.note{color:var(--faint);font-size:11px}
+@media (max-width:900px){main{grid-template-columns:1fr} aside{border-left:none;border-top:1px solid var(--line);max-height:none} #stage{min-height:420px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Virtual<span>Tissue</span></h1>
+  <div class="sub" id="subtitle">Loading…</div>
+  <div class="badge" id="badge"></div>
+</header>
+<main>
+  <section id="stage">
+    <canvas id="map"></canvas>
+    <div class="overlay-tools">
+      <label>Color <select id="colorMode"><option value="type">Cell type</option><option value="action">Current action</option><option value="aucell">AUCell score at t0</option></select></label>
+      <label id="sigWrap" style="display:none">Pathway <select id="signature"></select></label>
+      <label>Field <select id="field"><option value="">None</option></select></label>
+      <label><input type="checkbox" id="showContext" checked> Context</label>
+      <label><input type="checkbox" id="showFx" checked> Interactions</label>
+    </div>
+    <div id="tooltip"></div>
+  </section>
+  <aside>
+    <div>
+      <h2>Tissue now</h2>
+      <div class="tiles">
+        <div class="tile"><div class="v" id="tTumor">–</div><div class="k">live tumor candidates</div></div>
+        <div class="tile"><div class="v" id="tDiv">–</div><div class="k">divisions</div></div>
+        <div class="tile"><div class="v" id="tDeath">–</div><div class="k">cell deaths</div></div>
+        <div class="tile"><div class="v" id="tEat">–</div><div class="k">phagocytosed</div></div>
+        <div class="tile"><div class="v" id="tCorpse">–</div><div class="k">corpses present</div></div>
+        <div class="tile"><div class="v" id="tDec">–</div><div class="k">AI decisions</div></div>
+      </div>
+    </div>
+    <div><h2 id="legendTitle">Cell types</h2><div id="legend"></div></div>
+    <div><h2>Visual key</h2><div class="keys">
+      <div><svg width="26" height="14"><line x1="2" y1="7" x2="20" y2="7" stroke="#21e6a8" stroke-width="2"/><path d="M15 3 L21 7 L15 11" fill="none" stroke="#21e6a8" stroke-width="2"/></svg>crawling toward a target</div>
+      <div><svg width="26" height="14"><line x1="2" y1="7" x2="22" y2="7" stroke="#ff4d5e" stroke-width="3"/></svg>cytotoxic hit</div>
+      <div><svg width="26" height="14"><path d="M13 2 A5 5 0 1 1 8.7 9.5" fill="none" stroke="#fff2dc" stroke-width="2"/></svg>cell-cycle progress</div>
+      <div><svg width="26" height="14"><path d="M13 2 A5 5 0 1 1 8.7 9.5" fill="none" stroke="#9aa3bf" stroke-width="2" stroke-dasharray="2 2"/></svg>cycle paused (no room)</div>
+      <div><svg width="26" height="14"><rect x="6" y="2" width="12" height="10" rx="3" fill="#4a4458" stroke="#9a8fa6" stroke-dasharray="2 2"/></svg>dying cell / corpse</div>
+      <div><svg width="26" height="14"><circle cx="13" cy="7" r="5" fill="none" stroke="#f2c14e" stroke-width="2"/></svg>phagocytosis</div>
+    </div></div>
+    <div><h2>Live tumor candidates over time</h2><canvas id="chart"></canvas></div>
+    <div><h2>Selected cell</h2><div id="inspector"><div class="hint">Click any cell to see its t0 pathway profile and every decision it made.</div></div></div>
+    <div><h2>Recent events</h2><div id="feed"></div></div>
+    <div class="note" id="scope"></div>
+  </aside>
+</main>
+<footer>
+  <div class="controls">
+    <button id="play">▶ Play</button>
+    <button id="restart" title="Back to t = 0">⟲</button>
+    <span id="clock">0.0 h</span>
+    <label>Speed <select id="speed"><option value="0.5">0.5 h / s</option><option value="1" selected>1 h / s</option><option value="2">2 h / s</option><option value="4">4 h / s</option></select></label>
+    <button id="record" title="Record the full replay as a WebM video">● Record video</button>
+    <span id="phase"></span>
+  </div>
+  <div class="timeline"><canvas id="strip"></canvas><input type="range" id="seek" min="0" max="1" step="1" value="0"></div>
+</footer>
+<script id="payload" type="application/octet-stream">__PAYLOAD__</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const TYPES={
+  Tumor_proliferating:{name:"Tumor candidate (proliferating)",c:"#ff8a5c"},
+  Tumor:{name:"Tumor candidate",c:"#d8573f"},
+  T_CD8_cytotoxic:{name:"CD8 T cell",c:"#38d6cf"},
+  T_CD4:{name:"CD4 T cell",c:"#6fa8ff"},
+  B_cell:{name:"B cell",c:"#8f7cf6"},
+  Plasma_cell:{name:"Plasma cell",c:"#cfa2f5"},
+  Macrophage:{name:"Macrophage",c:"#f2c14e"},
+  CAF:{name:"CAF",c:"#86b35a"},
+  Fibroblast:{name:"Fibroblast",c:"#b9cf8c"},
+  Endothelial:{name:"Endothelial",c:"#ec6fae"},
+  occluded:{name:"Unannotated",c:"#3a4360"}
+};
+const ACTION_STYLE={
+  "":{n:"Quiet",c:"#2b3350"}, CYCLING:{n:"Cycling (growing)",c:"#ff8a5c"}, WAIT:{n:"Waiting",c:"#39425f"},
+  REST:{n:"Resting",c:"#4b5a7a"}, HOLD_POSITION:{n:"Holding position",c:"#55627f"}, HOLD_CONTACT:{n:"Holding contact",c:"#8a6bd6"},
+  DISENGAGE:{n:"Disengaging",c:"#7d8bb0"}, SCAN_RANDOM:{n:"Scanning",c:"#5fb7d6"}, MIGRATE_UP_CXCL9:{n:"Chemotaxis (CXCL9)",c:"#3fd0c9"},
+  APPROACH_TUMOR:{n:"Approaching tumor",c:"#21e6a8"}, DEGRANULATE:{n:"Degranulating",c:"#ff4d5e"},
+  APPROACH_CORPSE:{n:"Approaching corpse",c:"#ffd36b"}, EFFEROCYTOSE:{n:"Phagocytosing",c:"#f2a93b"}, PATROL:{n:"Patrolling",c:"#c7b46a"},
+  HELP_CD8:{n:"Helping CD8",c:"#7be37b"}, UPREGULATE_PDL1:{n:"Up-regulating PD-L1",c:"#e05cff"}, GLYCOLYTIC_SHIFT:{n:"Glycolytic shift",c:"#ffb0d0"},
+  OXIDATIVE_SHIFT:{n:"Oxidative shift",c:"#9fd3ff"}, SECRETE_VEGFA:{n:"Secreting VEGF",c:"#ec6fae"}, SECRETE_CXCL9:{n:"Secreting CXCL9",c:"#6ff0e8"},
+  SECRETE_VEGFA_TGFB:{n:"Secreting VEGF/TGF-β",c:"#c08bff"}, SECRETE_TGFB:{n:"Secreting TGF-β",c:"#a1a6ff"}, DEPOSIT_MATRIX:{n:"Depositing matrix",c:"#a4c46d"},
+  ENTER_CYCLE:{n:"Entering cycle",c:"#ff8a5c"}, REMAIN_QUIESCENT:{n:"Quiescent",c:"#55627f"}, STAY_QUIESCENT:{n:"Quiescent",c:"#55627f"}, SPROUT:{n:"Sprouting",c:"#ff7fbf"}, PROLIFERATE:{n:"CD8 expansion",c:"#38d6cf"}
+};
+const CHOICE_TEXT=Object.fromEntries(Object.entries(ACTION_STYLE).map(([k,v])=>[k,v.n]));
+Object.assign(CHOICE_TEXT,{ENTER_CYCLE:"Enter the cell cycle",REMAIN_QUIESCENT:"Remain quiescent",STAY_QUIESCENT:"Stay quiescent"});
+const VIRIDIS=["#440154","#414487","#2a788e","#22a884","#7ad151","#fde725"];
+const fmtH=m=>(m/60).toFixed(1)+" h";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const human=s=>CHOICE_TEXT[s.split(":")[0]]||s.split(":")[0].replaceAll("_"," ").toLowerCase();
+const lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+function hexRgb(h){const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255];}
+function mix(h1,h2,t){const a=hexRgb(h1),b=hexRgb(h2);return `rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(",")})`;}
+function viridis(v){v=Math.max(0,Math.min(1,v))*(VIRIDIS.length-1);const i=Math.min(VIRIDIS.length-2,Math.floor(v));return mix(VIRIDIS[i],VIRIDIS[i+1],v-i);}
+
+let P,T=0,Tmax=0,playing=false,lastTick=0,selected=null,hidden=new Set(),view={x:0,y:0,s:1},drag=null,render$=null,recorder=null;
+const frameIdx=[];
+const life={};      // per-cell event times
+const evByKind={};
+
+async function load(){
+  const b64=$("payload").textContent.trim();
+  const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return JSON.parse(await new Response(stream).text());
+}
+
+function prepare(){
+  for(const f of P.frames){const m=new Map();f.ids.forEach((id,i)=>m.set(id,i));frameIdx.push(m);}
+  Tmax=P.frames.at(-1).t;
+  for(const k of P.events_kinds)evByKind[k]=[];
+  for(const e of P.events){
+    const [t,k,c,x]=e,kind=P.events_kinds[k];evByKind[kind].push(e);
+    const L=life[c]||(life[c]={});
+    if(kind==="apoptosis_committed")L.commit=t;
+    if(kind==="intact_death")L.dead=t;
+    if(kind==="corpse_degraded")L.gone=t;
+    if(kind==="clearance"){const Lt=life[x]||(life[x]={});Lt.gone=t;Lt.eater=c;}
+  }
+  const seek=$("seek");seek.max=Tmax;seek.step=1;
+}
+
+// ---------------------------------------------------------------- state at time T
+function snapshot(T){
+  const F=P.frames;let k=0;while(k<F.length-1&&F[k+1].t<=T)k++;
+  const A=F[k],B=F[Math.min(k+1,F.length-1)],mA=frameIdx[k],mB=frameIdx[Math.min(k+1,F.length-1)];
+  const span=B.t-A.t,al=span>0?Math.max(0,Math.min(1,(T-A.t)/span)):0,s=smooth(al);
+  const out=[];
+  const pushCell=(id,x,y,r,src,i,scale,born)=>out.push({id,x,y,r,a:src.a[i],tg:src.tg[i],v:src.v[i],cp:src.cp[i],cb:src.cb?src.cb[i]:0,scale,born});
+  for(const [id,i] of mA){
+    const c=P.cells[id];
+    if(mB.has(id)){const j=mB.get(id);pushCell(id,lerp(A.x[i],B.x[j],s),lerp(A.y[i],B.y[j],s),lerp(A.r[i],B.r[j],s),al<.5?A:B,al<.5?i:j,1);}
+    else{ // removed during this interval (phagocytosed or fragmented)
+      const L=life[id]||{};let x=A.x[i],y=A.y[i];
+      if(L.eater&&mA.has(L.eater)){const e=mA.get(L.eater);x=lerp(x,A.x[e],.55*s);y=lerp(y,A.y[e],.55*s);}
+      const sc=1-s;if(sc>.03)pushCell(id,x,y,A.r[i]*Math.max(sc,.2),A,i,sc);
+    }
+  }
+  for(const [id,j] of mB){
+    if(mA.has(id))continue;const c=P.cells[id];if(!c||T<c.b)continue;
+    let x=B.x[j],y=B.y[j],r=B.r[j];
+    if(c.p&&mA.has(c.p)){const pi=mA.get(c.p),u=smooth(span>0?(T-c.b)/Math.max(1,B.t-c.b):1);x=lerp(A.x[pi],x,u);y=lerp(A.y[pi],y,u);r=lerp(r*.55,r,u);}
+    pushCell(id,x,y,r,B,j,1,true);
+  }
+  return {cells:out,k,al};
+}
+
+function powerCells(cells){
+  const n=cells.length;let maxR=0;for(const c of cells)maxR=Math.max(maxR,c.r);
+  const size=maxR*2,grid=new Map();
+  cells.forEach((c,i)=>{const key=Math.floor(c.x/size)+","+Math.floor(c.y/size);(grid.get(key)||grid.set(key,[]).get(key)).push(i);});
+  const polys=new Array(n);
+  for(let i=0;i<n;i++){
+    const c=cells[i],x=c.x,y=c.y,r=c.r,bx=Math.floor(x/size),by=Math.floor(y/size);
+    let poly=[];for(let k=0;k<40;k++)poly.push([x+r*Math.cos(k*Math.PI/20),y+r*Math.sin(k*Math.PI/20)]);
+    for(let u=-1;u<=1;u++)for(let v=-1;v<=1;v++){const list=grid.get((bx+u)+","+(by+v));if(!list)continue;
+      for(const j of list){if(i===j||!poly.length)continue;const d=cells[j],dx=d.x-x,dy=d.y-y,d2=dx*dx+dy*dy;
+        if(d2>(r+d.r)**2)continue;if(d2<1e-12){if(d.r>r||j<i)poly=[];continue;}
+        const lim=(d2+r*r-d.r*d.r)/2,val=p=>dx*(p[0]-x)+dy*(p[1]-y)-lim,clip=[];
+        let a=poly[poly.length-1],va=val(a);
+        for(const b of poly){const vb=val(b);if((va<=0)!==(vb<=0)){const q=va/(va-vb);clip.push([a[0]+q*(b[0]-a[0]),a[1]+q*(b[1]-a[1])]);}if(vb<=0)clip.push(b);a=b;va=vb;}
+        poly=clip;}}
+    polys[i]=poly;
+  }
+  return polys;
+}
+
+// ---------------------------------------------------------------- drawing
+const canvas=$("map"),ctx=canvas.getContext("2d");
+let lastSnap=null,lastPolys=null,W=0,H=0,DPR=1;
+const fieldCanvas=document.createElement("canvas");let fieldKey="";
+
+function resize(){const r=canvas.getBoundingClientRect();DPR=window.devicePixelRatio||1;W=r.width;H=r.height;canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);}
+function fitView(){
+  const f=P.frames[0];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(let i=0;i<f.ids.length;i++){x0=Math.min(x0,f.x[i]-f.r[i]);y0=Math.min(y0,f.y[i]-f.r[i]);x1=Math.max(x1,f.x[i]+f.r[i]);y1=Math.max(y1,f.y[i]+f.r[i]);}
+  view.x=(x0+x1)/2;view.y=(y0+y1)/2;view.s=Math.min(W/(x1-x0+20),H/(y1-y0+20))*.96;
+}
+const toScreen=(x,y)=>[(x-view.x)*view.s+W/2,(y-view.y)*view.s+H/2];
+const toWorld=(sx,sy)=>[(sx-W/2)/view.s+view.x,(sy-H/2)/view.s+view.y];
+
+function cellColor(c,info){
+  const mode=$("colorMode").value;
+  if(mode==="action")return (ACTION_STYLE[P.actions[c.a]]||ACTION_STYLE[""]).c;
+  if(mode==="aucell"){const j=+$("signature").value;const u=info.u?info.u[j]:null;return u==null?"#2a3150":viridis(u);}
+  return (TYPES[info.l]||TYPES.occluded).c;
+}
+
+function drawField(){
+  const name=$("field").value;if(!name||!P.fields.length)return;
+  let fr=P.fields[0];for(const f of P.fields)if(f.t<=T)fr=f;
+  const key=name+fr.t;const g=P.field_grid,[ny,nx]=g.shape;
+  if(key!==fieldKey){fieldKey=key;fieldCanvas.width=nx;fieldCanvas.height=ny;const fc=fieldCanvas.getContext("2d"),img=fc.createImageData(nx,ny);
+    const raw=atob(fr[name]);for(let i=0;i<nx*ny;i++){const v=raw.charCodeAt(i)/255;const rgb=name==="oxygen"?rampRGB(["#1d2b6b","#3f6fb5","#ffd36b"],v):rampRGB(VIRIDIS,v);
+      img.data.set([rgb[0],rgb[1],rgb[2],Math.round(255*(name==="oxygen"?.5:Math.min(.85,.08+v*1.5)))],i*4);}
+    fc.putImageData(img,0,0);}
+  const [sx,sy]=toScreen(g.origin[0]-g.spacing/2,g.origin[1]-g.spacing/2);
+  ctx.imageSmoothingEnabled=true;ctx.globalAlpha=.62;ctx.drawImage(fieldCanvas,sx,sy,nx*g.spacing*view.s,ny*g.spacing*view.s);ctx.globalAlpha=1;
+}
+function rampRGB(stops,v){v=Math.max(0,Math.min(1,v))*(stops.length-1);const i=Math.min(stops.length-2,Math.floor(v)),a=hexRgb(stops[i]),b=hexRgb(stops[i+1]),t=v-i;return a.map((x,k)=>Math.round(lerp(x,b[k],t)));}
+
+function polyPath(poly,cx,cy,scale){
+  const p=new Path2D();if(!poly||poly.length<3)return p;
+  const pt=q=>toScreen(cx+(q[0]-cx)*scale,cy+(q[1]-cy)*scale);
+  let [x,y]=pt(poly[0]);p.moveTo(x,y);
+  for(let i=1;i<poly.length;i++){[x,y]=pt(poly[i]);p.lineTo(x,y);}p.closePath();return p;
+}
+function measuredPath(info){
+  if(!info.poly)return null;
+  const p=new Path2D();
+  for(const polygon of info.poly)for(const ring of polygon){
+    if(!ring.length)continue;
+    let [x,y]=toScreen(...ring[0]);p.moveTo(x,y);
+    for(let i=1;i<ring.length;i++){[x,y]=toScreen(...ring[i]);p.lineTo(x,y);}p.closePath();
+  }
+  return p;
+}
+
+function draw(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  const grd=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.1,W/2,H/2,Math.max(W,H)*.75);
+  grd.addColorStop(0,"#111830");grd.addColorStop(1,"#070a14");ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+  const snap=snapshot(T),polys=powerCells(snap.cells);lastSnap=snap;lastPolys=polys;
+  const showCtx=$("showContext").checked,fx=$("showFx").checked,measuredBlend=1-smooth(Math.min(1,T/20));
+  const pos=new Map();snap.cells.forEach((c,i)=>pos.set(c.id,i));
+  const lw=Math.max(.4,Math.min(1.4,view.s*.35));
+  // cells
+  for(let pass=0;pass<2;pass++)snap.cells.forEach((c,i)=>{
+    const info=P.cells[c.id]||{l:"occluded",o:"occluded"};const context=info.o==="halo"||info.o==="occluded";
+    if(context!==(pass===0))return; if(context&&!showCtx)return;
+    const L=life[c.id]||{};const dying=L.commit!=null&&T>=L.commit,dead=L.dead!=null&&T>=L.dead;
+    let scale=c.scale;if(dying){const age=T-L.commit;scale*=1-.42*smooth(age/240);}
+    const path=polyPath(polys[i],c.x,c.y,scale*.97);
+    let col=cellColor(c,info),alpha=context?.28:.92;
+    if(hidden.size&&!hidden.has(info.l))alpha*=.18;
+    if(dying){const k=smooth((T-L.commit)/90);col=mix(rgbHex(col),"#4a4458",dead?.88:k*.75);}
+    ctx.globalAlpha=alpha*(1-measuredBlend);ctx.fillStyle=col;ctx.fill(path);
+    if(measuredBlend>0&&info.poly){const m=measuredPath(info);ctx.globalAlpha=alpha*measuredBlend;ctx.fill(m,"evenodd");}
+    ctx.globalAlpha=context?.25:.55;ctx.lineWidth=lw;ctx.strokeStyle=dying?"#9a8fa6":"rgba(255,255,255,.35)";
+    if(dying){ctx.setLineDash([2,2]);}ctx.stroke(measuredBlend===1&&info.poly?measuredPath(info):path);ctx.setLineDash([]);
+    // nucleus
+    if(!context&&view.s>1.1){const [sx,sy]=toScreen(c.x,c.y);const nr=Math.max(1,c.r*view.s*.28*scale);
+      ctx.globalAlpha=(dying?.5:.35)*alpha;ctx.fillStyle=dying?"#1b1722":"#0a0e1a";ctx.beginPath();
+      if(dying&&dead){for(let k=0;k<3;k++){ctx.moveTo(sx+nr*.8*Math.cos(k*2.1),sy+nr*.8*Math.sin(k*2.1));ctx.arc(sx+nr*.8*Math.cos(k*2.1),sy+nr*.8*Math.sin(k*2.1),nr*.45,0,7);}}
+      else ctx.arc(sx,sy,nr,0,7);ctx.fill();}
+    // cell-cycle progress ring
+    if(fx&&c.cp>=0&&!dying){const [sx,sy]=toScreen(c.x,c.y);const rr=c.r*view.s*.62;
+      ctx.globalAlpha=.9;ctx.lineWidth=Math.max(1,view.s*.5);ctx.strokeStyle=c.cb?"#9aa3bf":"#fff2dc";if(c.cb)ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(sx,sy,rr,-Math.PI/2,-Math.PI/2+2*Math.PI*Math.max(.02,c.cp));ctx.stroke();ctx.setLineDash([]);}
+  });
+  ctx.globalAlpha=1;
+  drawField();
+  if(fx)drawInteractions(snap,pos);
+  if(selected!=null&&pos.has(selected)){const i=pos.get(selected),c=snap.cells[i];
+    ctx.lineWidth=2.4;ctx.strokeStyle="#ffffff";ctx.globalAlpha=1;ctx.stroke(polyPath(polys[i],c.x,c.y,1));
+    if(c.tg&&pos.has(c.tg)){const d=snap.cells[pos.get(c.tg)];line(c,d,"#ffffff",1.2,[4,3]);}}
+  drawHud();
+}
+function rgbHex(c){if(c[0]==="#")return c;const m=c.match(/\d+/g);return "#"+m.slice(0,3).map(z=>(+z).toString(16).padStart(2,"0")).join("");}
+function line(a,b,col,w,dash){const [x1,y1]=toScreen(a.x,a.y),[x2,y2]=toScreen(b.x,b.y);ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+function glow(c,col,radius,alpha){const [x,y]=toScreen(c.x,c.y);const r=radius*view.s;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(0,0,0,0)");ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.globalAlpha=1;}
+function ring(c,col,radius,alpha,w){const [x,y]=toScreen(c.x,c.y);ctx.globalAlpha=alpha;ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.arc(x,y,radius*view.s,0,7);ctx.stroke();ctx.globalAlpha=1;}
+
+function drawInteractions(snap,pos){
+  const at=id=>pos.has(id)?snap.cells[pos.get(id)]:null;
+  // approach arrows
+  snap.cells.forEach(c=>{const act=P.actions[c.a];if((act==="APPROACH_TUMOR"||act==="APPROACH_CORPSE")&&c.tg){const d=at(c.tg);if(!d)return;
+    const dx=d.x-c.x,dy=d.y-c.y,n=Math.hypot(dx,dy)||1,ux=dx/n,uy=dy/n,len=Math.min(n*.6,c.r*1.6);
+    const tip={x:c.x+ux*len,y:c.y+uy*len};const [x1,y1]=toScreen(c.x,c.y),[x2,y2]=toScreen(tip.x,tip.y);
+    ctx.strokeStyle=act==="APPROACH_TUMOR"?"#21e6a8":"#ffd36b";ctx.globalAlpha=.85;ctx.lineWidth=Math.max(1,view.s*.45);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);const a=Math.atan2(y2-y1,x2-x1),h=Math.max(3,view.s*1.6);
+    ctx.lineTo(x2-h*Math.cos(a-.5),y2-h*Math.sin(a-.5));ctx.moveTo(x2,y2);ctx.lineTo(x2-h*Math.cos(a+.5),y2-h*Math.sin(a+.5));ctx.stroke();ctx.globalAlpha=1;}
+    if(act==="DEGRANULATE"&&c.tg){const d=at(c.tg);if(d)line(c,d,"rgba(255,77,94,.55)",Math.max(1,view.s*.5));}
+    if(act==="EFFEROCYTOSE"&&c.tg){const d=at(c.tg);if(d)line(c,d,"rgba(242,169,59,.6)",Math.max(1,view.s*.6));}
+  });
+  const recent=(kind,win)=>evByKind[kind].filter(e=>e[0]<=T&&T-e[0]<=win);
+  for(const e of recent("cytotoxic_pulse",40)){const a=at(e[2]),b=at(e[3]);const k=1-(T-e[0])/40;if(a&&b){line(a,b,`rgba(255,77,94,${.9*k})`,Math.max(1.5,view.s*.9));glow(b,"rgba(255,77,94,.9)",b.r*1.6,.7*k);}}
+  for(const e of recent("division",60)){const a=at(e[2]);const k=(T-e[0])/60;if(a){ring(a,"#fff2dc",a.r*(1+1.6*k),.9*(1-k),Math.max(1,view.s*.6));glow(a,"rgba(255,180,120,.9)",a.r*1.8,.5*(1-k));}}
+  for(const e of recent("apoptosis_committed",60)){const a=at(e[2]);const k=(T-e[0])/60;if(a)glow(a,"rgba(200,120,255,.9)",a.r*1.7,.55*(1-k));}
+  for(const e of recent("clearance",50)){const a=at(e[2]);const k=(T-e[0])/50;if(a){glow(a,"rgba(242,193,78,.95)",a.r*2,.6*(1-k));ring(a,"#f2c14e",a.r*1.15,.9*(1-k),Math.max(1.2,view.s*.6));}}
+  for(const e of recent("cd4_help",40)){const a=at(e[2]),b=at(e[3]);const k=1-(T-e[0])/40;if(a&&b)line(a,b,`rgba(123,227,123,${.8*k})`,Math.max(1,view.s*.6));}
+}
+function drawHud(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=1;
+  let um=10;for(const c of [10,20,50,100,200])if(c*view.s<=170)um=c;const px=um*view.s;
+  ctx.fillStyle="rgba(7,10,20,.6)";ctx.beginPath();ctx.roundRect(10,H-50,Math.max(72,px+18),40,8);ctx.fill();
+  ctx.fillStyle="rgba(231,235,245,.9)";ctx.fillRect(19,H-22,px,3);ctx.font="11px Inter,system-ui,sans-serif";ctx.fillText(um+" µm",19,H-29);
+  ctx.fillStyle="rgba(7,10,20,.72)";ctx.beginPath();ctx.roundRect(W-250,H-56,238,46,8);ctx.fill();
+  ctx.font="600 20px Inter,system-ui,sans-serif";ctx.textAlign="right";ctx.fillStyle="#e7ebf5";ctx.fillText(fmtH(T),W-22,H-30);
+  ctx.font="11px Inter,system-ui,sans-serif";ctx.fillStyle="#8d97b3";
+  ctx.fillText(T<20?"Measured Xenium segmentation":"Simulated · decisions by "+providerName(),W-22,H-16);ctx.textAlign="left";
+}
+function providerName(){return P.provider.startsWith("jev")?"Jev":"local rules";}
+
+// ---------------------------------------------------------------- side panel
+function countsAt(T){
+  const cnt=k=>evByKind[k].filter(e=>e[0]<=T).length;
+  return {div:cnt("division"),death:cnt("apoptosis_committed"),eat:cnt("clearance")};
+}
+function updatePanel(){
+  const snap=lastSnap;if(!snap)return;
+  const byType={};let tumor=0,corpses=0;
+  for(const c of snap.cells){const info=P.cells[c.id];if(!info||info.o==="halo"||info.o==="occluded")continue;if(c.scale<1)continue;
+    const L=life[c.id]||{};const dying=L.commit!=null&&T>=L.commit;if(dying){corpses++;continue;}
+    byType[info.l]=(byType[info.l]||0)+1;if(info.l.startsWith("Tumor"))tumor++;}
+  const c=countsAt(T);let dec=0;for(const id in P.decisions)for(const d of P.decisions[id])if(d[0]<=T)dec++;
+  $("tTumor").textContent=tumor;$("tDiv").textContent=c.div;$("tDeath").textContent=c.death;$("tEat").textContent=c.eat;$("tCorpse").textContent=corpses;$("tDec").textContent=dec.toLocaleString("en-US");
+  const mode=$("colorMode").value;
+  $("legendTitle").innerHTML=mode==="action"?"Current actions":mode==="aucell"?"AUCell score at t0":'Cell types <span class="hint" style="text-transform:none;letter-spacing:0">· click to focus</span>';
+  if(mode==="action"){const counts={};for(const c of snap.cells){const info=P.cells[c.id];if(!info||info.o==="halo"||info.o==="occluded"||c.scale<1)continue;const a=P.actions[c.a];counts[a]=(counts[a]||0)+1;}
+    $("legend").innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<div class="leg"><i style="background:${(ACTION_STYLE[a]||ACTION_STYLE[""]).c}"></i>${esc((ACTION_STYLE[a]||{n:a}).n)}<span class="n">${n}</span></div>`).join("");}
+  else if(mode==="aucell"){$("legend").innerHTML=`<div style="grid-column:1/3"><div style="height:10px;border-radius:5px;background:linear-gradient(90deg,${VIRIDIS.join(",")})"></div><div style="display:flex;justify-content:space-between" class="hint"><span>lowest in its type + depth group</span><span>highest</span></div><div class="hint" style="margin-top:4px">${esc($("signature").selectedOptions[0].text)} · grey = no score</div></div>`;}
+  else $("legend").innerHTML=Object.entries(TYPES).filter(([k])=>k!=="occluded"&&(byType[k]||P.__types.has(k))).map(([k,v])=>`<div class="leg ${hidden.size&&!hidden.has(k)?"off":""}" data-k="${k}"><i style="background:${v.c}"></i>${v.name}<span class="n">${byType[k]||0}</span></div>`).join("");
+  if(mode==="type")for(const el of document.querySelectorAll(".leg"))el.onclick=()=>{const k=el.dataset.k;if(hidden.has(k))hidden.delete(k);else hidden.add(k);draw();updatePanel();};
+  $("clock").textContent=fmtH(T);$("seek").value=Math.round(T);
+  drawChart();updateFeed();updateInspector();
+}
+let series=null;
+function buildSeries(){
+  series=P.frames.map((f,k)=>{let n=0,cd8=0;f.ids.forEach((id,i)=>{const info=P.cells[id];if(!info||info.o==="halo"||info.o==="occluded")return;if(f.v[i]!==0)return;if(info.l.startsWith("Tumor"))n++;if(info.l==="T_CD8_cytotoxic")cd8++;});return [f.t,n,cd8];});
+}
+function drawChart(){
+  const cv=$("chart"),r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);
+  const w=r.width,h=r.height,max=Math.max(...series.map(s=>s[1]))*1.1||1,min=0;
+  const X=t=>34+(w-44)*t/Math.max(1,Tmax),Y=v=>h-18-(h-28)*(v-min)/(max-min);
+  c.strokeStyle="#232c47";c.lineWidth=1;c.beginPath();c.moveTo(34,8);c.lineTo(34,h-18);c.lineTo(w-10,h-18);c.stroke();
+  c.fillStyle="#5d6684";c.font="10px Inter,system-ui";c.fillText(Math.round(max),4,14);c.fillText("0",22,h-18);c.fillText("0 h",30,h-4);c.textAlign="right";c.fillText(fmtH(Tmax),w-10,h-4);c.textAlign="left";
+  const g=c.createLinearGradient(0,8,0,h-18);g.addColorStop(0,"rgba(255,138,92,.35)");g.addColorStop(1,"rgba(255,138,92,0)");
+  c.beginPath();series.forEach((s,i)=>i?c.lineTo(X(s[0]),Y(s[1])):c.moveTo(X(s[0]),Y(s[1])));c.lineTo(X(Tmax),Y(0));c.lineTo(X(0),Y(0));c.closePath();c.fillStyle=g;c.fill();
+  c.beginPath();series.forEach((s,i)=>i?c.lineTo(X(s[0]),Y(s[1])):c.moveTo(X(s[0]),Y(s[1])));c.strokeStyle="#ff8a5c";c.lineWidth=2;c.stroke();
+  c.strokeStyle="#e7ebf5";c.lineWidth=1;c.beginPath();c.moveTo(X(T),8);c.lineTo(X(T),h-18);c.stroke();
+}
+const FEED={division:["#ff8a5c",e=>`${name(e[2])} divided → daughter #${e[3]}`],apoptosis_committed:["#c878ff",e=>`${name(e[2])} committed to apoptosis`],
+  clearance:["#f2c14e",e=>`Macrophage #${e[2]} engulfed the corpse of #${e[3]}`],corpse_degraded:["#7d7590",e=>`Corpse #${e[2]} fragmented (no phagocyte arrived)`],
+  cytotoxic_pulse:["#ff4d5e",e=>`CD8 #${e[2]} delivered a cytotoxic hit to #${e[3]}`],cycle_entered:["#ffc29e",e=>`${name(e[2])} chose to enter the cell cycle`],
+  cd4_help:["#7be37b",e=>`CD4 #${e[2]} helped CD8 #${e[3]}`],hypoxic_necrosis:["#888",e=>`${name(e[2])} died of hypoxia`]};
+function name(id){const c=P.cells[id];return `${c?(TYPES[c.l]||TYPES.occluded).name:"Cell"} #${id}`;}
+function updateFeed(){
+  const list=P.events.filter(e=>e[0]<=T&&FEED[P.events_kinds[e[1]]]).slice(-14).reverse();
+  $("feed").innerHTML=list.length?list.map(e=>{const [col,fn]=FEED[P.events_kinds[e[1]]];return `<div class="ev"><time>${fmtH(e[0])}</time><i style="background:${col}"></i><span>${esc(fn(e))}</span></div>`;}).join(""):'<div class="hint">No events yet. Press play.</div>';
+}
+function updateInspector(){
+  const box=$("inspector");if(selected==null){return;}
+  const info=P.cells[selected];if(!info){box.innerHTML='<div class="hint">Unknown cell.</div>';return;}
+  const snap=lastSnap,c=snap.cells.find(x=>x.id===selected),L=life[selected]||{};
+  const type=TYPES[info.l]||TYPES.occluded;
+  let status="Alive";if(L.gone!=null&&T>=L.gone)status=L.eater?`Phagocytosed by macrophage #${L.eater} at ${fmtH(L.gone)}`:`Corpse fragmented at ${fmtH(L.gone)}`;else if(L.dead!=null&&T>=L.dead)status="Corpse (dead, awaiting phagocytosis)";else if(L.commit!=null&&T>=L.commit)status="Apoptotic";
+  const origin=info.o==="born"?`Daughter of #${info.p}, born at ${fmtH(info.b)}`:info.o==="roi"?"Measured in the Xenium section":"Context cell (no autonomous decisions)";
+  const act=c?P.actions[c.a]:"";
+  let html=`<div class="title"><i style="background:${type.c}"></i>${type.name} #${selected}</div><div class="meta">${esc(origin)}${info.alt&&info.alt.length&&info.alt[0]!==info.l?` · second annotation: ${esc(info.alt[0].replaceAll("_"," "))}`:""}</div>`;
+  html+=`<dl class="kv"><dt>Status</dt><dd>${esc(status)}</dd><dt>Doing now</dt><dd>${c?esc((ACTION_STYLE[act]||{n:act}).n)+(c.tg?` → #${c.tg}`:""):"—"}</dd>${c&&c.cp>=0?`<dt>Cell cycle</dt><dd>${Math.round(c.cp*100)}% complete${c.cb?" · paused: no room to grow or divide (contact inhibition)":""}</dd>`:""}</dl>`;
+  if(info.u){const rows=P.signatures.map((s,j)=>[s,info.u[j]]).filter(r=>r[1]!=null).sort((a,b)=>b[1]-a[1]);
+    html+=`<div class="hint">t0 AUCell pathway profile (percentile within type + detection depth)${info.o==="born"?" · inherited from the parent":""}</div><div class="bars">`+rows.map(([s,u])=>`<div class="bar"><span class="name" title="${esc(s)}">${esc(s.replaceAll("_"," ").toLowerCase())}</span><span class="track"><span class="fill" style="display:block;width:${(u*100).toFixed(0)}%;background:${viridis(u)}"></span></span><span class="num">${u.toFixed(2)}</span></div>`).join("")+`</div>`;}
+  else html+=`<div class="hint">No AUCell profile (context or unscored cell).</div>`;
+  const decs=(P.decisions[selected]||[]).filter(d=>d[0]<=T);
+  html+=`<div class="hint">${decs.length} decision${decs.length===1?"":"s"} so far${decs.length>6?" · latest 6":""}</div>`;
+  for(const d of decs.slice(-6).reverse()){html+=`<div class="dec"><div class="head"><b>${esc(human(d[1]))}</b><span class="hint">${fmtH(d[0])} · conf ${d[2].toFixed(2)}</span></div><div class="hint">woken by: ${esc(d[4].join(", ").replaceAll("_"," "))}</div><div class="probs">`+d[3].map(([k,p])=>`<div class="p"><span>${esc(human(k))}</span><span class="track"><span class="fill" style="display:block;width:${(p*100).toFixed(0)}%"></span></span><span>${p.toFixed(2)}</span></div>`).join("")+`</div></div>`;}
+  box.innerHTML=html;
+}
+function drawStrip(){
+  const cv=$("strip"),r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);
+  const kinds=[["division","#ff8a5c",0],["apoptosis_committed","#c878ff",4],["clearance","#f2c14e",8]];
+  for(const [k,col,y] of kinds){c.fillStyle=col;for(const e of evByKind[k])c.fillRect(8+(r.width-16)*e[0]/Math.max(1,Tmax),y,1.5,3.5);}
+}
+
+// ---------------------------------------------------------------- interaction
+let pending=false;function request(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;draw();});}
+let panelTimer=0;
+function loop(now){
+  if(playing){const dt=Math.min(.1,(now-lastTick)/1000);T=Math.min(Tmax,T+dt*60*(+$("speed").value));if(T>=Tmax){playing=false;$("play").textContent="▶ Play";if(recorder)stopRecording();}}
+  lastTick=now;draw();if(now-panelTimer>120||!playing){panelTimer=now;updatePanel();}
+  if(playing)requestAnimationFrame(loop);
+}
+function play(){if(T>=Tmax)T=0;playing=true;$("play").textContent="❚❚ Pause";lastTick=performance.now();requestAnimationFrame(loop);}
+function pause(){playing=false;$("play").textContent="▶ Play";updatePanel();}
+function hit(sx,sy){if(!lastSnap)return null;const [x,y]=toWorld(sx,sy);let best=null,bd=1e9;for(const c of lastSnap.cells){const d=Math.hypot(c.x-x,c.y-y);if(d<c.r&&d<bd){bd=d;best=c;}}return best;}
+function startRecording(){
+  if(!window.MediaRecorder){alert("Video recording is not supported in this browser.");return;}
+  const stream=canvas.captureStream(30);const mime=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")?"video/webm;codecs=vp9":"video/webm";
+  const chunks=[];recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8e6});recorder.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  recorder.onstop=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(chunks,{type:"video/webm"}));a.download=`virtualtissue_${P.patch}_${P.provider}.webm`;a.click();recorder=null;$("record").textContent="● Record video";};
+  recorder.start();$("record").textContent="■ Stop recording";T=0;play();
+}
+function stopRecording(){if(recorder&&recorder.state!=="inactive")recorder.stop();}
+
+function init(){
+  prepare();buildSeries();P.__types=new Set(Object.values(P.cells).filter(c=>c.o!=="halo"&&c.o!=="occluded").map(c=>c.l));
+  const provider=P.provider.startsWith("mock_jev")?"mocked Jev responses (software test)":P.provider.startsWith("jev")?`Jev${P.model?" ("+P.model+")":""}`:"local rules (free smoke test)";
+  $("subtitle").textContent=`Lung adenocarcinoma · Xenium region ${P.patch.replace("LUAD3_","")} · active cells use ${provider}`;
+  $("badge").textContent=`${fmtH(Tmax)} simulated · ${P.paid_calls} ${P.provider.startsWith("mock_jev")?"mock requests":"API attempts"} · seed ${P.seed} · ${P.stop?P.stop.replaceAll("_"," "):"checkpoint (incomplete)"}`;
+  $("scope").textContent=P.scope+" Measured segmentation is shown at t0; subsequent shapes and interpolated motion are a simulation rendering. Cells start from their t0 AUCell percentiles within provisional type and detection-depth group; daughters inherit them.";
+  $("signature").innerHTML=P.signatures.map((s,j)=>`<option value="${j}" ${s==="MITOTIC_CELL_CYCLE"?"selected":""}>${s.replaceAll("_"," ").toLowerCase()}</option>`).join("");
+  $("field").innerHTML+=Object.entries(P.field_grid.names).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  resize();fitView();drawStrip();draw();updatePanel();
+  $("play").onclick=()=>playing?pause():play();
+  $("restart").onclick=()=>{T=0;draw();updatePanel();};
+  $("seek").oninput=e=>{T=+e.target.value;draw();updatePanel();};
+  $("record").onclick=()=>recorder?stopRecording():startRecording();
+  for(const id of ["colorMode","signature","field","showContext","showFx"])$(id).onchange=()=>{$("sigWrap").style.display=$("colorMode").value==="aucell"?"flex":"none";fieldKey="";draw();updatePanel();};
+  window.addEventListener("resize",()=>{resize();drawStrip();request();updatePanel();});
+  canvas.addEventListener("wheel",e=>{e.preventDefault();const [wx,wy]=toWorld(e.offsetX,e.offsetY);const f=Math.exp(-e.deltaY*.0015);view.s=Math.max(.3,Math.min(40,view.s*f));const [nx,ny]=toWorld(e.offsetX,e.offsetY);view.x+=wx-nx;view.y+=wy-ny;request();},{passive:false});
+  canvas.addEventListener("mousedown",e=>{drag={x:e.offsetX,y:e.offsetY,vx:view.x,vy:view.y,moved:false};canvas.classList.add("dragging");});
+  window.addEventListener("mouseup",e=>{if(drag&&!drag.moved){const c=hit(drag.x,drag.y);selected=c?c.id:null;if(!c)$("inspector").innerHTML='<div class="hint">Click any cell to see its t0 pathway profile and every decision it made.</div>';updatePanel();request();}drag=null;canvas.classList.remove("dragging");});
+  canvas.addEventListener("mousemove",e=>{
+    if(drag){const dx=e.offsetX-drag.x,dy=e.offsetY-drag.y;if(Math.hypot(dx,dy)>3)drag.moved=true;view.x=drag.vx-dx/view.s;view.y=drag.vy-dy/view.s;request();return;}
+    const c=hit(e.offsetX,e.offsetY),tip=$("tooltip");if(!c){tip.style.display="none";return;}
+    const info=P.cells[c.id]||{l:"occluded"};const act=P.actions[c.a];
+    tip.innerHTML=`<b>${esc((TYPES[info.l]||TYPES.occluded).name)} #${c.id}</b><br>${esc((ACTION_STYLE[act]||{n:act}).n)}${c.tg?` → #${c.tg}`:""}`;
+    tip.style.display="block";tip.style.left=Math.min(e.offsetX+14,W-200)+"px";tip.style.top=(e.offsetY+14)+"px";});
+  canvas.addEventListener("mouseleave",()=>$("tooltip").style.display="none");
+  canvas.addEventListener("dblclick",()=>{fitView();request();});
+  document.addEventListener("keydown",e=>{if(e.code==="Space"&&e.target.tagName!=="INPUT"&&e.target.tagName!=="SELECT"){e.preventDefault();playing?pause():play();}});
+}
+load().then(p=>{P=p;init();}).catch(err=>{document.body.innerHTML=`<p style="padding:24px;color:#ff8a8a">Could not open the replay: ${esc(err.message)}</p>`;});
+</script>
+</body>
+</html>

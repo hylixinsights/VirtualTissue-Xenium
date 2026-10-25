@@ -1,0 +1,387 @@
+{
+  "assumed_competence_profiles": {
+    "autonomous_exploratory_v1": {
+      "actions": [
+        "WAIT",
+        "REST",
+        "HOLD_POSITION",
+        "HOLD_CONTACT",
+        "DISENGAGE",
+        "SCAN_RANDOM",
+        "MIGRATE_UP_CXCL9",
+        "DEGRANULATE",
+        "EFFEROCYTOSE",
+        "ENTER_CYCLE",
+        "REMAIN_QUIESCENT",
+        "PROLIFERATE",
+        "UPREGULATE_PDL1",
+        "GLYCOLYTIC_SHIFT",
+        "OXIDATIVE_SHIFT",
+        "SECRETE_VEGFA",
+        "SECRETE_CXCL9",
+        "SECRETE_VEGFA_TGFB",
+        "PATROL",
+        "SPROUT",
+        "STAY_QUIESCENT",
+        "DEPOSIT_MATRIX",
+        "SECRETE_TGFB",
+        "HELP_CD8",
+        "APPROACH_TUMOR",
+        "APPROACH_CORPSE"
+      ],
+      "evidence": "SIM, not a phenotype inferred from Xenium. Identity-gated cells are assigned functional machinery for the listed programs, including receptors absent from the panel. Recognition and cytotoxic/clearance competence require separate scenario declarations."
+    }
+  },
+  "autonomous_scenarios": {
+    "static": {
+      "angiogenesis": false,
+      "assumed_competence_profile": "autonomous_exploratory_v1",
+      "autonomy": false,
+      "blockade": false,
+      "clearance_competence": null,
+      "effector_competence": null,
+      "fields": true,
+      "identity_policy": "intersection",
+      "motility": false,
+      "nerve": "none",
+      "nonperfused_fraction": 0.0,
+      "recognition": null,
+      "recruitment": false,
+      "title": "Static geometry and field sanity control",
+      "tumour_cycle": false,
+      "warburg": false
+    },
+    "S0": {
+      "angiogenesis": false,
+      "assumed_competence_profile": "autonomous_exploratory_v1",
+      "blockade": false,
+      "clearance_competence": null,
+      "effector_competence": null,
+      "fields": true,
+      "identity_policy": "primary_annotation",
+      "motility": true,
+      "nerve": "none",
+      "nonperfused_fraction": 0.0,
+      "recognition": null,
+      "recruitment": false,
+      "title": "Exploratory candidate epithelium; antigen recognition and effector competence unknown",
+      "tumour_cycle": true,
+      "warburg": false
+    }
+  },
+  "biology": {
+    "approach_max_min": 120,
+    "cd4_help_recovery": 0.08,
+    "cd8_cycle_min": 720,
+    "checkpoint_blockade_factor": 0.1,
+    "chemotaxis_min_gradient": 1e-05,
+    "clearance_capacity": 4,
+    "clearance_min": 40,
+    "contact_program_min": 20,
+    "cooldown_min": 60,
+    "corpse_degradation_min": 1440,
+    "corpse_signal_radius_um": 120,
+    "cycle_oxygen_gate": 0.15,
+    "death_commitment_min": 30,
+    "death_threshold_au": 2.0,
+    "evidence": "SIM assumptions; no field concentration, recognition, protein competence, exhaustion, cycle phase or rate is measured.",
+    "exhaustion_per_hour": {
+      "antigen": 0.015,
+      "cgrp": 0.025,
+      "lactate": 0.015,
+      "ne": 0.025,
+      "pdl1": 0.025,
+      "tgfb": 0.015
+    },
+    "exhaustion_terminal": 0.8,
+    "exhaustion_tpex": 0.4,
+    "glucose_gate": 0.15,
+    "glycolysis_step": 0.25,
+    "help_divisions": 1,
+    "hypoxia_threshold": 0.3,
+    "initial_glycolysis": 0.25,
+    "initial_pulses": 3,
+    "initialize_cycle_phase_from_annotation": false,
+    "lactate_damage_factor": 1.0,
+    "macrophage_dwell_min": 360,
+    "matrix_drag_factor": 2.0,
+    "max_population": 1000,
+    "ne_motility_factor": 1.0,
+    "necrosis_delay_min": 360,
+    "necrosis_threshold": 0.08,
+    "nerve_effects": {
+      "cgrp_exhaustion": true,
+      "ne_cycle_bias": true,
+      "ne_exhaustion": true,
+      "ne_motility": true,
+      "ne_tumour_vegf": true
+    },
+    "nerve_placement": "A declared 80 um line just beyond the halo envelope on the initial tumor-facing side (outside all t=0 disks); fixed and not inferred from Xenium.",
+    "nerve_radius_um": 1.0,
+    "pdl1_step": 0.25,
+    "perfusion_delay_min": 180,
+    "program_min": 60,
+    "pulse_damage_au": 1.0,
+    "recruitment_interval_min": 360,
+    "recruitment_max_per_vessel": 6,
+    "recruitment_pressure_gate": 0.15,
+    "refill_interval_min": 360,
+    "rest_recovery_per_hour": 0.01,
+    "secretory_program_min": 180,
+    "sensing_radius_um": 60,
+    "signal_threshold": 0.015,
+    "sprout_duration_min": 360,
+    "sprout_speed_um_per_min": 0.05,
+    "t0_cycle_min_remaining_min": 120
+  },
+  "division": {
+    "axis": "long axis of the simulated cell (minimum rotated rectangle); seeded random axis if degenerate",
+    "cycle_entry_max_local_pressure": 0.25,
+    "cycle_label": "Accelerated 24 h tumour cycle, explicitly labelled; real LUAD doubles in weeks to months.",
+    "daughter_offset_fraction_of_radius": 0.3,
+    "division_blocked_local_pressure": 0.4,
+    "growth": "the target area rises linearly from A0 to 2*A0 over the cycle",
+    "local_pressure": "mean one-sided pressure of the cell and its simulated contacts",
+    "quiescent_recheck_min": 720,
+    "tumour_cycle_min": 1440
+  },
+  "evidence": "SIM: every number below is a declared, uncalibrated modelling assumption unless its note says otherwise.",
+  "fields": {
+    "boundary": "Zero flux on the rectangle enclosing the halo. Nutrients enter only at declared perfused endothelial sites.",
+    "context_sources": "Context has constant declared basal nutrient consumption; endothelial perfusion is scenario assigned. Context cells have no programs or decisions.",
+    "glucose_consumption": 0.018,
+    "lactate_production": 0.04,
+    "matrix_integrator": "Implicit Euler, tick 10 min; all other fields quasi-steady. Sources deposited conservatively. Matrix persists after secretion and decays.",
+    "matrix_source": 0.1,
+    "nerve_source_per_um": 1.0,
+    "oxygen_consumption": 0.025,
+    "perfusion_exchange": 2.0,
+    "secretory_source": 0.5,
+    "spacing_um": 4,
+    "specs": {
+      "cgrp": {
+        "decay": 0.05,
+        "diffusion": 100
+      },
+      "cxcl9": {
+        "decay": 0.03,
+        "diffusion": 100
+      },
+      "glucose": {
+        "decay": 0.001,
+        "diffusion": 600
+      },
+      "ifng": {
+        "decay": 0.05,
+        "diffusion": 80
+      },
+      "lactate": {
+        "decay": 0.03,
+        "diffusion": 100
+      },
+      "matrix": {
+        "decay": 0.005,
+        "diffusion": 0.2
+      },
+      "ne": {
+        "decay": 0.05,
+        "diffusion": 100
+      },
+      "oxygen": {
+        "decay": 0.001,
+        "diffusion": 1000
+      },
+      "tgfb": {
+        "decay": 0.03,
+        "diffusion": 30
+      },
+      "vegf": {
+        "decay": 0.03,
+        "diffusion": 80
+      }
+    }
+  },
+  "geometry": {
+    "contact_handover": "At t=0 the contact graph is exactly the measured graph (H04). A t=0 pair keeps its measured status while its site distance stays within contact_memory_um of the t=0 value; afterwards the simulated geometry decides. Provenance is recorded as measured_contact_persisting or simulated_contact.",
+    "contact_max_gap_um": 1.0,
+    "contact_memory_um": 1.0,
+    "dummy_sites": 64,
+    "fit_exponent": 0.7,
+    "fit_iterations": 80,
+    "kappa_bounds_times_pi": [
+      0.3,
+      8.0
+    ],
+    "measured_contact": "polygon gap <= 1 um (MANUAL H04), valid at t=0 only",
+    "model": "Bounded power (Laguerre) diagram: the simulated cell of body i is its power cell intersected with its disk of radius rho_i (weight rho_i^2). Cells tile the union of disks and cannot overlap by construction.",
+    "radius_rule": "rho_i^2 = kappa_i * A0_i; kappa_i is fitted once at t=0 so the power-cell area approaches the measured polygon area, then inherited by daughters",
+    "recover_initial_hidden": true,
+    "simulated_contact": "H04 applied to simulated cells: power-adjacent bodies whose cells share an interface or whose disks are within contact_max_gap_um; always labelled simulated_contact. Mechanical forces act only through shared interfaces.",
+    "site_at_t0": "centroid of the measured Xenium polygon (not obsm/spatial)",
+    "t0_display": "measured polygons are shown at t=0; simulated cells thereafter; the two are never mixed silently",
+    "target_area_at_t0": "the fitted t=0 power-cell area, so the measured configuration is a declared mechanical equilibrium; the measured area is kept for reporting"
+  },
+  "handler_actions": [
+    "WAIT",
+    "REST",
+    "HOLD_POSITION",
+    "HOLD_CONTACT",
+    "DISENGAGE",
+    "SCAN_RANDOM",
+    "MIGRATE_UP_CXCL9",
+    "DEGRANULATE",
+    "EFFEROCYTOSE",
+    "ENTER_CYCLE",
+    "REMAIN_QUIESCENT",
+    "PROLIFERATE",
+    "UPREGULATE_PDL1",
+    "GLYCOLYTIC_SHIFT",
+    "OXIDATIVE_SHIFT",
+    "SECRETE_VEGFA",
+    "SECRETE_CXCL9",
+    "SECRETE_VEGFA_TGFB",
+    "PATROL",
+    "SPROUT",
+    "STAY_QUIESCENT",
+    "DEPOSIT_MATRIX",
+    "SECRETE_TGFB",
+    "HELP_CD8",
+    "APPROACH_TUMOR",
+    "APPROACH_CORPSE"
+  ],
+  "local_policy_m1": {
+    "description": "Legacy mechanics exercise; use the prepared loader with static or baseline scenarios.",
+    "name": "m1_exercise_policy"
+  },
+  "mechanics": {
+    "anchoring": {
+      "class_of_label": {
+        "B_cell": "immune",
+        "CAF": "anchored",
+        "Endothelial": "anchored",
+        "Fibroblast": "anchored",
+        "Macrophage": "immune",
+        "Plasma_cell": "immune",
+        "T_CD4": "immune",
+        "T_CD8_cytotoxic": "immune",
+        "Tumor": "anchored",
+        "Tumor_proliferating": "anchored",
+        "occluded": "anchored"
+      },
+      "creep_min": 360,
+      "note": "Viscoelastic attachment to matrix: v -= k * (x - anchor); the anchor creeps toward the site with time constant creep_min. Transient pushes (passing lymphocytes) recover; sustained pressure (growth) displaces permanently. Self-propelled cells carry their anchor.",
+      "stiffness_per_min": {
+        "anchored": 0.2,
+        "immune": 0.05
+      }
+    },
+    "compression_constraint": {
+      "area_floor_fraction_by_label": {},
+      "factor": 1.0,
+      "fallback_fraction": null,
+      "max_backtracks": 4,
+      "max_freeze_passes": 4,
+      "method": "New specimen nucleus/cell area q10 by provisional runtime type, clipped to [0.1,0.8]. Global new-specimen fallback if a type has fewer than 30 valid objects. Structural proxy only."
+    },
+    "domain": "ROI and halo are mechanically active. Context bodies (halo, occluded) whose t=0 site lies farther than roi_radius + halo_um - fixed_ring_um from the ROI centre form a fixed boundary. Only ROI cells, their daughters and recruited cells may act; crossing the ROI boundary is tracked, never a deletion. Mobile sites are confined by a wall at the inner edge of the fixed ring (radius roi_radius + halo_um - fixed_ring_um); every confinement is counted.",
+    "fixed_ring_um": 12,
+    "force": "F_i = -sum_j ((P_i + P_j) / 2) * L_ij * n_ij over simulated contacts; free edges follow from the disk arcs",
+    "hard_core": {
+      "fraction_of_radii": 0.35,
+      "note": "Power-adjacent sites are projected apart to at least max(fraction * (rho_i + rho_j), sqrt(|w_i - w_j|) + margin), the two-body condition for neither cell to vanish. Pairs already closer in the measured t=0 geometry keep their t=0 distance as their core.",
+      "weight_margin_um": 1.0
+    },
+    "max_step_um_per_substep": 1.0,
+    "mobility_per_min": 0.2,
+    "pressure": "one-sided P_i = max(0, (A0_i - A_i) / A0_i): cells resist compression; there is no cohesive tension",
+    "rescue": {
+      "area_fraction_below": 0.3,
+      "kappa_factor_per_substep": 1.0,
+      "kappa_max_times_initial": 1.0,
+      "note": "Disabled for the constrained mechanics profile; weights cannot inflate to rescue compressed cells."
+    },
+    "roi_radius_margin_um": 0.5,
+    "substep_min": 0.5,
+    "tick_min": 10
+  },
+  "migration": {
+    "cd8_declared_speed_um_per_min": 4.0,
+    "direction_bias_beta": 2.0,
+    "fixed_bodies": "never swapped or penetrated",
+    "mode": "self_propelled",
+    "modes": {
+      "self_propelled": "Default. Self-propelled site (v0 * persistent heading * permeability) inside the packed power diagram; neighbours are displaced by pressure and neighbour exchanges happen as topological changes of the diagram (MANUAL H18: motion displaces, never occupies void).",
+      "swap": "Plan alternative kept for comparison: discrete exchange of two sites on the contact graph. Rejected as default in M1 because exchanges scramble passive cells (see docs/IMPLEMENTATION.md)."
+    },
+    "permeability": {
+      "B_cell": 0.9,
+      "CAF": 0.1,
+      "Endothelial": 0.3,
+      "Fibroblast": 0.5,
+      "Macrophage": 0.5,
+      "Plasma_cell": 0.9,
+      "T_CD4": 0.9,
+      "T_CD8_cytotoxic": 0.9,
+      "Tumor": 0.1,
+      "Tumor_proliferating": 0.1,
+      "occluded": 0.3
+    },
+    "permeability_note": "Class factor in [0, 1]. self_propelled: speed is scaled by the interface-weighted mean factor of current neighbours. swap: acceptance probability of an exchange with that neighbour. Fixed bodies are 0 (never displaced).",
+    "persistence_min": 10,
+    "speed_note": "SIM assumption inherited from prototype; not fitted to this sample.",
+    "substrate_perimeter_fraction": 0.75,
+    "traction_note": "self_propelled speed = v0 * sum_j L_ij * permeability_j / max(sum_j L_ij, substrate_perimeter_fraction * 2 * pi * r_eq): lymphocytes crawl on neighbours, so they slow at void edges and cannot cross empty space."
+  },
+  "prototype_notes": {
+    "approach": "APPROACH_TUMOR (CD8 within sensing_radius_um of a live tumor cell) and APPROACH_CORPSE (macrophage within corpse_signal_radius_um of an apoptotic cell) are directed crawling programs that end on contact or after approach_max_min.",
+    "corpses": "Dead cells remain as corpses until a macrophage completes EFFEROCYTOSE; corpses not cleared within corpse_degradation_min are removed as secondary necrosis.",
+    "crowding": "Prototype relaxes crowding gates (division blocked above local pressure 0.4, was 0.25; cycle entry allowed up to 0.25, was 0.15). Compression area floors are unchanged.",
+    "status": "Uncalibrated prototype. Rates, recognition and competences are declared assumptions, not measurements.",
+    "t0_cycle": "No initial cell is marked Tumor_proliferating by this workflow; malignant cycling cannot be established from these provisional clusters.",
+    "t0_state": "t0 AUCell scores and percentiles by provisional cell type and within-type detection-depth decile. AUCell is not UCell. Daughters inherit the initial profile; RNA is not dynamically resimulated."
+  },
+  "provider": {
+    "argmax_repair_gap": 0.02,
+    "max_payload_bytes": 40000,
+    "max_questions": 20,
+    "max_response_bytes": 2000000,
+    "pinned_model": "jev-1.13.0",
+    "rounding_tolerance_per_option": 0.005,
+    "semantics": "Probabilities rank licensed behaviors; never event rates. Invalid individual answers start no program; clocks continue. No retry. Journal before applying; identical requests reuse stored responses."
+  },
+  "run": {
+    "frame_interval_min": 20,
+    "horizon_min": 60,
+    "max_horizon_min": 10080
+  },
+  "scenarios": {
+    "m1_exercise": {
+      "cd8_motility": true,
+      "title": "M1 mechanics exercise (declared local policy, not biology)",
+      "tumour_cycle": true
+    },
+    "static": {
+      "cd8_motility": false,
+      "title": "Null control: no motility, no cycle",
+      "tumour_cycle": false
+    }
+  },
+  "scheduler": {
+    "cd8_contact_interval_min": 30,
+    "contact_limit": 6,
+    "interval_min": {
+      "CAF": 720,
+      "Endothelial": 360,
+      "Fibroblast": 720,
+      "Macrophage": 180,
+      "T_CD4": 180,
+      "T_CD8_cytotoxic": 60,
+      "Tumor": 720,
+      "Tumor_proliferating": 720
+    },
+    "max_per_cell_day": 24,
+    "wake": "New relevant heterotypic contact, field-bin crossing, program completion, cycle checkpoint, ROI entry. Initial relevant contacts count as new; initial proliferating annotation is a SIM phase checkpoint. Quiet cells receive no synthetic WAIT."
+  },
+  "status": "Preparation template. New-sample structural statistics must be inserted before simulation; kinetic rates remain declared SIM assumptions.",
+  "version": "xenium-prime-lung-aucell-1.0.0"
+}

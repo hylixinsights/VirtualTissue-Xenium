@@ -1,0 +1,108 @@
+{
+  "sample_id": "Xenium_Prime_Human_Lung_Cancer_FFPE",
+  "source_page": "https://www.10xgenomics.com/datasets/xenium-human-lung-cancer-post-xenium-technote",
+  "archive_etag": "\"3e516a2ccee25ab90a75c3e4bcf218d5-2697\"",
+  "files": [
+    {
+      "path": "raw/analysis.tar.gz",
+      "role": "Original vendor secondary analysis (clusters, PCA/UMAP and differential expression); not reviewed cell identities.",
+      "bytes": 59375653,
+      "sha256": "ac5a60af19dd5dc044a16265476bd802c79407af9b5ae3066629ce963e781689",
+      "source_archive_member": "analysis.tar.gz",
+      "zip_crc32": "4bf33fe5",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:34.492677+00:00"
+    },
+    {
+      "path": "raw/analysis_summary.html",
+      "role": "Original vendor analysis report.",
+      "bytes": 16378242,
+      "sha256": "23d83a3ae2d8636cdd4b0c711431a605f6e852463b61571339e4cee8523faa68",
+      "source_archive_member": "analysis_summary.html",
+      "zip_crc32": "f96e9285",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:11.430544+00:00"
+    },
+    {
+      "path": "raw/cell_boundaries.parquet",
+      "role": "Original vendor cell boundary polygons; simplified outlines, not full masks.",
+      "bytes": 24166853,
+      "sha256": "270cd87f97d3cb3af3845bd2d32442d387ad7b6107900f1e69ff4de2bb684537",
+      "source_archive_member": "cell_boundaries.parquet",
+      "zip_crc32": "c7358168",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:17.616278+00:00"
+    },
+    {
+      "path": "raw/cell_feature_matrix.h5",
+      "role": "Sparse cell-feature transcript count matrix; preserve feature types and controls.",
+      "bytes": 103878075,
+      "sha256": "f8e2727f495284cd821750e7fd45a89682867168527f00caef10d7e9e58dd116",
+      "source_archive_member": "cell_feature_matrix.h5",
+      "zip_crc32": "21fc1e1f",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:39.942315+00:00"
+    },
+    {
+      "path": "raw/cells.parquet",
+      "role": "Cell identifiers, XY centroids in micrometres, counts and cell/nucleus areas.",
+      "bytes": 5545487,
+      "sha256": "87d0f6dd12303f2f956691f2cab523df47fb410fc2ec868380d781e54de1e730",
+      "source_archive_member": "cells.parquet",
+      "zip_crc32": "2aa6c61a",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:23.291936+00:00"
+    },
+    {
+      "path": "raw/cells.zarr.zip",
+      "role": "Original cell and nucleus segmentation masks and geometry.",
+      "bytes": 291475252,
+      "sha256": "13fea9909d67a1fd0a48682298d358a30676b2543e9843743b14b8f99d1df5fa",
+      "source_archive_member": "cells.zarr.zip",
+      "zip_crc32": "9df80884",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:17:01.113100+00:00"
+    },
+    {
+      "path": "raw/experiment.xenium",
+      "role": "Original vendor experiment manifest; some referenced optional files are not downloaded.",
+      "bytes": 2336,
+      "sha256": "e6c355e612ecce7a7c84d3420dc5f96798b0d8d06da17d93da64a0c7293b9a54",
+      "source_archive_member": "experiment.xenium",
+      "zip_crc32": "8ccfdf8c",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:02.621151+00:00"
+    },
+    {
+      "path": "raw/gene_panel.json",
+      "role": "Original panel gene definitions and probe metadata.",
+      "bytes": 4478940,
+      "sha256": "a507dedd8ae03e6ef8f858c58b6149dbf43b80b0fcc841d32c85878e80167a5d",
+      "source_archive_member": "gene_panel.json",
+      "zip_crc32": "f445fd81",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:03.072555+00:00"
+    },
+    {
+      "path": "raw/metrics_summary.csv",
+      "role": "Original sample-level quality-control metrics.",
+      "bytes": 2205,
+      "sha256": "6a556d44e9ec8b8a2aa00b99444ee87969d7c89414c16c4590c21284552d25dc",
+      "source_archive_member": "metrics_summary.csv",
+      "zip_crc32": "3b3402f9",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:05.390667+00:00"
+    },
+    {
+      "path": "raw/nucleus_boundaries.parquet",
+      "role": "Original vendor nucleus boundary polygons; simplified outlines.",
+      "bytes": 21667757,
+      "sha256": "e0902150866d7a317467b50b410d69a25524f0507181a2fc9d1d3ff55ca14df7",
+      "source_archive_member": "nucleus_boundaries.parquet",
+      "zip_crc32": "141168de",
+      "zip_crc32_verified": true,
+      "downloaded_utc": "2026-10-25T12:16:23.955248+00:00"
+    }
+  ],
+  "complete": true
+}

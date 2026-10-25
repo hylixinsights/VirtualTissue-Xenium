@@ -1,0 +1,175 @@
+{
+  "description": "Byte-identical copies of the validated VirtualTissue Xenium code (2026-10-25). These files are vendored unchanged: prepared bundles embed prepared_runtime.py and xenium_runtime/, and the simulator refuses any bundle whose Python files differ from this engine. tests/test_engine_integrity.py checks every hash below.",
+  "original_root": "VirtualTissue/ (Helder Nakaya, local working folders)",
+  "preparation_version": "lung5k-preparation-1.1.0",
+  "simulation_version": "xenium-jev-colab-1.1.0",
+  "renamed": [
+    {
+      "from": "Xenium_Public_Lung5K/processing/colab_setup.py",
+      "to": "colab_setup_prepare.py",
+      "reason": "Two different colab_setup.py files existed (Part 1 and simulation). Content unchanged; only the file name differs."
+    }
+  ],
+  "files": {
+    "colab_setup.py": {
+      "sha256": "2763ae27496e11d52149178812b15833c5d7615e28e261c0b71d8928d1e619ad",
+      "bytes": 4102,
+      "original_path": "Colab_Xenium_Jev/source/colab_setup.py"
+    },
+    "colab_setup_prepare.py": {
+      "sha256": "257b6e988b54396f87adb3f18fd7aff9890a23bfff0ba19b8768f2938e9881dd",
+      "bytes": 4111,
+      "original_path": "Xenium_Public_Lung5K/processing/colab_setup.py"
+    },
+    "jev_provider.py": {
+      "sha256": "bb6b16dcb6e0deda6484a855f7dfae9529b9f36944811828ec8d013c0d8999a4",
+      "bytes": 10342,
+      "original_path": "Colab_Xenium_Jev/source/jev_provider.py"
+    },
+    "player.py": {
+      "sha256": "ce80f7294aa4b2dee3c98af505850fdd3743b57f0de3378c97c2e20e36ce18d9",
+      "bytes": 6319,
+      "original_path": "Colab_Xenium_Jev/source/player.py"
+    },
+    "prepared_runtime.py": {
+      "sha256": "a558d40f5cc4f002308e7bcb22e276f67bb0c26e64b3e6e2f1eb679f86a66972",
+      "bytes": 4138,
+      "original_path": "Colab_Xenium_Jev/source/prepared_runtime.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "requirements-colab.txt": {
+      "sha256": "4405ff7c33531dc6942afaf1a670a93aac29731f64a9fb157ef2b2a85d1d05a3",
+      "bytes": 521,
+      "original_path": "Colab_Xenium_Jev/source/requirements-colab.txt  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "resources/cluster_annotations.json": {
+      "sha256": "cfc16f481b43d3f7e62f2db31e545bdd37482c23a6f21658778ff61a273fe48a",
+      "bytes": 12871,
+      "original_path": "Xenium_Public_Lung5K/processing/resources/cluster_annotations.json"
+    },
+    "resources/gene_sets_provenance.json": {
+      "sha256": "d3453eb19ef2e879d3acdb2c8ceea501978627c1d3738febf851cecc86c53c28",
+      "bytes": 394,
+      "original_path": "Xenium_Public_Lung5K/processing/resources/gene_sets_provenance.json"
+    },
+    "resources/go20_msigdb_2026.1.Hs.json": {
+      "sha256": "f2853349a2407e8b164261c652af0f12943eddc1c532b12f7c4684ae26b157a7",
+      "bytes": 138189,
+      "original_path": "Xenium_Public_Lung5K/processing/resources/go20_msigdb_2026.1.Hs.json"
+    },
+    "resources/runtime_origin.json": {
+      "sha256": "2ac52e4d04c939679e7971b9280f8c75fee0ee51aa7b2da273ba7260ee8772ab",
+      "bytes": 2385,
+      "original_path": "Xenium_Public_Lung5K/processing/resources/runtime_origin.json"
+    },
+    "resources/runtime_template.json": {
+      "sha256": "3efeb7c6895a671f771d75e37a6ee9f6e02538ca1ba00019d0d4f7328413de12",
+      "bytes": 15957,
+      "original_path": "Xenium_Public_Lung5K/processing/resources/runtime_template.json"
+    },
+    "simulation_workflow.py": {
+      "sha256": "fb7e6264a17cf79ff919a48aef69bcf549dd8cb33486113e398ab21df9e95f01",
+      "bytes": 15073,
+      "original_path": "Colab_Xenium_Jev/source/simulation_workflow.py"
+    },
+    "web/player_template.html": {
+      "sha256": "ac164055085e9c0314973f5840ad5e0b5930ce8c2d4d96aebbd882fa481fc3c8",
+      "bytes": 39889,
+      "original_path": "Colab_Xenium_Jev/source/web/player_template.html"
+    },
+    "xenium_prepare.py": {
+      "sha256": "9b5ffee6c95e4b9e1c0e807ea487284d72e5da1772cd9952991e602a9a4a2446",
+      "bytes": 45038,
+      "original_path": "Xenium_Public_Lung5K/processing/xenium_prepare.py"
+    },
+    "xenium_runtime/__init__.py": {
+      "sha256": "9366da3b908871d5230e51429402618a49ecaf528acd01abcc731254de5c8787",
+      "bytes": 112,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/__init__.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/conditions.py": {
+      "sha256": "dba2bade7ec0c4918323ba9165e6dacb19a51de6c6b79bca497d99fac651d3a1",
+      "bytes": 9526,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/conditions.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/engine.py": {
+      "sha256": "3f88d5596d95b4112e30f76716c0c655365c272b2377370faacfb2e537a65384",
+      "bytes": 1038,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/engine.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/io.py": {
+      "sha256": "f2ca49eef4d9c925e8c240e2b95427a3c37e3226558a1cc314aae59bab72c803",
+      "bytes": 1167,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/io.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/providers.py": {
+      "sha256": "b6b1330466bacc771261ee53132eb80ca76f233855953508b675cbd1ba00a706",
+      "bytes": 118,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/providers.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/__init__.py": {
+      "sha256": "3965663e78df6ac98fde70fae0692362f392763f650c523abd43aae151af8593",
+      "bytes": 349,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/__init__.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/autonomous.py": {
+      "sha256": "c5cc71326fcc0dd419d2118f4e379419a8aad43d25e4d4b577c93b0bf1b536c9",
+      "bytes": 46447,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/autonomous.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/episode.py": {
+      "sha256": "57de6d79629aeb24ad595eee41362472ae2ba8d9c65002322d5b64bb2f4fe33e",
+      "bytes": 2832,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/episode.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/fidelity.py": {
+      "sha256": "5ed632b3bad8747ea78642a0817976dfc8127452c67583634b8f31819f1bc0ea",
+      "bytes": 4102,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/fidelity.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/fields.py": {
+      "sha256": "2532a00399307647edc2f570a057c30fd264aa9a8a39f4313423c5b537cac44d",
+      "bytes": 4189,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/fields.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/geometry.py": {
+      "sha256": "140b94acf14ffaa523c0f0929bfa2bb45c1b0868125f3a5bbd939428f73c6262",
+      "bytes": 7522,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/geometry.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/local_policy.py": {
+      "sha256": "6eece544c9884d4bfcd3efec2b1f6b5c8b6026379768c8b24314171ff6d84517",
+      "bytes": 774,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/local_policy.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/mechanics.py": {
+      "sha256": "fb68126712f57920d30900f28fd3d002092da4d00a0c13894d07c7836e2bf1df",
+      "bytes": 25580,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/mechanics.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/menus.py": {
+      "sha256": "57737027411fc3845e620e95a7dc1fce7e152cff031c7f76e80c19b596377288",
+      "bytes": 8602,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/menus.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/policy.py": {
+      "sha256": "3beb77e1a96fec0527b3151be98f014908f58cee95065ad82e60bd93d40135ca",
+      "bytes": 3517,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/policy.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/provider_jev.py": {
+      "sha256": "5708aca0808030f616623cbca6e4621caefeeaaec55513d0fe26a94287235841",
+      "bytes": 1442,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/provider_jev.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/runtime.py": {
+      "sha256": "e1a1d967ebb15384f817d582dd6365e9d335673ec90b13b8131e854119aefffb",
+      "bytes": 18638,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/runtime.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "xenium_runtime/v2/scheduler.py": {
+      "sha256": "f9684d16ce160d1f2b0e086f705270e0ab10a77b8f1ea9b57e0120c18b38e4ee",
+      "bytes": 1280,
+      "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/scheduler.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    }
+  }
+}

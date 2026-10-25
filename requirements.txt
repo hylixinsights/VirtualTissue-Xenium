@@ -1,0 +1,4 @@
+# Exact environment in which the engine was validated (Python 3.12 or 3.13).
+# The single source of truth is the engine copy, which is also embedded in
+# every prepared bundle:
+-r src/virtualtissue_xenium/engine/requirements-colab.txt

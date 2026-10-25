@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "versions": {
+    "python": "3.13.17",
+    "system": "Linux",
+    "machine": "x86_64",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.1",
+      "pandas": "2.3.3",
+      "shapely": "2.2.0",
+      "h5py": "3.16.0",
+      "anndata": "0.12.19",
+      "pyarrow": "19.0.1"
+    }
+  },
+  "zip_sha256": "b2528cd957061fcfe63099f42a3f3f89daf3a654a94fa36261e119fcf5cc7a82",
+  "initial_cells": 989,
+  "initial_questions": 280,
+  "initial_batches": 26,
+  "mock_http_batches": 35,
+  "actual_network_calls": 0,
+  "simulated_minutes": 60,
+  "decisions": 362,
+  "events": {
+    "cycle_entered": 78,
+    "cytotoxic_pulse": 2,
+    "growth_blocked_compression": 1,
+    "program_completed": 2,
+    "program_started": 98
+  },
+  "deterministic_resume": true,
+  "cap_before_round": true,
+  "partial_round_failure_atomic": true,
+  "interrupted_checkpoint_preserved": true,
+  "unsafe_and_modified_input_rejected": true,
+  "elapsed_seconds": 46.24,
+  "final_state_fingerprint": "ee2d642b918e92f224d13ee57246643d6f22738353f37ba0627bc0fe077c7355"
+}

@@ -1,0 +1,33 @@
+{
+  "sample_id": "Xenium_Prime_Human_Lung_Cancer_FFPE",
+  "checks": {
+    "all_downloads_crc32_verified": true,
+    "all_local_sha256_rechecked": true,
+    "matrix_cell_ids_unique": true,
+    "cell_metadata_ids_unique": true,
+    "matrix_metadata_ids_match": true,
+    "all_matrix_cells_have_cell_boundary": true,
+    "all_xy_finite": true,
+    "segmentation_cell_count_matches": true,
+    "nucleus_and_cell_masks_present": true,
+    "cells_without_nucleus_boundary_have_zero_nucleus_count": true
+  },
+  "cells": 278328,
+  "matrix_shape_features_by_cells": [
+    10029,
+    278328
+  ],
+  "gene_expression_features": 5001,
+  "other_features": 5028,
+  "cells_with_cell_boundaries": 278328,
+  "cells_with_nucleus_boundaries": 275207,
+  "cells_without_nucleus_boundaries": 3121,
+  "coordinate_units": "micrometres",
+  "total_raw_bytes": 526970800,
+  "processing_performed": "Integrity, inventory and identifier/coordinate validation only. No expression preprocessing, annotation, scoring or simulation.",
+  "limits": [
+    "Cell boundary polygons are simplified representations of the segmentation masks.",
+    "No biological validation of segmentation or cell identities was performed.",
+    "This selected-file collection is not a complete Xenium Explorer bundle."
+  ]
+}

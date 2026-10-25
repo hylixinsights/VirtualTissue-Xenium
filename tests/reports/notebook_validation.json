@@ -1,0 +1,68 @@
+{
+  "python": "3.13.17",
+  "part1": {
+    "regions": [
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R06",
+      "R07",
+      "R08"
+    ],
+    "exported": "<output>/content/drive/MyDrive/VirtualTissue/Xenium_Lung5K_Prepared/run_20261025_205228_731701/simulation_input_R03_205501_580201.zip",
+    "atlas_fingerprint": "67f4eb7877f9cf44bc510ab2a681ab8e688f77ac986b634bfd89ccc579634fc3",
+    "report": {
+      "passed": true,
+      "total_cells": 989,
+      "acting_cells": 526,
+      "context_cells": 463,
+      "static_minutes": 10,
+      "decisions": 0,
+      "http_calls": 0
+    }
+  },
+  "parts2_4_jev_mock": {
+    "http_attempts": 35,
+    "decisions": 362,
+    "simulated_minutes": 60,
+    "stop_reason": "horizon_reached"
+  },
+  "restore_from_drive": {
+    "new_http_calls": 0,
+    "reused_batches": 35
+  },
+  "local_preview_upload": {
+    "decisions": 362
+  },
+  "part4": {
+    "summary": {
+      "run": "notebook_validation",
+      "mode": "jev",
+      "scenario": "declared_recognition",
+      "provider": "jev_choice_journal_v1",
+      "completed": true,
+      "stop_reason": "horizon_reached",
+      "simulated_hours": 1.0,
+      "cell_decisions": 362,
+      "invalid_answers": 0,
+      "http_attempts": 35,
+      "reused_batches": 35,
+      "input_tokens": 3500,
+      "output_tokens": 700,
+      "tumour_cells_final": 263,
+      "divisions": 0,
+      "apoptosis_committed": 0,
+      "cytotoxic_pulses": 2,
+      "corpses_cleared": 0,
+      "corpses_degraded": 0
+    }
+  },
+  "peak_memory_mb": 3529,
+  "passed": true,
+  "actual_network_calls": 0,
+  "mocked_http_attempts": 35,
+  "drive_mounts": 9,
+  "secret_absent_from_outputs": true
+}

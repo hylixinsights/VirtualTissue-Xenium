@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. Please also cite the 10x Genomics dataset you simulate and the Jev model (TypeSafe)."
+title: "VirtualTissue-Xenium: AI-agent-driven virtual tissue simulations from Xenium spatial transcriptomics"
+type: software
+authors:
+  - family-names: Nakaya
+    given-names: Helder
+version: 0.1.0
+date-released: 2026-10-25
+license: MIT
+repository-code: "https://github.com/hylixinsights/VirtualTissue-Xenium"
+keywords:
+  - spatial transcriptomics
+  - Xenium
+  - agent-based modelling
+  - virtual tissue
+  - AUCell
+  - language-model agents

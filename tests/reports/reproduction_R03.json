@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-25",
+  "python": "3.13.17",
+  "platform": "Linux x86_64",
+  "reference_bundle": "simulation_input_R03_180834_343907.zip (original notebook v1.1, macOS arm64)",
+  "reference_atlas_fingerprint": "67f4eb7877f9cf44bc510ab2a681ab8e688f77ac986b634bfd89ccc579634fc3",
+  "vtx_prepare_cli": {
+    "identical_files": 39,
+    "of": 39
+  },
+  "part1_notebook": {
+    "identical_files": 39,
+    "of": 39
+  },
+  "own_data_route": {
+    "cells_identical": true,
+    "differing_atlas_keys": [
+      "fingerprint",
+      "patch_id",
+      "provenance"
+    ],
+    "note": "Same raw files registered as sample MY_LUNG_SAMPLE with create_data_folder; cluster template filled with the packaged labels."
+  },
+  "simulation_24h_local": {
+    "cd4_help": 9,
+    "cycle_entered": 78,
+    "cytotoxic_pulse": 6,
+    "division": 11,
+    "division_blocked_crowding": 65,
+    "exhaustion_transition": 1,
+    "growth_blocked_compression": 16,
+    "program_cancelled": 2,
+    "program_completed": 309,
+    "program_started": 311,
+    "roi_entered": 4,
+    "roi_exited": 6
+  },
+  "original_24h_mock_validation": {
+    "decisions": 761,
+    "division": 11,
+    "division_blocked_crowding": 65,
+    "final_population": 1000
+  }
+}

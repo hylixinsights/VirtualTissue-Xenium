@@ -1,0 +1,6 @@
+{
+  "collection": "MSigDB C5:GO:BP 2026.1.Hs",
+  "url": "https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2026.1.Hs/c5.go.bp.v2026.1.Hs.json",
+  "selection": "Twenty biological-process definitions previously selected for the project; only public gene definitions reused. Scores and reference distributions are recomputed on this new sample.",
+  "file": "go20_msigdb_2026.1.Hs.json"
+}

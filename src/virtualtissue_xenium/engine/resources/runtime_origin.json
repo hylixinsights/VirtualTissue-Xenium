@@ -1,0 +1,32 @@
+{
+  "source": "Prototype_source_2026-10-25.zip",
+  "source_sha256": "ff3118fb739ce0095b9a46c5fd297461f5e2f63824f9339238af36d44918be0d",
+  "original_modules_sha256": {
+    "__init__.py": "9366da3b908871d5230e51429402618a49ecaf528acd01abcc731254de5c8787",
+    "io.py": "f2ca49eef4d9c925e8c240e2b95427a3c37e3226558a1cc314aae59bab72c803",
+    "conditions.py": "711e9b395458c489accafe6d5352659e6070029ec0eafff725af92c8b506bd17",
+    "v2/__init__.py": "3965663e78df6ac98fde70fae0692362f392763f650c523abd43aae151af8593",
+    "v2/autonomous.py": "cb3108bf10483025f10f49c5b1f83998ab977426ed0ca1a9d7fd3278a9475c91",
+    "v2/runtime.py": "e1a1d967ebb15384f817d582dd6365e9d335673ec90b13b8131e854119aefffb",
+    "v2/mechanics.py": "fb68126712f57920d30900f28fd3d002092da4d00a0c13894d07c7836e2bf1df",
+    "v2/geometry.py": "140b94acf14ffaa523c0f0929bfa2bb45c1b0868125f3a5bbd939428f73c6262",
+    "v2/fidelity.py": "5ed632b3bad8747ea78642a0817976dfc8127452c67583634b8f31819f1bc0ea",
+    "v2/fields.py": "2532a00399307647edc2f570a057c30fd264aa9a8a39f4313423c5b537cac44d",
+    "v2/local_policy.py": "6eece544c9884d4bfcd3efec2b1f6b5c8b6026379768c8b24314171ff6d84517",
+    "v2/policy.py": "033f42864c6b0a3a0a61dfda4b88ab269a311b27d578247e91b0b86ab9448679",
+    "v2/scheduler.py": "f9684d16ce160d1f2b0e086f705270e0ab10a77b8f1ea9b57e0120c18b38e4ee",
+    "v2/menus.py": "9dd12c49695fd1338a73b57cf187f278c8bc7a137434f14602dd19090ed29e83",
+    "v2/episode.py": "57de6d79629aeb24ad595eee41362472ae2ba8d9c65002322d5b64bb2f4fe33e"
+  },
+  "modifications": [
+    "Isolated package name xenium_runtime; original prototype unchanged.",
+    "No legacy LUAD atlas builder, reference rulebook or specimen calibration.",
+    "UCell observation names changed to AUCell, using within-type and detection-depth percentiles.",
+    "Macrophage is a provisional generic class; SPP1 subtype was not observed.",
+    "No network transport or credential handling; local policies only.",
+    "Missing score evidence is not imputed to a midpoint.",
+    "Contract population cap is 1000; initial proliferating tumour assignment disabled.",
+    "The offline cycle rule uses a declared 0.75 within-type/depth percentile and requires a positive raw AUCell score; this threshold is not biologically calibrated.",
+    "Constant depth-reference signatures remain unavailable; annotation edits invalidate derived scores and selections."
+  ]
+}

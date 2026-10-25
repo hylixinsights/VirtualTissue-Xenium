@@ -1,0 +1,461 @@
+[
+  {
+    "cluster": 1,
+    "label": "T_helper_like",
+    "compartment": "immune",
+    "runtime_label": "T_CD4",
+    "markers": [
+      "CD3E",
+      "CD3G",
+      "CD2",
+      "CD40LG",
+      "FOXP3"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 2,
+    "label": "Myeloid_mixed",
+    "compartment": "immune",
+    "runtime_label": null,
+    "markers": [
+      "CD1C",
+      "CLEC10A",
+      "CSF1R",
+      "MRC1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 3,
+    "label": "Endothelial",
+    "compartment": "stroma",
+    "runtime_label": "Endothelial",
+    "markers": [
+      "CLDN5",
+      "CDH5",
+      "ROBO4",
+      "TEK"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 4,
+    "label": "Activated_fibroblast",
+    "compartment": "fibroblast",
+    "runtime_label": "CAF",
+    "markers": [
+      "FAP",
+      "COL5A1",
+      "COL10A1",
+      "POSTN",
+      "LRRC15"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 5,
+    "label": "Smooth_muscle",
+    "compartment": "stroma",
+    "runtime_label": null,
+    "markers": [
+      "PLN",
+      "CASQ2",
+      "SMTN",
+      "SYNPO2"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 6,
+    "label": "Neutrophil",
+    "compartment": "immune",
+    "runtime_label": null,
+    "markers": [
+      "CXCR1",
+      "CXCR2",
+      "CSF3R",
+      "DEFA1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 7,
+    "label": "NK_T_mixed",
+    "compartment": "immune",
+    "runtime_label": null,
+    "markers": [
+      "KLRD1",
+      "FGFBP2",
+      "PRF1",
+      "CD3E",
+      "CD8A"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 8,
+    "label": "Epithelial_tumor_candidate",
+    "compartment": "tumor_candidate",
+    "runtime_label": "Tumor",
+    "markers": [
+      "EPCAM",
+      "MAL2",
+      "CDH1",
+      "FOLR1",
+      "HHLA2"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 9,
+    "label": "Epithelial_tumor_candidate",
+    "compartment": "tumor_candidate",
+    "runtime_label": "Tumor",
+    "markers": [
+      "EPHA10",
+      "ABCC3",
+      "GSDMB",
+      "PROM2"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 10,
+    "label": "Fibroblast",
+    "compartment": "fibroblast",
+    "runtime_label": "Fibroblast",
+    "markers": [
+      "TCF21",
+      "WNT2",
+      "CCBE1",
+      "SVEP1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 11,
+    "label": "Epithelial_tumor_candidate",
+    "compartment": "tumor_candidate",
+    "runtime_label": "Tumor",
+    "markers": [
+      "MUC1",
+      "HHLA2",
+      "ABCC3",
+      "ROS1",
+      "COL17A1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 12,
+    "label": "B_cell",
+    "compartment": "immune",
+    "runtime_label": "B_cell",
+    "markers": [
+      "MS4A1",
+      "PAX5",
+      "CD19",
+      "CD79A",
+      "CD79B"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 13,
+    "label": "Endothelial",
+    "compartment": "stroma",
+    "runtime_label": "Endothelial",
+    "markers": [
+      "PLVAP",
+      "SELE",
+      "SELP",
+      "FLT4",
+      "TIE1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 14,
+    "label": "Mixed_unresolved",
+    "compartment": "unknown",
+    "runtime_label": null,
+    "markers": [
+      "COMP",
+      "CXCL9",
+      "CXCL10",
+      "CLDN1",
+      "CD3E"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 15,
+    "label": "Plasma_cell",
+    "compartment": "immune",
+    "runtime_label": "Plasma_cell",
+    "markers": [
+      "MZB1",
+      "TNFRSF17",
+      "DERL3",
+      "XBP1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 16,
+    "label": "Macrophage",
+    "compartment": "immune",
+    "runtime_label": "Macrophage",
+    "markers": [
+      "MARCO",
+      "CD68",
+      "MMP12",
+      "TREM2",
+      "MSR1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 17,
+    "label": "Fibroblast",
+    "compartment": "fibroblast",
+    "runtime_label": "Fibroblast",
+    "markers": [
+      "PDGFRA",
+      "TCF21",
+      "PI16",
+      "DPT",
+      "FGF7"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 18,
+    "label": "Alveolar_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "AGER",
+      "CLDN18",
+      "RTKN2",
+      "AQP4"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 19,
+    "label": "Airway_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "TP63",
+      "MUC5B",
+      "MUC5AC",
+      "CFTR"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 20,
+    "label": "Alveolar_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "ABCA3",
+      "CRTAC1",
+      "CLDN18",
+      "LAMP3"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 21,
+    "label": "T_helper_like",
+    "compartment": "immune",
+    "runtime_label": "T_CD4",
+    "markers": [
+      "CD3E",
+      "CD3G",
+      "CD40LG",
+      "FOXP3"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 22,
+    "label": "Endothelial",
+    "compartment": "stroma",
+    "runtime_label": "Endothelial",
+    "markers": [
+      "CLDN5",
+      "ROBO4",
+      "TEK",
+      "SOX17"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 23,
+    "label": "Alveolar_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "AGER",
+      "CLDN18",
+      "CRTAC1",
+      "RTKN2"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 24,
+    "label": "Pericyte",
+    "compartment": "stroma",
+    "runtime_label": null,
+    "markers": [
+      "RGS5",
+      "PDGFRB",
+      "NOTCH3",
+      "CSPG4"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 25,
+    "label": "Mixed_unresolved",
+    "compartment": "unknown",
+    "runtime_label": null,
+    "markers": [
+      "DEFA1",
+      "CLDN5",
+      "FLT4",
+      "TMEM100"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 26,
+    "label": "Ciliated_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "DNAH9",
+      "DNAH10",
+      "DNAI1",
+      "TEKT1"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 27,
+    "label": "Mast_cell",
+    "compartment": "immune",
+    "runtime_label": null,
+    "markers": [
+      "KIT",
+      "HDC",
+      "CMA1",
+      "MS4A2"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 28,
+    "label": "Ciliated_epithelial",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "TEKT1",
+      "DNAH9",
+      "DRC1",
+      "SPAG6"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 29,
+    "label": "Cycling_unresolved",
+    "compartment": "unknown",
+    "runtime_label": null,
+    "markers": [
+      "TOP2A",
+      "MKI67",
+      "CDK1",
+      "BIRC5"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 30,
+    "label": "CD8_T",
+    "compartment": "immune",
+    "runtime_label": "T_CD8_cytotoxic",
+    "markers": [
+      "CD8A",
+      "CD3E",
+      "CD3G",
+      "ITGAE",
+      "GZMB"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 31,
+    "label": "Neuroendocrine_like",
+    "compartment": "epithelial_other",
+    "runtime_label": null,
+    "markers": [
+      "ASCL1",
+      "GRP",
+      "DDC",
+      "SCGN"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  },
+  {
+    "cluster": 32,
+    "label": "Cycling_CD8_T",
+    "compartment": "immune",
+    "runtime_label": "T_CD8_cytotoxic",
+    "markers": [
+      "MKI67",
+      "GZMB",
+      "ITGAE",
+      "CXCL13"
+    ],
+    "status": "tentative_cluster_interpretation",
+    "source": "Original 10x graph-clustering differential expression; reviewed as provisional marker-based labels, not independent validation"
+  }
+]
