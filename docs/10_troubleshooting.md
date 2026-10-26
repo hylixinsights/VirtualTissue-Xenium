@@ -78,3 +78,15 @@ Find the message you see (or part of it) in the left column.
 | Video recording does nothing | Use Chrome or Edge (WebM `MediaRecorder`), and keep the tab visible while recording |
 
 Still stuck? Open an issue with the full error message, the notebook cell, `run_report.json` (if any) and the output of the first cell (Python and package versions). **Never paste your key.**
+
+## No tumour candidates / non-cancer test
+
+If the reviewed map has no QC-passing `tumor_candidate` cells, preparation now stops before AUCell and geometry with an explanation and the path to the input audit/annotation review. This is an unsupported tissue profile, not a computation failure. `--list-only` and a manual centre still require a tumour interface. Correct a mistaken annotation only with biological evidence. Changing cancer-cell labels to `epithelial_other` is a negative contract test; it is not validation on a healthy sample.
+
+## Another spatial platform
+
+The current importer requires Xenium schemas, including cluster assignments and differential expression inside `analysis.tar.gz`. Packaging arbitrary tables into a tar archive is not a supported cross-platform conversion. Other technologies need an adapter with validated cell IDs, raw counts, gene coverage, spatial units, geometry and annotations. See [experiment and adapter design](11_experiment_design.md).
+
+## No killing despite a completed replay
+
+Check the saved scenario first. `baseline_unknown` and `recognition_off` do not permit CD8 cytotoxic killing. Select `declared_recognition` explicitly for that experiment, use a new run name, and inspect the active CD8 count and contacts. A permitted action need not be chosen or completed. Hypoxic necrosis is separate; extending the horizon does not enable immune recognition.

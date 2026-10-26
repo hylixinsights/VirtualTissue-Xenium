@@ -88,6 +88,7 @@ def cmd_prepare(a):
     sample = prep.load_sample(a.data_dir, run_dir, verify_hashes=not a.no_verify_hashes, min_counts=20, min_genes=10)
     prep.save_json(run_dir / "environment.json", prep.environment())
     prep.annotate(sample, {})
+    own_data.require_tumour_interface(sample)
     plt.close(prep.plot_marker_review(sample))
     prep.score_aucell(sample, n_up=a.aucell_top_ranks, min_overlap=5, batch_size=4096)
     fig, ax = plt.subplots(figsize=(8, 3))
@@ -139,6 +140,9 @@ def cmd_check(a):
     settings = _settings(a)
     wf.effective_contract(bundle, settings)
     facts, first_request = wf.preflight(bundle, settings)
+    from .experiments import experiment_notes
+    for note in experiment_notes(settings, facts):
+        print(note)
     out = workdir / "preflight"
     out.mkdir(parents=True, exist_ok=True)
     wf.write_json(out / "preflight.json", facts)
@@ -157,6 +161,9 @@ def cmd_run(a):
     bundle = wf.extract_bundle(a.bundle_zip, workdir / "extracted")
     settings = _settings(a)
     wf.effective_contract(bundle, settings)
+    from .experiments import experiment_notes
+    for note in experiment_notes(settings):
+        print(note)
     mode = "jev" if a.mode == "jev" else "local_preview"
     run_dir = workdir / (a.run_name + ("_local_preview" if mode == "local_preview" else ""))
     key = ""
@@ -263,10 +270,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None):
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
     if getattr(args, "hours", None) is not None and float(args.hours).is_integer():
         args.hours = int(args.hours)
-    args.func(args)
+    from .own_data import PreparationScopeError
+    try:
+        args.func(args)
+    except PreparationScopeError as exc:
+        parser.exit(2, f"Preparation stopped: {exc}\n")
 
 
 if __name__ == "__main__":

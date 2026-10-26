@@ -291,6 +291,8 @@ def build_part1() -> Path:
     ''')
     nb.code('''
     #@title Calculate AUCell, reference distributions, and quality checks
+    from virtualtissue_xenium.own_data import require_tumour_interface
+    require_tumour_interface(sample)
     coverage=prep.score_aucell(sample,n_up=AUCELL_TOP_RANKS,min_overlap=5,batch_size=4096)
     display(coverage[['full_genes','panel_genes','panel_coverage','available']])
     print('Cells with AUCell:',int(sample['obs'].aucell_available.sum()))
@@ -611,6 +613,10 @@ def build_part2_4() -> Path:
     nb.md('''
     # PART 3 · Configure and run the simulation
 
+    **To test CD8-mediated tumour killing, explicitly select `declared_recognition`.** Compare with
+    `recognition_off` using the same region, seed, model, duration and population ceiling. The default
+    `baseline_unknown` does not enable immune killing, even with a longer horizon. Hypoxic necrosis is separate.
+
     **Scenario**
     * `baseline_unknown` — recognition and effector/clearance competence stay unknown; cytotoxic killing is not licensed.
     * `declared_recognition` — assume antigen recognition and effector/clearance competence. Enables contact-dependent
@@ -669,6 +675,9 @@ def build_part2_4() -> Path:
     nb.code('''
     #@title Preflight estimate and request preview (no API calls)
     PREFLIGHT, FIRST_REQUEST = workflow.preflight(BUNDLE, SETTINGS)
+    from virtualtissue_xenium.experiments import experiment_notes
+    for note in experiment_notes(SETTINGS, PREFLIGHT):
+        print(note)
     display(pd.DataFrame([dict(cell_type=k, actors=v) for k,v in PREFLIGHT["acting_composition"].items()]))
     print(json.dumps({k:PREFLIGHT[k] for k in ("total_cells", "acting_cells", "context_cells", "initial_cell_questions", "initial_http_batches", "growth_headroom", "static_preflight_passed")}, indent=2))
     if MAX_HTTP_ATTEMPTS < PREFLIGHT["initial_http_batches"] and MODE == "jev":

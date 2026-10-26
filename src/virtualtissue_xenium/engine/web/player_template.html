@@ -24,7 +24,7 @@ main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:0}
 #map.dragging{cursor:grabbing}
 #tooltip{position:absolute;pointer-events:none;background:rgba(10,14,26,.92);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;display:none;max-width:260px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
 #tooltip b{font-weight:600}
-.overlay-tools{position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap}
+.overlay-tools{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
 .overlay-tools label{display:flex;align-items:center;gap:6px;background:rgba(17,23,41,.88);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--muted);font-size:12px}
 select,button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:4px 8px}
 button{cursor:pointer}
@@ -77,6 +77,20 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
 #strip{position:absolute;left:0;right:0;top:0;height:12px;width:100%}
 #seek{position:absolute;left:0;right:0;top:12px;width:100%;margin:0;accent-color:var(--accent)}
 .note{color:var(--faint);font-size:11px}
+.experiment{padding:10px 18px;background:#101b2b;border-bottom:1px solid var(--line);font-size:12px;color:#b8c9dd}
+.experiment strong{color:var(--text)}
+.field-tools{flex-basis:100%;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.field-tools span{color:var(--muted);margin-right:5px}
+.field-tools button{padding:5px 9px;font-size:11px}
+.field-tools button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:#102b35}
+.field-tools button[data-active="true"]::after{content:" •";color:#73e5b4}
+#fieldStatus{font-size:12px;color:#bac7dc;padding:8px 10px;background:#0b1220e8;border:1px solid var(--line);border-radius:8px;max-width:480px}
+.field-scale{height:7px;border-radius:4px;margin:7px 0 3px;background:linear-gradient(90deg,#440154,#414487,#2a788e,#22a884,#7ad151,#fde725)}
+.scale-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+#highlights{display:flex;flex-direction:column;gap:6px}
+.highlight{text-align:left;display:block;width:100%;padding:9px 10px;white-space:normal}
+.highlight small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.highlight-context{font-size:11px;color:var(--muted);margin:5px 0 8px}
 @media (max-width:900px){main{grid-template-columns:1fr} aside{border-left:none;border-top:1px solid var(--line);max-height:none} #stage{min-height:420px}}
 </style>
 </head>
@@ -86,25 +100,30 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
   <div class="sub" id="subtitle">Loading…</div>
   <div class="badge" id="badge"></div>
 </header>
+<div class="experiment" id="experiment"></div>
 <main>
   <section id="stage">
     <canvas id="map"></canvas>
     <div class="overlay-tools">
       <label>Color <select id="colorMode"><option value="type">Cell type</option><option value="action">Current action</option><option value="aucell">AUCell score at t0</option></select></label>
       <label id="sigWrap" style="display:none">Pathway <select id="signature"></select></label>
-      <label>Field <select id="field"><option value="">None</option></select></label>
       <label><input type="checkbox" id="showContext" checked> Context</label>
       <label><input type="checkbox" id="showFx" checked> Interactions</label>
+      <label><input type="checkbox" id="showHighlights" checked> Highlights</label>
+      <input type="hidden" id="field" value="auto">
+      <div class="field-tools" id="fieldButtons" aria-label="Simulated fields"></div>
+      <div id="fieldStatus" role="status"></div>
     </div>
     <div id="tooltip"></div>
   </section>
   <aside>
+    <div><h2>What is happening here?</h2><div class="highlight-context">Recorded events and local signal peaks. Click to locate them. These are not statistical outliers.</div><div id="highlights"></div></div>
     <div>
       <h2>Tissue now</h2>
       <div class="tiles">
         <div class="tile"><div class="v" id="tTumor">–</div><div class="k">live tumor candidates</div></div>
         <div class="tile"><div class="v" id="tDiv">–</div><div class="k">divisions</div></div>
-        <div class="tile"><div class="v" id="tDeath">–</div><div class="k">cell deaths</div></div>
+        <div class="tile" title="Cumulative apoptosis commitments plus hypoxic necrosis; completed apoptosis is not counted twice."><div class="v" id="tDeath">–</div><div class="k">apoptosis + necrosis</div></div>
         <div class="tile"><div class="v" id="tEat">–</div><div class="k">phagocytosed</div></div>
         <div class="tile"><div class="v" id="tCorpse">–</div><div class="k">corpses present</div></div>
         <div class="tile"><div class="v" id="tDec">–</div><div class="k">AI decisions</div></div>
@@ -127,7 +146,7 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
 </main>
 <footer>
   <div class="controls">
-    <button id="play">▶ Play</button>
+    <button id="play" title="Play the saved trajectory; this does not run a new experiment">▶ Replay</button>
     <button id="restart" title="Back to t = 0">⟲</button>
     <span id="clock">0.0 h</span>
     <label>Speed <select id="speed"><option value="0.5">0.5 h / s</option><option value="1" selected>1 h / s</option><option value="2">2 h / s</option><option value="4">4 h / s</option></select></label>
@@ -148,6 +167,7 @@ const TYPES={
   B_cell:{name:"B cell",c:"#8f7cf6"},
   Plasma_cell:{name:"Plasma cell",c:"#cfa2f5"},
   Macrophage:{name:"Macrophage",c:"#f2c14e"},
+  Macrophage_SPP1:{name:"Macrophage (SPP1+)",c:"#f2c14e"},
   CAF:{name:"CAF",c:"#86b35a"},
   Fibroblast:{name:"Fibroblast",c:"#b9cf8c"},
   Endothelial:{name:"Endothelial",c:"#ec6fae"},
@@ -189,6 +209,10 @@ async function load(){
 }
 
 function prepare(){
+  // Earlier LUAD replays stored one ring as flat XY pairs.
+  for(const c of Object.values(P.cells))if(c.poly?.length&&typeof c.poly[0]==="number"){
+    const ring=[];for(let i=0;i+1<c.poly.length;i+=2)ring.push([c.poly[i],c.poly[i+1]]);c.poly=[[ring]];
+  }
   for(const f of P.frames){const m=new Map();f.ids.forEach((id,i)=>m.set(id,i));frameIdx.push(m);}
   Tmax=P.frames.at(-1).t;
   for(const k of P.events_kinds)evByKind[k]=[];
@@ -198,6 +222,7 @@ function prepare(){
     if(kind==="apoptosis_committed")L.commit=t;
     if(kind==="intact_death")L.dead=t;
     if(kind==="corpse_degraded")L.gone=t;
+    if(kind==="hypoxic_necrosis"){L.gone=t;L.necrotic=true;}
     if(kind==="clearance"){const Lt=life[x]||(life[x]={});Lt.gone=t;Lt.eater=c;}
   }
   const seek=$("seek");seek.max=Tmax;seek.step=1;
@@ -269,9 +294,49 @@ function cellColor(c,info){
   return (TYPES[info.l]||TYPES.occluded).c;
 }
 
+const FIELD_HELP={
+  ifng:"Produced during CD8 degranulation; can enable PD-L1 and chemokine responses.",
+  cxcl9:"A simulated chemokine gradient that can guide T-cell movement.",
+  tgfb:"A simulated stromal/macrophage signal that contributes to CD8 exhaustion.",
+  oxygen:"Assumed perfusion and cellular consumption; affects cycling and hypoxic death."
+};
+let fieldFrameCache=null,fieldStatsCache={};
+function currentFieldFrame(){
+  let fr=null;for(const f of P.fields){if(f.t>T)break;fr=f;}
+  if(fr!==fieldFrameCache){
+    fieldFrameCache=fr;fieldStatsCache={};
+    if(fr)for(const name of Object.keys(P.field_grid.names)){
+      const raw=atob(fr[name]);let min=255,max=0,peak=0;
+      for(let i=0;i<raw.length;i++){const v=raw.charCodeAt(i);min=Math.min(min,v);if(v>max){max=v;peak=i;}}
+      const scale=P.field_grid.scales[name];
+      fieldStatsCache[name]={raw,min:min/255*scale,max:max/255*scale,peak,nonzero:max>0};
+    }
+  }
+  return fr;
+}
+function visibleField(){
+  currentFieldFrame();
+  if($("field").value!=="auto")return $("field").value;
+  return ["ifng","cxcl9","tgfb","oxygen"].find(k=>fieldStatsCache[k]?.nonzero)||"";
+}
+const fmtSIM=v=>v===0?"0":v<.001?v.toExponential(1):v.toFixed(3);
+function updateFieldStatus(name,fr){
+  for(const b of $("fieldButtons").querySelectorAll("button")){
+    b.setAttribute("aria-pressed",String(b.dataset.field===$("field").value));
+    b.dataset.active=String(!!fieldStatsCache[b.dataset.field]?.nonzero);
+  }
+  const stat=fieldStatsCache[name];
+  if(!fr||!stat){$("fieldStatus").textContent=fr?"Field overlay off. Highlights still show recorded events.":"No saved field frame at this time.";return;}
+  const auto=$("field").value==="auto"?"Auto · ":"";
+  const description=stat.nonzero?`Current range: ${fmtSIM(stat.min)}–${fmtSIM(stat.max)} SIM`:"No detectable signal in this saved frame.";
+  $("fieldStatus").innerHTML=`<strong>${esc(auto+P.field_grid.names[name])}</strong> · ${esc(description)}
+    <div class="field-scale" ${name==="oxygen"?'style="background:linear-gradient(90deg,#1d2b6b,#3f6fb5,#ffd36b)"':""}></div>
+    <div class="scale-ends"><span>0</span><span>${fmtSIM(P.field_grid.scales[name])} SIM · scale fixed for this run</span></div>
+    <div style="margin-top:5px">${esc(FIELD_HELP[name]||"")} Saved at ${fmtH(fr.t)}. Approximate SIM values, not measured concentrations.</div>`;
+}
 function drawField(){
-  const name=$("field").value;if(!name||!P.fields.length)return;
-  let fr=P.fields[0];for(const f of P.fields)if(f.t<=T)fr=f;
+  const fr=currentFieldFrame(),name=visibleField();updateFieldStatus(name,fr);
+  if(!name||!fr||!fieldStatsCache[name]?.nonzero)return;
   const key=name+fr.t;const g=P.field_grid,[ny,nx]=g.shape;
   if(key!==fieldKey){fieldKey=key;fieldCanvas.width=nx;fieldCanvas.height=ny;const fc=fieldCanvas.getContext("2d"),img=fc.createImageData(nx,ny);
     const raw=atob(fr[name]);for(let i=0;i<nx*ny;i++){const v=raw.charCodeAt(i)/255;const rgb=name==="oxygen"?rampRGB(["#1d2b6b","#3f6fb5","#ffd36b"],v):rampRGB(VIRIDIS,v);
@@ -281,6 +346,59 @@ function drawField(){
   ctx.imageSmoothingEnabled=true;ctx.globalAlpha=.62;ctx.drawImage(fieldCanvas,sx,sy,nx*g.spacing*view.s,ny*g.spacing*view.s);ctx.globalAlpha=1;
 }
 function rampRGB(stops,v){v=Math.max(0,Math.min(1,v))*(stops.length-1);const i=Math.min(stops.length-2,Math.floor(v)),a=hexRgb(stops[i]),b=hexRgb(stops[i+1]),t=v-i;return a.map((x,k)=>Math.round(lerp(x,b[k],t)));}
+
+const SIGNAL_HIGHLIGHTS={ifng:["IFN-γ-like release","#73e5b4"],cxcl9:["CXCL9/10-like gradient","#48d9d1"],tgfb:["TGF-β-like signal","#bba6ff"]};
+const EVENT_HIGHLIGHTS={
+  cytotoxic_pulse:["Cytotoxic hit","#ff7181",true],
+  apoptosis_committed:["Apoptosis committed","#d4a0ff",false],
+  hypoxic_necrosis:["Death from hypoxia","#c5cbd8",false],
+  exhaustion_transition:["CD8 exhaustion state changed","#f2c14e",false],
+  clearance:["Corpse engulfed","#f2c14e",false],
+  division:["Cell division","#ffab7e",false]
+};
+function highlightsNow(){
+  currentFieldFrame();
+  const f=P.frames[lastSnap.k],positions=new Map(f.ids.map((id,i)=>[id,{x:f.x[i],y:f.y[i]}]));
+  const found=[],used=new Set();
+  for(let i=P.events.length-1;i>=0;i--){
+    const e=P.events[i];if(e[0]>T)continue;if(T-e[0]>40)break;
+    const kind=P.events_kinds[e[1]],style=EVENT_HIGHLIGHTS[kind];if(!style||used.has(kind))continue;
+    const id=style[2]?e[3]:e[2],pos=positions.get(id);if(!pos)continue;
+    used.add(kind);found.push({...pos,id,title:style[0],color:style[1],detail:`${fmtH(e[0])} · cell #${id} · recorded event`});
+  }
+  for(const [field,[title,color]] of Object.entries(SIGNAL_HIGHLIGHTS)){
+    const s=fieldStatsCache[field];if(!s?.nonzero)continue;
+    const g=P.field_grid,[ny,nx]=g.shape;
+    found.push({field,title,color,x:g.origin[0]+s.peak%nx*g.spacing,y:g.origin[1]+Math.floor(s.peak/nx)*g.spacing,
+      detail:`Local peak ≈ ${fmtSIM(s.max)} SIM · saved at ${fmtH(fieldFrameCache.t)}`});
+  }
+  return found.slice(0,3);
+}
+function drawHighlights(){
+  if(!$("showHighlights").checked||W<280)return;
+  const top=document.querySelector(".overlay-tools").getBoundingClientRect().bottom-$("stage").getBoundingClientRect().top+16;
+  const placed=[];
+  for(const item of highlightsNow()){
+    const [sx,sy]=toScreen(item.x,item.y);if(sx<0||sx>W||sy<top||sy>H-65)continue;
+    ctx.font="600 12px Inter,system-ui,sans-serif";
+    const bw=Math.min(W-24,ctx.measureText(item.title).width+24),bh=30;
+    let bx=Math.max(12,Math.min(W-bw-12,sx<W/2?sx+36:sx-bw-36)),by=Math.max(top,Math.min(H-100,sy-40));
+    while(placed.some(r=>bx<r.x+r.w&&bx+bw>r.x&&by<r.y+bh+7&&by+bh+7>r.y))by+=bh+10;
+    if(by+bh>H-65)continue;placed.push({x:bx,y:by,w:bw});
+    const lx=Math.max(bx,Math.min(bx+bw,sx)),ly=by+bh/2;
+    ctx.globalAlpha=1;ctx.strokeStyle=item.color;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(sx,sy);ctx.stroke();
+    const a=Math.atan2(sy-ly,sx-lx);ctx.beginPath();ctx.moveTo(sx-7*Math.cos(a-.5),sy-7*Math.sin(a-.5));ctx.lineTo(sx,sy);ctx.lineTo(sx-7*Math.cos(a+.5),sy-7*Math.sin(a+.5));ctx.stroke();
+    ctx.fillStyle="#0a1225ed";ctx.beginPath();ctx.roundRect(bx,by,bw,bh,7);ctx.fill();ctx.stroke();ctx.fillStyle=item.color;ctx.fillText(item.title,bx+12,by+20);
+  }
+}
+function updateHighlights(){
+  const items=highlightsNow(),box=$("highlights");
+  box.innerHTML=items.length?items.map((item,i)=>`<button class="highlight" data-index="${i}" style="border-left:3px solid ${item.color}">${esc(item.title)}<small>${esc(item.detail)}</small></button>`).join(""):
+    '<div class="hint">No recent highlighted events or detectable secretion fields at this time. Try an earlier frame or inspect oxygen.</div>';
+  box.querySelectorAll("button").forEach(b=>b.onclick=()=>{const item=items[+b.dataset.index];
+    view.x=item.x;view.y=item.y;selected=item.id??null;
+    if(item.field)$("field").value=item.field;draw();updatePanel();});
+}
 
 function polyPath(poly,cx,cy,scale){
   const p=new Path2D();if(!poly||poly.length<3)return p;
@@ -333,6 +451,7 @@ function draw(){
   ctx.globalAlpha=1;
   drawField();
   if(fx)drawInteractions(snap,pos);
+  drawHighlights();
   if(selected!=null&&pos.has(selected)){const i=pos.get(selected),c=snap.cells[i];
     ctx.lineWidth=2.4;ctx.strokeStyle="#ffffff";ctx.globalAlpha=1;ctx.stroke(polyPath(polys[i],c.x,c.y,1));
     if(c.tg&&pos.has(c.tg)){const d=snap.cells[pos.get(c.tg)];line(c,d,"#ffffff",1.2,[4,3]);}}
@@ -377,10 +496,12 @@ function providerName(){return P.provider.startsWith("jev")?"Jev":"local rules";
 // ---------------------------------------------------------------- side panel
 function countsAt(T){
   const cnt=k=>evByKind[k].filter(e=>e[0]<=T).length;
-  return {div:cnt("division"),death:cnt("apoptosis_committed"),eat:cnt("clearance")};
+  const deaths=new Set([...(evByKind.apoptosis_committed||[]),...(evByKind.hypoxic_necrosis||[])].filter(e=>e[0]<=T).map(e=>e[2]));
+  return {div:cnt("division"),death:deaths.size,eat:cnt("clearance")};
 }
 function updatePanel(){
   const snap=lastSnap;if(!snap)return;
+  updateHighlights();
   const byType={};let tumor=0,corpses=0;
   for(const c of snap.cells){const info=P.cells[c.id];if(!info||info.o==="halo"||info.o==="occluded")continue;if(c.scale<1)continue;
     const L=life[c.id]||{};const dying=L.commit!=null&&T>=L.commit;if(dying){corpses++;continue;}
@@ -426,7 +547,7 @@ function updateInspector(){
   const info=P.cells[selected];if(!info){box.innerHTML='<div class="hint">Unknown cell.</div>';return;}
   const snap=lastSnap,c=snap.cells.find(x=>x.id===selected),L=life[selected]||{};
   const type=TYPES[info.l]||TYPES.occluded;
-  let status="Alive";if(L.gone!=null&&T>=L.gone)status=L.eater?`Phagocytosed by macrophage #${L.eater} at ${fmtH(L.gone)}`:`Corpse fragmented at ${fmtH(L.gone)}`;else if(L.dead!=null&&T>=L.dead)status="Corpse (dead, awaiting phagocytosis)";else if(L.commit!=null&&T>=L.commit)status="Apoptotic";
+  let status="Alive";if(L.gone!=null&&T>=L.gone)status=L.necrotic?`Died of hypoxia at ${fmtH(L.gone)}`:L.eater?`Phagocytosed by macrophage #${L.eater} at ${fmtH(L.gone)}`:`Corpse fragmented at ${fmtH(L.gone)}`;else if(L.dead!=null&&T>=L.dead)status="Corpse (dead, awaiting phagocytosis)";else if(L.commit!=null&&T>=L.commit)status="Apoptotic";
   const origin=info.o==="born"?`Daughter of #${info.p}, born at ${fmtH(info.b)}`:info.o==="roi"?"Measured in the Xenium section":"Context cell (no autonomous decisions)";
   const act=c?P.actions[c.a]:"";
   let html=`<div class="title"><i style="background:${type.c}"></i>${type.name} #${selected}</div><div class="meta">${esc(origin)}${info.alt&&info.alt.length&&info.alt[0]!==info.l?` · second annotation: ${esc(info.alt[0].replaceAll("_"," "))}`:""}</div>`;
@@ -449,12 +570,12 @@ function drawStrip(){
 let pending=false;function request(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;draw();});}
 let panelTimer=0;
 function loop(now){
-  if(playing){const dt=Math.min(.1,(now-lastTick)/1000);T=Math.min(Tmax,T+dt*60*(+$("speed").value));if(T>=Tmax){playing=false;$("play").textContent="▶ Play";if(recorder)stopRecording();}}
+  if(playing){const dt=Math.min(.1,(now-lastTick)/1000);T=Math.min(Tmax,T+dt*60*(+$("speed").value));if(T>=Tmax){playing=false;$("play").textContent="▶ Replay";if(recorder)stopRecording();}}
   lastTick=now;draw();if(now-panelTimer>120||!playing){panelTimer=now;updatePanel();}
   if(playing)requestAnimationFrame(loop);
 }
 function play(){if(T>=Tmax)T=0;playing=true;$("play").textContent="❚❚ Pause";lastTick=performance.now();requestAnimationFrame(loop);}
-function pause(){playing=false;$("play").textContent="▶ Play";updatePanel();}
+function pause(){playing=false;$("play").textContent="▶ Replay";updatePanel();}
 function hit(sx,sy){if(!lastSnap)return null;const [x,y]=toWorld(sx,sy);let best=null,bd=1e9;for(const c of lastSnap.cells){const d=Math.hypot(c.x-x,c.y-y);if(d<c.r&&d<bd){bd=d;best=c;}}return best;}
 function startRecording(){
   if(!window.MediaRecorder){alert("Video recording is not supported in this browser.");return;}
@@ -472,13 +593,20 @@ function init(){
   $("badge").textContent=`${fmtH(Tmax)} simulated · ${P.paid_calls} ${P.provider.startsWith("mock_jev")?"mock requests":"API attempts"} · seed ${P.seed} · ${P.stop?P.stop.replaceAll("_"," "):"checkpoint (incomplete)"}`;
   $("scope").textContent=P.scope+" Measured segmentation is shown at t0; subsequent shapes and interpolated motion are a simulation rendering. Cells start from their t0 AUCell percentiles within provisional type and detection-depth group; daughters inherit them.";
   $("signature").innerHTML=P.signatures.map((s,j)=>`<option value="${j}" ${s==="MITOTIC_CELL_CYCLE"?"selected":""}>${s.replaceAll("_"," ").toLowerCase()}</option>`).join("");
-  $("field").innerHTML+=Object.entries(P.field_grid.names).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  const scenarioText={
+    baseline_unknown:"Immune killing is not enabled: tumour recognition and effector competence are unknown. Longer playback cannot enable it.",
+    declared_recognition:"Tumour recognition and effector/clearance competence are assumed. Contact-dependent killing is permitted, not guaranteed.",
+    recognition_off:"Negative control: tumour recognition is disabled; CD8 cytotoxic killing is not permitted."
+  };
+  $("experiment").innerHTML=`<strong>Saved experiment · ${esc(P.scenario)}</strong> — ${esc(scenarioText[P.scenario]||"Read the saved experiment contract for its biological assumptions.")} Replay plays recorded results. Configure a new run to test an intervention.`;
+  $("fieldButtons").innerHTML='<span>Signals</span>'+[["auto","Auto"],["","Off"],...Object.entries(P.field_grid.names)].map(([k,v])=>`<button data-field="${esc(k)}" aria-pressed="false">${esc(v)}</button>`).join("");
+  $("fieldButtons").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("field").value=b.dataset.field;fieldKey="";draw();updatePanel();});
   resize();fitView();drawStrip();draw();updatePanel();
   $("play").onclick=()=>playing?pause():play();
   $("restart").onclick=()=>{T=0;draw();updatePanel();};
   $("seek").oninput=e=>{T=+e.target.value;draw();updatePanel();};
   $("record").onclick=()=>recorder?stopRecording():startRecording();
-  for(const id of ["colorMode","signature","field","showContext","showFx"])$(id).onchange=()=>{$("sigWrap").style.display=$("colorMode").value==="aucell"?"flex":"none";fieldKey="";draw();updatePanel();};
+  for(const id of ["colorMode","signature","showContext","showFx","showHighlights"])$(id).onchange=()=>{$("sigWrap").style.display=$("colorMode").value==="aucell"?"flex":"none";fieldKey="";draw();updatePanel();};
   window.addEventListener("resize",()=>{resize();drawStrip();request();updatePanel();});
   canvas.addEventListener("wheel",e=>{e.preventDefault();const [wx,wy]=toWorld(e.offsetX,e.offsetY);const f=Math.exp(-e.deltaY*.0015);view.s=Math.max(.3,Math.min(40,view.s*f));const [nx,ny]=toWorld(e.offsetX,e.offsetY);view.x+=wx-nx;view.y+=wy-ny;request();},{passive:false});
   canvas.addEventListener("mousedown",e=>{drag={x:e.offsetX,y:e.offsetY,vx:view.x,vy:view.y,moved:false};canvas.classList.add("dragging");});
@@ -491,7 +619,7 @@ function init(){
     tip.style.display="block";tip.style.left=Math.min(e.offsetX+14,W-200)+"px";tip.style.top=(e.offsetY+14)+"px";});
   canvas.addEventListener("mouseleave",()=>$("tooltip").style.display="none");
   canvas.addEventListener("dblclick",()=>{fitView();request();});
-  document.addEventListener("keydown",e=>{if(e.code==="Space"&&e.target.tagName!=="INPUT"&&e.target.tagName!=="SELECT"){e.preventDefault();playing?pause():play();}});
+  document.addEventListener("keydown",e=>{if(e.code==="Space"&&!["INPUT","SELECT","BUTTON"].includes(e.target.tagName)){e.preventDefault();playing?pause():play();}});
 }
 load().then(p=>{P=p;init();}).catch(err=>{document.body.innerHTML=`<p style="padding:24px;color:#ff8a8a">Could not open the replay: ${esc(err.message)}</p>`;});
 </script>

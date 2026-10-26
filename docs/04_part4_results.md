@@ -48,7 +48,8 @@ The input bundle is **not** copied into the results. Keep it to reproduce the ru
 |---|---|
 | **Play / pause** (or the space bar), **restart**, the **time slider**, **speed** (0.5–4 simulated h per second) | Navigate in time. The view starts from the **measured** segmentation and cross-fades into the simulated cells within the first 20 min |
 | **Color** | `Cell type` (default) · `Current action` · `AUCell score at t0` (then pick a signature, e.g. mitotic cell cycle) |
-| **Field** | Overlay a simulated field: IFN-γ-like, CXCL9/10-like, oxygen, TGF-β-like |
+| **Signals** | Visible buttons for Auto, Off, IFN-γ-like, CXCL9/10-like, oxygen and TGF-β-like. Auto prioritises detectable IFN-γ, CXCL9/10, then TGF-β; otherwise oxygen. A dot marks a nonzero saved field. |
+| **Highlights** | Up to three arrow callouts and clickable cards for recorded recent events and local signal maxima. A peak is not a statistical or biological anomaly. |
 | **Context** | Show or hide the grey context cells |
 | **Interactions** | Arrows (crawling toward a target), red flashes (cytotoxic hits), cycle rings (dashed when paused for lack of space), bursts (division), grey shrinking corpses, gold flashes (phagocytosis) |
 | Mouse wheel / drag / double-click | Zoom, pan, fit to view |
@@ -115,3 +116,9 @@ tumour.groupby(pd.cut(tumour.mitotic_pct, [0, .25, .5, .75, 1]), observed=False)
 * Probabilities are Jev's **preferences among the options offered at that moment**. They are not rates, and they change when the menu changes. Always read them together with `options` and `excluded`.
 * A count such as "tumour cells at 24 h" depends on declared assumptions: the accelerated 24 h cycle, damage per hit, the population ceiling and the scenario. Compare runs that differ in **one** setting (e.g. `declared_recognition` vs `recognition_off`, same seed) rather than reading absolute numbers.
 * Local-preview results are labelled `local…` in `provider` and in the folder name. Never mix them with Jev runs without saying so.
+
+## Reading highlights and fields
+
+Arrow labels and clickable cards show up to three recent recorded events (within 40 simulated minutes) and local secretion-field peaks at the current saved frame. A local maximum is not a biological anomaly. Field values reconstructed from the replay are approximate (8-bit display encoding); the scale is fixed across each run and may differ between runs. Use common scales for quantitative comparisons. Zero-field frames are explicitly labelled. TNF-alpha is not implemented.
+
+The scenario banner explains when CD8 killing is disabled. The cumulative death tile counts apoptosis commitments plus hypoxic necrosis, without recounting completion of apoptosis. Playback controls display existing results; they do not launch an intervention or call Jev.

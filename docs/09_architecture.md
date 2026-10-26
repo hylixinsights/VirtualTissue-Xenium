@@ -2,7 +2,7 @@
 
 ## 1. Design goals
 
-1. **Keep the validated code exactly as it is.** The engine (Part 1 preparation, kernel, Jev client, replay) was developed and validated before this repository existed. The repository organises it into an installable package, adds documentation, notebooks and helpers, and **does not change a single byte** of it.
+1. **Keep biological changes explicit and auditable.** The 0.1.0 release vendored the original engine unchanged. Version 0.1.1 changes the replay template and package helpers only; the biological kernel and bundled runtime are still identical. `ORIGINAL_SOURCES.json` records current hashes and preserves the original hash of revised files.
 2. **One engine for all parts.** Bundles made by Part 1 must be accepted by Parts 2–4, so both sides share one folder.
 3. **Users bring their own data, Drive and API key.** Nothing personal lives in the repository.
 
@@ -11,7 +11,7 @@
 ```text
 src/virtualtissue_xenium/
 ├── __init__.py          stdlib only · ENGINE_DIR · activate_engine() · lazy vtx.prepare / vtx.workflow / vtx.runtime
-├── engine/              ◀ VERBATIM (32 files, hashes in ORIGINAL_SOURCES.json)
+├── engine/              ◀ kernel + replay (32 files, recorded hashes and revisions)
 ├── download.py          new · public example download (HTTP ranges), verification, manual registration
 ├── own_data.py          new · data folder + manifest for your Xenium run, cluster-map template/validation/activation
 ├── colab.py             new · Colab detection, Drive mount, key lookup, run backup/restore, inline replay
@@ -22,7 +22,7 @@ src/virtualtissue_xenium/
 
 ### Engine module map
 
-| File (unchanged) | Version string | Role |
+| File | Version string | Role |
 |---|---|---|
 | `xenium_prepare.py` | `lung5k-preparation-1.1.0` | Part 1: `load_sample`, `annotate`, `score_aucell`, `read_geometry`, `propose_regions`, `plot_*`, `manual_region`, `export_region`, `write_bundle_manifest`, `zip_bundle` |
 | `prepared_runtime.py` | — | `load_inputs` (all integrity checks), `initialize`, `validate_bundle` (static tick). **Copied into every bundle** |
@@ -122,3 +122,7 @@ git push -u origin main
 * `.gitignore` already excludes data, bundles, results, journals and secrets. Run `git status` before the first commit and check that no `.h5ad`, `.parquet`, `.zip` or key file is staged.
 * Optional: create a GitHub **release** and attach an example bundle, e.g. `simulation_input_R03_180834_343907.zip` (≈ 20 MB, derived from CC BY 4.0 data; keep the 10x attribution in the release notes). Users can then skip Part 1 with `INPUT_SOURCE = url`.
 * After publishing, the "Open in Colab" badges in `notebooks/README.md` and the default `CODE_SOURCE = github` work without changes.
+
+### 0.1.1 compatibility
+
+The replay HTML changed, while `prepared_runtime.py` and `xenium_runtime/**` did not. Existing input bundles remain compatible. Existing HTMLs are self-contained and remain unchanged unless explicitly regenerated. Because run fingerprints include the replay template, resume old runs with the original software checkout; use a new run name for runs with this version. Never edit a saved fingerprint to bypass that check. Early tissue eligibility checks live in the CLI/notebook helpers before AUCell, preserving the preparation engine.

@@ -1,5 +1,5 @@
 {
-  "description": "Byte-identical copies of the validated VirtualTissue Xenium code (2026-10-25). These files are vendored unchanged: prepared bundles embed prepared_runtime.py and xenium_runtime/, and the simulator refuses any bundle whose Python files differ from this engine. tests/test_engine_integrity.py checks every hash below.",
+  "description": "Vendored engine from 2026-10-25 with current file hashes. Original hashes are retained for revised files. In 0.1.1 only the replay HTML changes; prepared_runtime.py and xenium_runtime/ remain byte-identical to the original bundle runtime.",
   "original_root": "VirtualTissue/ (Helder Nakaya, local working folders)",
   "preparation_version": "lung5k-preparation-1.1.0",
   "simulation_version": "xenium-jev-colab-1.1.0",
@@ -72,9 +72,12 @@
       "original_path": "Colab_Xenium_Jev/source/simulation_workflow.py"
     },
     "web/player_template.html": {
-      "sha256": "ac164055085e9c0314973f5840ad5e0b5930ce8c2d4d96aebbd882fa481fc3c8",
-      "bytes": 39889,
-      "original_path": "Colab_Xenium_Jev/source/web/player_template.html"
+      "sha256": "adc018d57fdb502b7fc26cad5ffbe5ef52f83574f68e143f070bac769111b5cd",
+      "bytes": 49113,
+      "original_path": "Colab_Xenium_Jev/source/web/player_template.html",
+      "original_sha256": "ac164055085e9c0314973f5840ad5e0b5930ce8c2d4d96aebbd882fa481fc3c8",
+      "original_bytes": 39889,
+      "revision": "0.1.1: interpretive highlights, field legends, scenario explanation and death counting; biological runtime unchanged."
     },
     "xenium_prepare.py": {
       "sha256": "9b5ffee6c95e4b9e1c0e807ea487284d72e5da1772cd9952991e602a9a4a2446",

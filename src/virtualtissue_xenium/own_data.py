@@ -32,6 +32,25 @@ from . import ENGINE_DIR
 
 PUBLIC_SAMPLE_ID = "Xenium_Prime_Human_Lung_Cancer_FFPE"
 
+
+class PreparationScopeError(ValueError):
+    """Valid input whose annotation is outside the tumour-interface workflow."""
+
+
+def require_tumour_interface(sample):
+    """Reject unsupported tissue before AUCell and geometry work, retaining the audit."""
+    obs = sample["obs"]
+    candidates = (obs.compartment == "tumor_candidate") & obs.qc_pass
+    if not candidates.any():
+        raise PreparationScopeError(
+            "No QC-passing tumour-candidate epithelium in the reviewed annotations. "
+            "This preparation workflow selects tumour–fibroblast–immune interfaces; "
+            "non-tumour tissue is not supported yet. Stopped before AUCell and geometry. "
+            "If this is tumour tissue, review the cluster map and RNA QC. Do not relabel "
+            "healthy cells as tumour to bypass this check. A manual centre and --list-only "
+            "use the same tissue requirements. Input audit and annotation review: "
+            f"{sample['output_dir']}")
+
 REQUIRED_FILES = {
     "cell_feature_matrix.h5": "Sparse cell-feature count matrix (10x HDF5); only 'Gene Expression' features are used.",
     "cells.parquet": "Cell IDs, XY centroids (micrometres), transcript counts, cell and nucleus areas.",

@@ -43,3 +43,5 @@ Part 1 ──► simulation_input_<REGION>_<HHMMSS_ffffff>.zip ──► Parts 2
 | **Journal** | `jev_journal.jsonl`: an append-only, hash-chained record of every request intent and response. Resuming reuses responses preserved in this file; responses lost after the last backup may be requested again. |
 | **Local preview** | The same simulation with programmed local rules instead of Jev. It is free and labelled as such everywhere. |
 | **Scenario** | `baseline_unknown`, `declared_recognition` or `recognition_off`: declared assumptions about antigen recognition and effector competence. |
+
+[11 · Experiment design](11_experiment_design.md): useful control/intervention comparisons, proposed perturbation controls, measured versus assumed baseline, and the requirements for non-cancer tissue and other platforms.

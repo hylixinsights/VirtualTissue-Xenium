@@ -24,6 +24,8 @@ The cell checks the values and builds the *effective contract*: the bundle's con
 
 ## 2. Scenarios
 
+**For the immune-killing walkthrough, explicitly select `declared_recognition`.** The default remains `baseline_unknown` so that antigen recognition is never silently assumed. A run with that default can grow or move but cannot produce CD8 cytotoxic attacks simply by waiting longer. Necrosis from sufficiently sustained hypoxia is a separate mechanism. Compare the same bundle under `declared_recognition` and `recognition_off`; inspect active CD8 counts and growth headroom in the preflight. See the [experiment design guide](11_experiment_design.md) for the distinction between a measured starting state, a control and an intervention.
+
 | Scenario | Recognition | Effector / clearance competence | Use it for |
 |---|---|---|---|
 | `baseline_unknown` | unknown (`null`) | unknown | What follows from measured state alone. Cytotoxic killing and efferocytosis are **not licensed**, because unknown never opens a gate |

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 — 2026-10-26
+
+* Quickstart explicitly selects declared recognition for immune-killing experiments and explains the matched recognition-off control, CD8 composition and growth ceiling. CLI and notebook preflight explain the selected scenario.
+* Replay adds automatic signal selection, visible field buttons, quantitative SIM legends, zero-field messages, arrow callouts and clickable highlights of recorded events/local signal peaks. Cumulative deaths include hypoxic necrosis without double-counting completed apoptosis. Legacy flat-ring LUAD replays are readable.
+* Non-tumour annotations stop preparation before AUCell and geometry with a clear CLI message, retaining the annotation audit.
+* Experiment design documents the proposed paired perturbation workbench and the missing models/adapters for drugs, resistance, neutrophils, TNF, healthy tissue and other platforms. These capabilities are not advertised as implemented.
+* Biological runtime and input-bundle compatibility are unchanged. Replay-source changes alter run fingerprints: resume earlier runs with their original checkout; new runs use a new name.
+
 ## 0.1.0 — 2026-10-25
 
 First packaged release.

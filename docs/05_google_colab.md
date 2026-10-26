@@ -127,3 +127,5 @@ Use the original ZIP path, not a folder that may now select a different export. 
 * Parts 2–4 work on the fast session disk and copy to `DRIVE_RESULTS_DIR`. The last cell refreshes the copy and downloads the results ZIP (`DOWNLOAD_RESULTS`).
 * **Saving the notebook does not save files under `/content`.** Only Drive copies and downloads persist.
 * Open `replay.html` after downloading it. Drive's own preview does not execute it.
+
+For the immune-killing walkthrough, explicitly set `SCENARIO = "declared_recognition"` in Part 3. Compare with `recognition_off` using a new run name and identical remaining settings. The default `baseline_unknown` keeps recognition and competence unknown and cannot produce CD8 cytotoxic attacks merely by running longer. Inspect the preflight explanations before starting.

@@ -4,7 +4,7 @@
 
 VirtualTissue-Xenium takes one region of a Xenium section (cell segmentation, XY coordinates and gene expression) and turns it into a living simulation in which **every cell is an agent**. Each cell starts from its own measured state at time zero: 20 AUCell pathway scores computed from its transcripts, its polygon and its measured contacts. Whenever something relevant happens to it, the cell asks **Jev** ([TypeSafe](https://typesafe.ai)'s model for structured choices) which of its currently permitted actions to take: crawl toward a tumour cell, degranulate, enter the cell cycle, phagocytose a corpse, secrete a signal, rest. A deterministic physics kernel owns everything that should not be left to a model: space, mechanics, diffusing fields, clocks, damage, death and division.
 
-The result is an interactive replay in which you can watch the tissue evolve, click any cell and read every decision it made, with Jev's probability for each option.
+Use the same measured starting tissue to ask a specific question and compare a control with a changed assumption. The replay highlights recorded events and local signal peaks; you can click a cell and inspect every decision. Current experiments support declared immune recognition and its negative control. Named drugs, acquired resistance and neutrophil recruitment are not implemented. The [experiment design guide](docs/11_experiment_design.md) separates available experiments from the proposed perturbation workbench.
 
 ![Replay of region R03 of the public Xenium Prime lung cancer sample](docs/images/replay_R03.png)
 
@@ -84,7 +84,7 @@ Everything runs on a free **CPU** runtime. Inputs and results live in **your own
 
 7. Open [`Part2-4_Run_Jev_Simulation.ipynb` in Colab](https://colab.research.google.com/github/hylixinsights/VirtualTissue-Xenium/blob/main/notebooks/Part2-4_Run_Jev_Simulation.ipynb) and save your own copy in Drive. **In this simulation notebook**, open the **🔑 Secrets** panel, click **Add new secret**, set Name = `TYPESAFE_API_KEY`, paste your key as the Value and switch on **Notebook access**. If the secret already exists, enable access for this notebook. Skip the secret for a local preview.
 8. Run setup, then Part 2. `BUNDLE_ZIP` defaults to the Part 1 output folder, so the newest bundle inside it is used. To select a particular region or resume an earlier run, set it to that run's exact bundle ZIP. Keep this ZIP for future resumptions.
-9. In Part 3, choose `SCENARIO`, `HORIZON_HOURS` and `MAX_HTTP_ATTEMPTS`, then run the zero-cost **preflight**. It shows how many cell questions and HTTP requests the first round needs. Check **`START_RUN`** and run the cell.
+9. In Part 3, **explicitly choose `SCENARIO = declared_recognition` to test CD8-mediated tumour killing**. This assumes recognition and effector competence; it permits killing without guaranteeing it. The conservative default, `baseline_unknown`, leaves killing disabled. Set `HORIZON_HOURS` and `MAX_HTTP_ATTEMPTS`, then run the zero-cost **preflight**. Inspect the active CD8 count, growth headroom and first-round request estimate. Check **`START_RUN`** and run the cell.
 10. In Part 4, the replay opens inside the notebook. The results are copied to `MyDrive/VirtualTissue/Simulation_Results/` and can also be downloaded as a ZIP. `replay.html` opens offline in any browser.
 
 No API key yet? Set `RUN_MODE = "Local preview (no API)"`. The engine then runs the same simulation with programmed local rules, which are free and labelled as such everywhere.
@@ -108,18 +108,31 @@ vtx download-example data/Xenium_Public_Lung5K
 vtx prepare data/Xenium_Public_Lung5K outputs/prepared --region R03
 BUNDLE=$(ls -t outputs/prepared/run_*/simulation_input_R03_*.zip | head -1)
 
-# Part 2: verify the bundle and preview the first round (no API calls)
-vtx check "$BUNDLE"
+# Part 2: inspect the immune-killing experiment before running it (no API calls)
+vtx check "$BUNDLE" --scenario declared_recognition --hours 48
 
 # Part 3: free local preview, then a real Jev run
-vtx run "$BUNDLE" outputs/runs --run-name R03_local --mode local --hours 24
+vtx run "$BUNDLE" outputs/runs --run-name R03_decl_local --mode local \
+        --scenario declared_recognition --hours 48 --seed 21
 export TYPESAFE_API_KEY=...               # never commit it
-vtx run "$BUNDLE" outputs/runs --run-name R03_jev01 --mode jev \
-        --scenario baseline_unknown --hours 24 --max-http-attempts 600
+vtx run "$BUNDLE" outputs/runs --run-name R03_decl01 --mode jev \
+        --scenario declared_recognition --hours 48 --seed 21 --max-http-attempts 1000
 
 # Part 4: summary, figure and replay
-vtx explore outputs/runs/R03_jev01_results.zip --plot outputs/R03_jev01_overview.png --open
+vtx explore outputs/runs/R03_decl01_results.zip --plot outputs/R03_decl01_overview.png --open
 ```
+
+For a matched negative control, repeat the Jev command with `--scenario recognition_off` and a new name such as `R03_recognition_off01`, retaining every other setting. Only interpret the shared simulated time interval if either run stops at its request cap. `1000` is a ceiling on requests, not a guarantee of reaching 48 h. Keep `baseline_unknown` when the question is what happens without assuming immune recognition; elapsed time does not unlock killing. Hypoxic necrosis is a separate mechanism.
+
+**Already prepared R08?** The same experiment uses your exact bundle path:
+
+```bash
+vtx run outputs/prepared/run_20261026_115727_254671/simulation_input_R08_115925_827152.zip outputs/runs \
+  --run-name R08_decl01 --mode jev --scenario declared_recognition \
+  --hours 48 --seed 21 --max-http-attempts 1000
+```
+
+Replace that path with your own exported ZIP. R08 in the public example has only three active CD8 cells; a small response can reflect composition, contacts, choices or model assumptions. Inspect these before extending the horizon. R03 and R08 also start near the default 1,000-body ceiling; use the same larger `--max-population` in both arms if growth is part of the question.
 
 The same notebooks also run in local Jupyter (`jupyter lab notebooks/`). They detect local execution for code loading and working folders, but **you must replace the Drive paths in the input/output fields before running the data cells**. Set Part 1's `DATA_DIR` and `OUTPUT_BASE`, Part 2's `BUNDLE_ZIP`, and the explorer's `RESULTS_PATH` to your own local paths. Uncheck `SAVE_RESULTS_TO_DRIVE`, or set its destination to a local backup folder. The [local guide](docs/08_local_installation.md#3-the-notebooks-in-local-jupyter) lists every field. For your own sample, follow the [own-data guide](docs/06_your_own_xenium_data.md) before `vtx prepare`.
 
@@ -246,7 +259,7 @@ VirtualTissue-Xenium/
 ├── notebooks/                    the three Colab/Jupyter notebooks (generated by tools/build_notebooks.py)
 ├── src/virtualtissue_xenium/
 │   ├── __init__.py               puts engine/ on sys.path; lazy access: vtx.prepare, vtx.workflow, vtx.runtime
-│   ├── engine/                   ◀ the validated code, byte-identical to the originals (see ORIGINAL_SOURCES.json)
+│   ├── engine/                   ◀ the biological kernel plus replay (hashes and revisions in ORIGINAL_SOURCES.json)
 │   │   ├── xenium_prepare.py         Part 1: load, annotate, AUCell, regions, export
 │   │   ├── prepared_runtime.py       bundle loader and static validation (also embedded in every bundle)
 │   │   ├── simulation_workflow.py    Parts 2–4: extract, preflight, run, checkpoints, results ZIP
@@ -266,7 +279,7 @@ VirtualTissue-Xenium/
 └── tools/build_notebooks.py      regenerates notebooks/ from readable source
 ```
 
-Why the engine is vendored unchanged and placed on `sys.path` is explained in [docs/09_architecture.md](docs/09_architecture.md). In short, bundles embed `prepared_runtime.py` and `xenium_runtime/`, and the simulator refuses a bundle whose code differs by even one byte.
+Why the biological kernel is vendored and placed on `sys.path` is explained in [docs/09_architecture.md](docs/09_architecture.md). In short, bundles embed `prepared_runtime.py` and `xenium_runtime/`, and the simulator refuses a bundle whose code differs by even one byte.
 
 ---
 
@@ -274,14 +287,14 @@ Why the engine is vendored unchanged and placed on `sys.path` is explained in [d
 
 | Check | Result |
 |---|---|
-| Engine files identical to the validated originals | ✔ SHA-256 of all 32 files ([`ORIGINAL_SOURCES.json`](src/virtualtissue_xenium/engine/ORIGINAL_SOURCES.json)), enforced by `tests/test_engine_integrity.py` |
+| Engine files match the recorded version; biological runtime remains unchanged | ✔ SHA-256 of all 32 files ([`ORIGINAL_SOURCES.json`](src/virtualtissue_xenium/engine/ORIGINAL_SOURCES.json)), enforced by `tests/test_engine_integrity.py` |
 | Part 1 through the package reproduces the earlier R03 export | ✔ all 39 bundle files byte-identical, including `region.h5ad` and the atlas fingerprint `67f4eb78…` |
 | Own-data route (fresh manifest, filled-in cluster template) | ✔ same 989 R03 cells as the public route; only sample ID and provenance differ |
 | Original engine tests (Jev provider, preparation, R03 integration with mocked Jev) | ✔ budget stop before a round, atomic failed rounds, deterministic resume, rejection of unsafe or modified ZIPs. Run on Python 3.12 and 3.13 |
 | 24 h simulation of R03 through the package (`vtx run --mode local`) | ✔ same decisions and events as the original 24 h validation: 761 decisions, 11 divisions, 65 divisions blocked by the population ceiling |
 | All three notebooks executed end to end (mocked Colab UI and Jev) | ✔ Part 1 → R03 ZIP; Parts 2–4 with mocked Jev; Drive restore in a "new runtime" sent **0** new requests; upload + local preview; explorer |
 | API key absent from every output | ✔ checked across journals, replays, CSVs and ZIPs |
-| Live Colab frontend, live Jev service with this package | **Not yet run.** Do the first live run with a small `MAX_HTTP_ATTEMPTS` |
+| Live Jev result artifacts supplied by users | R03 (24 h) and R08 (72 h) saved replays inspected; both used `baseline_unknown`. Further samples and technologies remain unvalidated |
 
 Run the tests with `pytest`. See [docs/08](docs/08_local_installation.md#5-running-the-tests) for the full and mocked notebook checks.
 

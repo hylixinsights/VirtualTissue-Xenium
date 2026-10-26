@@ -1,4 +1,4 @@
-"""The packaged engine must stay byte-identical to the validated originals."""
+"""The packaged engine must match the recorded hashes, including documented revisions."""
 import hashlib
 import json
 import re
@@ -13,14 +13,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class EngineIntegrity(unittest.TestCase):
-    def test_every_engine_file_matches_the_recorded_original(self):
+    def test_every_engine_file_matches_the_recorded_version(self):
         record = json.loads((vtx.ENGINE_DIR / "ORIGINAL_SOURCES.json").read_text())["files"]
         present = {p.relative_to(vtx.ENGINE_DIR).as_posix() for p in vtx.ENGINE_DIR.rglob("*")
                    if p.is_file() and "__pycache__" not in p.parts and p.name != "ORIGINAL_SOURCES.json"}
         self.assertEqual(present, set(record), "Engine files were added or removed.")
         for name, expected in record.items():
             digest = hashlib.sha256((vtx.ENGINE_DIR / name).read_bytes()).hexdigest()
-            self.assertEqual(digest, expected["sha256"], f"{name} differs from the validated original.")
+            self.assertEqual(digest, expected["sha256"], f"{name} differs from its recorded version.")
 
     def test_engine_versions(self):
         import simulation_workflow
