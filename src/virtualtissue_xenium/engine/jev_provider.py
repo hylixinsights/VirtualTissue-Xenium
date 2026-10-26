@@ -14,7 +14,7 @@ from pathlib import Path
 
 from xenium_runtime.io import canonical, fingerprint
 from xenium_runtime.providers import BudgetExhausted
-from xenium_runtime.v2.provider_jev import build_batches, payload
+from jev_payload import build_batches, payload
 
 ENDPOINT = "https://api.typesafe.ai/v1/systemone"
 

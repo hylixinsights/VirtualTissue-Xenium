@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 — 2026-10-26
+
+* Results include hypoxic necrosis, unique deaths and division blocks by cause. `vtx compare` validates matching provenance/settings and compares the latest common saved frame. Original runs remain intact; optional replay copies share field scales and the comparison endpoint.
+* Replay exports all ten fields, keeps Auto on oxygen, renders zero oxygen as anoxia, distinguishes disabled/missing/zero/uniform fields, and labels field maxima accurately. Field details collapse, callouts clamp to map edges, necrosis has a saved position, and population-ceiling warnings no longer claim contact inhibition.
+* A reporting adapter records event coordinates and distinguishes population ceiling, local pressure and compression. The bundled biological runtime, its population-limit rule and its trajectories are unchanged. Existing input bundles retain their integrity checks and remain compatible.
+* Jev prompt `vtx-choice-2` omits global recognition flags and gate-exclusion diagnostics; the latter remain in the episode. CD8 questions are batched separately from other cell types. Frozen t0 AUCell semantics are explicit. Jev results can change and require new run names; live Jev behavior was not validated for this release.
+* Region feasibility is checked before whole-section AUCell. Annotation validation warns about tumour-free maps; preflight warns about few active CD8 cells and limited growth headroom. Documentation explains finite pulses, effective damage, synchronized accelerated cycles and the cumulative computational ceiling.
+* Notebooks detect the current workflow version correctly on repeated setup. Resume 0.1.1 runs with the 0.1.1 checkout; do not overwrite saved fingerprints. Persistent AUCell caching and scheduled interventions remain future work.
+* Validation details and limits are recorded in `tests/reports/release_0.1.2.json`. Offline JavaScript tests cover replay logic at 1400×900 and 1920×1080; browser visual inspection and live Colab/Jev are not claimed.
+
 ## 0.1.1 — 2026-10-26
 
 * Quickstart explicitly selects declared recognition for immune-killing experiments and explains the matched recognition-off control, CD8 composition and growth ceiling. CLI and notebook preflight explain the selected scenario.

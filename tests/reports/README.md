@@ -1,4 +1,8 @@
-# Validation reports (2026-10-25, package 0.1.0)
+# Validation reports
+
+`release_0.1.2.json` records the 2026-10-26 checks for version 0.1.2: Python 3.12/3.13 suites, unchanged local biological trajectories, real-bundle prompt comparison, matched-run accounting, mocked notebooks and offline replay logic. It explicitly separates these checks from live service and browser validation.
+
+The files below are the earlier 2026-10-25 records for package 0.1.0:
 
 | File | Produced by | Shows |
 |---|---|---|

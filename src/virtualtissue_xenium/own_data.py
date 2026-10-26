@@ -280,6 +280,30 @@ def write_annotation_template(data_dir, out_json, *, top_n: int = 15, marker_sum
     return out
 
 
+def annotation_scope_warnings(annotations):
+    """Schema validity and suitability for the tumour workflow are different."""
+    records = json.loads(Path(annotations).read_text()) if not isinstance(annotations, list) else annotations
+    if not any(r.get("compartment") == "tumor_candidate" for r in records):
+        return ["No tumour-candidate annotation: this map cannot open the current tumour-interface preparation workflow."]
+    return []
+
+
+def preflight_regions(prep, sample, *, n_options=8, core_target=750, max_total=1000, halo_um=30, center=None):
+    """Reject unusable geometry/region requests before whole-section AUCell."""
+    require_tumour_interface(sample)
+    try:
+        prep.read_geometry(sample)
+        if center is not None:
+            import math
+            if len(center) != 2 or not all(math.isfinite(x) for x in center):
+                raise ValueError("Use two finite coordinates in micrometres.")
+            if prep.make_region(sample, center, core_target, max_total, halo_um) is None:
+                raise ValueError("No usable region fits the total cell limit here; choose another centre.")
+        prep.propose_regions(sample, n_options=n_options, core_target=core_target, max_total=max_total, halo_um=halo_um)
+    except ValueError as exc:
+        raise PreparationScopeError(f"{exc} Stopped before AUCell. Input audit: {sample['output_dir']}") from None
+
+
 def validate_annotations(annotations, data_dir=None) -> list[str]:
     """Return a list of problems (empty list = valid).
 

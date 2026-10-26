@@ -23,6 +23,16 @@ def experiment_notes(settings, facts=None):
             notes.append("No active CD8 T cells in this region; the current scenarios cannot test CD8 killing here.")
         else:
             notes.append(f"Active CD8 T cells: {cd8}. Inspect their contacts and access to tumour when interpreting killing.")
+            if cd8 < 10:
+                notes.append("Low CD8 count: outcomes may depend on a few cells and their contacts. "
+                             "The warning threshold of 10 is a usability heuristic, not a validated biological cutoff.")
         notes.append(f"Growth headroom: {facts['growth_headroom']} new bodies before the population ceiling. "
                      "This limit includes context and removed bodies.")
+        eligible = facts.get("initially_cycling_or_eligible", 0)
+        if settings.get("horizon_hours", 0) >= 24 and eligible > facts["growth_headroom"]:
+            notes.append(f"Population ceiling may constrain this horizon: {eligible} cells are initially cycling or eligible "
+                         "to enter cycle. This is a capacity warning, not a prediction of divisions.")
+        if "initial_http_batches" in facts:
+            notes.append(f"First round needs {facts['initial_http_batches']} requests. Total demand depends on events; "
+                         "equal request budgets do not ensure equal simulated time. Compare only the common saved interval.")
     return notes

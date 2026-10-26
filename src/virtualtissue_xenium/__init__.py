@@ -1,7 +1,7 @@
 """VirtualTissue-Xenium: AI-agent-driven virtual tissue simulations from Xenium data.
 
 The simulation code lives in the ``engine/`` folder next to this file. The
-biological kernel is unchanged; replay revisions are recorded in
+biological kernel is unchanged; package-side reporting and payload revisions are recorded in
 ``engine/ORIGINAL_SOURCES.json``. Those modules use
 top-level imports (``import xenium_prepare``, ``from xenium_runtime.io import ...``)
 because prepared input bundles embed the same files and the simulator compares
@@ -24,7 +24,7 @@ import importlib
 import sys
 from pathlib import Path
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 #: Folder that holds the engine modules and their recorded resources.
 ENGINE_DIR = Path(__file__).resolve().parent / "engine"
@@ -34,7 +34,7 @@ DATASETS_DIR = Path(__file__).resolve().parent / "datasets"
 
 #: Versions written by the engine itself (kept here for documentation).
 PREPARATION_VERSION = "lung5k-preparation-1.1.0"
-SIMULATION_VERSION = "xenium-jev-colab-1.1.0"
+SIMULATION_VERSION = "xenium-jev-colab-1.1.1"
 
 _ENGINE_MODULES = {
     "prepare": "xenium_prepare",

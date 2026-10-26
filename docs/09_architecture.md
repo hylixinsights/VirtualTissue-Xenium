@@ -126,3 +126,11 @@ git push -u origin main
 ### 0.1.1 compatibility
 
 The replay HTML changed, while `prepared_runtime.py` and `xenium_runtime/**` did not. Existing input bundles remain compatible. Existing HTMLs are self-contained and remain unchanged unless explicitly regenerated. Because run fingerprints include the replay template, resume old runs with the original software checkout; use a new run name for runs with this version. Never edit a saved fingerprint to bypass that check. Early tissue eligibility checks live in the CLI/notebook helpers before AUCell, preserving the preparation engine.
+
+### 0.1.2 compatibility
+
+`RecordedSimulation` subclasses the unchanged autonomous kernel to add event positions, block causes and recording metadata. It enriches copied frames without changing the live biological state. `jev_payload.py` owns prompt `vtx-choice-2`; it removes recognition flags and gate diagnostics from provider observations, states that AUCell is frozen, and separates CD8 batches. The full local observations remain auditable in decisions.
+
+The embedded `prepared_runtime.py` and `xenium_runtime/**` retain their original hashes, so existing input bundles pass the same strict checks. No bundle code is executed and no integrity check is relaxed. The wrapper, payload, replay and workflow are package-side code covered by the run source fingerprint. Preparation remains `lung5k-preparation-1.1.0`; the workflow is `xenium-jev-colab-1.1.1`.
+
+Use the original 0.1.1 checkout to resume a 0.1.1 run. Start a new run name for 0.1.2; new prompts are not interchangeable with old paid answers. Saved episodes/HTMLs remain unchanged unless a separate derived replay is exported.

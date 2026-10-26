@@ -171,13 +171,29 @@ def main():
     assert len(calls) == first_calls
     report["local_preview_upload"] = dict(decisions=ns["RESULT"]["episode"]["summary"]["decisions"])
 
+    # A matched control must use the same provider, seed, model and contract.
+    control = dict(sim, SCENARIO="recognition_off", RUN_NAME="notebook_control")
+    ns = execute("Part2-4_Run_Jev_Simulation.ipynb", control, content, log, calls, downloads, shown, mounts)
+    assert ns["RESULT"]["report"]["completed"]
+    report["recognition_off_control"] = dict(http_attempts=ns["RESULT"]["report"]["usage"]["http_attempts"])
+
     # ---------------------------------------------------------------- Part 4 explorer
     explore = dict(common, RESULTS_SOURCE="google_drive",
                    RESULTS_PATH=str(backup / "notebook_validation_results.zip"), CELL_ID=0,
-                   COMPARE_PATHS=f"{backup / 'notebook_validation_results.zip'},{content / 'Xenium_Jev/results/local_check_local_preview'}")
+                   COMPARE_PATHS=f"{backup / 'notebook_validation_results.zip'},{backup / 'notebook_control_results.zip'}")
     ns = execute("Part4_Explore_Saved_Results.ipynb", explore, content, log, calls, downloads, shown, mounts)
     assert not ns["DECISIONS"].empty and ns["cell"] > 0
-    report["part4"] = dict(summary=ns["vtx_results"].summary(ns["RES"]))
+    comparison = ns["vtx_results"].compare_runs(explore["COMPARE_PATHS"].split(","))
+    assert len(comparison) == 2 and comparison.attrs["common_time_min"] == 60
+    try:
+        ns["vtx_results"].compare_runs([backup / "notebook_validation_results.zip",
+                                      content / "Xenium_Jev/results/local_check_local_preview"])
+    except ValueError as error:
+        assert "provider" in str(error)
+    else:
+        raise AssertionError("Different providers must not be compared as matched runs.")
+    report["part4"] = dict(summary=ns["vtx_results"].summary(ns["RES"]),
+                           comparison_time_min=60, mismatched_provider_rejected=True)
 
     # ---------------------------------------------------------------- secrets never persisted
     leaked = []
@@ -191,7 +207,8 @@ def main():
                 leaked.append(str(p))
     assert not leaked, leaked
     import resource
-    report["peak_memory_mb"] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024)
+    rss_divisor = 1024**2 if sys.platform == "darwin" else 1024
+    report["peak_memory_mb"] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rss_divisor)
     report.update(passed=True, actual_network_calls=0, mocked_http_attempts=len(calls),
                   drive_mounts=len(mounts), secret_absent_from_outputs=True)
     (out / "execution.log").write_text(log.getvalue())

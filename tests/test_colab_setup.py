@@ -46,6 +46,12 @@ class SetupTests(unittest.TestCase):
     def test_requirements_file_is_where_setup_expects_it(self):
         self.assertTrue((vtx.ENGINE_DIR / "requirements-colab.txt").is_file())
 
+    def test_current_simulation_does_not_trigger_spurious_restart(self):
+        with patch.dict(sys.modules, {"simulation_workflow": types.SimpleNamespace(VERSION=vtx.SIMULATION_VERSION)}), \
+             patch.object(colab_setup, "changed_loaded_packages", return_value=[]), \
+             patch.object(colab_setup.subprocess, "run", return_value=types.SimpleNamespace(returncode=0, stdout='{"python":"3.13"}', stderr="")):
+            self.assertTrue(colab_setup.setup_environment(vtx.ENGINE_DIR, install_packages=False)["ready"])
+
     def test_notebooks_are_valid_english_and_have_edit_markers(self):
         for name in NOTEBOOKS:
             nb = json.loads((ROOT / "notebooks" / name).read_text())

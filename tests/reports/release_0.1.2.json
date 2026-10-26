@@ -1,0 +1,166 @@
+{
+  "package": "virtualtissue-xenium",
+  "version": "0.1.2",
+  "date": "2026-10-26",
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "baseline_revision": "6b521f142255273b88e2a51a876f91cb5544acd0",
+  "existing_bundle": {
+    "name": "simulation_input_R03_180834_343907.zip",
+    "sha256": "b2528cd957061fcfe63099f42a3f3f89daf3a654a94fa36261e119fcf5cc7a82",
+    "compatible": true
+  },
+  "suites": [
+    {
+      "python": "3.12.14",
+      "runner": "unittest",
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "python": "3.13.17",
+      "runner": "pytest",
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "biological_runtime_byte_identical_to_0_1_1": true,
+  "local_trajectory_regressions": {
+    "hypoxia": {
+      "hours": 6,
+      "identical_final_state": true,
+      "identical_decisions": true,
+      "identical_metrics": true,
+      "divisions": 0,
+      "apoptosis_committed": 0,
+      "hypoxic_necrosis": 263,
+      "unique_deaths": 263,
+      "cytotoxic_pulses": 0,
+      "corpses_cleared": 0,
+      "corpses_degraded": 0,
+      "division_blocks_population_ceiling": 0,
+      "division_blocks_local_pressure": 0,
+      "division_blocks_compression": 0,
+      "division_blocks_legacy_unspecified": 0,
+      "growth_blocks_compression": 0
+    },
+    "R03_48h": {
+      "hours": 48,
+      "identical_final_state": true,
+      "identical_decisions": true,
+      "identical_metrics": true,
+      "divisions": 11,
+      "apoptosis_committed": 0,
+      "hypoxic_necrosis": 0,
+      "unique_deaths": 0,
+      "cytotoxic_pulses": 6,
+      "corpses_cleared": 0,
+      "corpses_degraded": 0,
+      "division_blocks_population_ceiling": 83,
+      "division_blocks_local_pressure": 0,
+      "division_blocks_compression": 0,
+      "division_blocks_legacy_unspecified": 0,
+      "growth_blocks_compression": 63
+    }
+  },
+  "actual_r03_t0_prompts": {
+    "passed": true,
+    "questions": {
+      "declared_recognition": 280,
+      "recognition_off": 280
+    },
+    "non_cd8_questions": 278,
+    "non_cd8_payloads_byte_identical": true,
+    "non_cd8_batches_byte_identical": true,
+    "initial_batches": {
+      "declared_recognition": 25,
+      "recognition_off": 25
+    },
+    "prompt_version": "vtx-choice-2"
+  },
+  "legacy_comparison": {
+    "declared_endpoint_min": 570,
+    "recognition_off_endpoint_min": 1120,
+    "common_saved_time_min": 560,
+    "originals_preserved": true,
+    "shared_scale_replay_copies": 2,
+    "legacy_prompt_confounding_warning": true
+  },
+  "notebooks": {
+    "passed": true,
+    "python": "3.13.17",
+    "colab_ui": "mocked",
+    "jev_transport": "mocked",
+    "part1": {
+      "regions": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "R08"
+      ],
+      "total_r03_cells": 989,
+      "atlas_fingerprint": "cdafce0e4ea64d6f83b9c2e85514603493dcf8f406847b31e5ec8e8eb246ca77",
+      "cells_equal_to_existing_bundle_after_sorting_neighbor_lists": true,
+      "neighbor_list_order_differences": 984,
+      "note": "The freshly prepared atlas is not byte-identical to the older artifact: neighbor-list ordering differs; cell IDs, geometry, scores and neighbor sets match."
+    },
+    "parts2_4": {
+      "http_attempts": 34,
+      "decisions": 362,
+      "simulated_minutes": 60,
+      "stop_reason": "horizon_reached"
+    },
+    "drive_restore": {
+      "new_http_calls": 0,
+      "reused_batches": 34
+    },
+    "local_preview_upload": {
+      "decisions": 362
+    },
+    "recognition_off_control": {
+      "http_attempts": 26
+    },
+    "matched_comparison_time_min": 60,
+    "mismatched_provider_rejected": true,
+    "actual_network_calls": 0,
+    "secret_absent_from_outputs": true
+  },
+  "replay": {
+    "test": "node tests/test_player_logic.cjs",
+    "passed": true,
+    "dimensions": [
+      [
+        1400,
+        900
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "scope": "Offline JavaScript with mock DOM and canvas; not browser rendering.",
+    "checks": [
+      "zero oxygen remains visible and labelled anoxia",
+      "removed-cell necrosis retains event coordinates",
+      "offscreen callouts clamp to map edge",
+      "backward seek restores counts",
+      "disabled and missing fields are distinct",
+      "inactive fields hide normalization floors"
+    ]
+  },
+  "limitations": [
+    "No live Jev requests; changed prompts require new runs and can change Jev decisions.",
+    "No live Google Colab session; notebook execution used mocked Colab services.",
+    "Browser security blocked local replay opening; visual browser inspection was not completed.",
+    "The population ceiling remains cumulative and includes context and removed bodies.",
+    "No biological or clinical validation is implied by software regression tests."
+  ]
+}

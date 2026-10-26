@@ -74,7 +74,7 @@ every 10 simulated minutes (one tick):
 
 One request = `{"model", "state", "questions"}`. Each question is a `choice` with:
 
-* `instructions.local_observation` — `time_min`, `primary_label`, `identity`, `t0_aucell_percentile` and `t0_aucell_raw` (the 20 signatures, missing ones absent), `t0_aucell_provenance`, `sim_state` (viability, damage, effector pulses, exhaustion, glycolysis, PD-L1, polarisation), `fields_sim` (oxygen, glucose, lactate, IFN-γ-like, CXCL9-like, VEGF-like, TGF-β-like, matrix), `local_pressure_sim`, `contacts` (id, label, viability, PD-L1, provenance), `recognition_sim`, and `excluded` (offered-but-gated actions with the failed condition);
+* `instructions.local_observation` — `time_min`, `primary_label`, `identity`, `t0_aucell_percentile` and `t0_aucell_raw` (the 20 signatures, missing ones absent), `t0_aucell_provenance`, `sim_state` (viability, damage, effector pulses, exhaustion, glycolysis, PD-L1, polarisation), `fields_sim` (oxygen, glucose, lactate, IFN-γ-like, CXCL9-like, VEGF-like, TGF-β-like, matrix), `local_pressure_sim`, `contacts` (id, label, viability, PD-L1, provenance). The global `recognition_sim` and `excluded` diagnostics are omitted from provider payloads in prompt `vtx-choice-2` and retained in local decision records;
 * `criteria` — the permitted options and their one-line descriptions. Targeted actions are keyed `ACTION:<target_id>`.
 
 It never contains raw counts, gene lists, coordinates, the contract or a desired outcome. See the full real example in the [README](../README.md#43-how-one-cell-asks-jev-part-3).

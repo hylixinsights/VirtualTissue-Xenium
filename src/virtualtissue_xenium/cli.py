@@ -63,9 +63,12 @@ def cmd_annotation_template(a):
 
 
 def cmd_check_annotations(a):
-    from .own_data import validate_annotations
+    from .own_data import validate_annotations, annotation_scope_warnings
     problems = validate_annotations(a.annotations, a.data_dir)
     print("Valid." if not problems else "Problems:\n  " + "\n  ".join(problems))
+    if not problems:
+        for warning in annotation_scope_warnings(a.annotations):
+            print("Scope warning:", warning)
     sys.exit(0 if not problems else 1)
 
 
@@ -89,6 +92,8 @@ def cmd_prepare(a):
     prep.save_json(run_dir / "environment.json", prep.environment())
     prep.annotate(sample, {})
     own_data.require_tumour_interface(sample)
+    own_data.preflight_regions(prep, sample, n_options=a.n_regions, core_target=a.core_target,
+                               max_total=a.max_total, halo_um=a.halo, center=a.center)
     plt.close(prep.plot_marker_review(sample))
     prep.score_aucell(sample, n_up=a.aucell_top_ranks, min_overlap=5, batch_size=4096)
     fig, ax = plt.subplots(figsize=(8, 3))
@@ -96,7 +101,6 @@ def cmd_prepare(a):
     ax.axvline(a.aucell_top_ranks, color="#bc582d", label="Minimum detected genes for AUCell")
     ax.set(xlabel="Detected genes per cell", ylabel="Number of cells"); ax.legend()
     fig.tight_layout(); fig.savefig(run_dir / "rna_depth_qc.png", dpi=150); plt.close(fig)
-    prep.read_geometry(sample)
     table = prep.propose_regions(sample, n_options=a.n_regions, core_target=a.core_target,
                                  max_total=a.max_total, halo_um=a.halo)
     plt.close(prep.plot_overview(sample))
@@ -209,6 +213,14 @@ def cmd_explore(a):
         webbrowser.open(res["replay"].resolve().as_uri())
 
 
+def cmd_compare(a):
+    from .results import compare_runs, export_comparison_replays
+    print(compare_runs(a.results).to_string())
+    if a.shared_replays:
+        for path in export_comparison_replays(a.results, a.shared_replays):
+            print("Replay with shared field scales:", path)
+
+
 # --------------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="vtx", description="VirtualTissue-Xenium command line (Parts 1-4).")
@@ -266,6 +278,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("results"); s.add_argument("--plot", help="Save an overview figure (PNG).")
     s.add_argument("--open", action="store_true", help="Open replay.html in the default browser.")
     s.set_defaults(func=cmd_explore)
+    s = sub.add_parser("compare", help="Compare matched runs at their latest common saved time.")
+    s.add_argument("results", nargs="+"); s.add_argument("--shared-replays", metavar="OUTPUT_DIR")
+    s.set_defaults(func=cmd_compare)
     return p
 
 
@@ -279,6 +294,10 @@ def main(argv=None):
         args.func(args)
     except PreparationScopeError as exc:
         parser.exit(2, f"Preparation stopped: {exc}\n")
+    except ValueError as exc:
+        if args.command == "compare":
+            parser.exit(2, f"Comparison stopped: {exc}\n")
+        raise
 
 
 if __name__ == "__main__":

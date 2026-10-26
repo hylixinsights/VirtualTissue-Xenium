@@ -17,14 +17,14 @@ from pathlib import Path, PurePosixPath
 
 from prepared_runtime import load_inputs
 from xenium_runtime.io import canonical, fingerprint
-from xenium_runtime.v2.autonomous import AutonomousSimulation
+from recorded_simulation import RecordedSimulation as AutonomousSimulation
 from xenium_runtime.v2.episode import validate_episode
 from xenium_runtime.v2.policy import ScoreAwareLocalPolicy
-from xenium_runtime.v2.provider_jev import build_batches, payload
+from jev_payload import PROMPT_VERSION, build_batches, payload
 from player import write_player
 from jev_provider import JevProvider
 
-VERSION = "xenium-jev-colab-1.1.0"
+VERSION = "xenium-jev-colab-1.1.1"
 SOURCE = Path(__file__).resolve().parent
 
 
@@ -136,6 +136,9 @@ def preflight(bundle, settings):
                  context_cells=int((~sim.tissue.acts).sum()), acting_composition=dict(counts),
                  initial_cell_questions=len(rows), initial_http_batches=len(batches),
                  growth_headroom=settings["max_population"] - len(bundle["atlas"]["cells"]),
+                 initially_cycling_or_eligible=sum(bool(s.get("cycle")) for s in sim.bio) +
+                     sum("ENTER_CYCLE" in r["options"] for r in rows),
+                 prompt_version=PROMPT_VERSION,
                  scenario=sim.scenario, t0_fidelity=sim.fidelity, zip_sha256=bundle["zip_sha256"])
     # A fresh static simulation checks one mechanical tick without asking any provider.
     null = AutonomousSimulation(bundle["atlas"], bundle["contract"], scenario="static", seed=settings["seed"])
@@ -171,7 +174,7 @@ def versions():
 def run_context(bundle, settings):
     sources = {p.relative_to(SOURCE).as_posix(): sha256(p) for p in sorted(SOURCE.rglob("*"))
                if p.is_file() and p.suffix in (".py", ".html", ".txt")}
-    return dict(version=VERSION, zip_sha256=bundle["zip_sha256"], atlas_fingerprint=bundle["atlas"]["fingerprint"],
+    return dict(version=VERSION, prompt_version=PROMPT_VERSION, zip_sha256=bundle["zip_sha256"], atlas_fingerprint=bundle["atlas"]["fingerprint"],
                 original_contract_fingerprint=fingerprint(bundle["contract"]),
                 effective_contract_fingerprint=fingerprint(effective_contract(bundle, settings)),
                 settings=settings, sources=sources, environment=versions())

@@ -63,7 +63,7 @@ def setup_environment(code_dir, install_packages=True):
     changed = changed_loaded_packages(loaded)
     # Prevent an old notebook's imported source from surviving a source update.
     previous = sys.modules.get('simulation_workflow')
-    if previous is not None and getattr(previous, 'VERSION', None) != 'xenium-jev-colab-1.1.0':
+    if previous is not None and getattr(previous, 'VERSION', None) != 'xenium-jev-colab-1.1.1':
         changed.append('previous simulation code')
     if changed:
         print('\nINSTALLATION COMPLETE — ONE SESSION RESTART IS REQUIRED.')

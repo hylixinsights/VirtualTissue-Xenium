@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from jev_provider import JevProvider, ProviderError, validate_response
 from xenium_runtime.providers import BudgetExhausted
-from xenium_runtime.v2.provider_jev import payload, build_batches
+from jev_payload import payload, build_batches
 
 
 PARAMS = dict(max_questions=2, max_payload_bytes=40000, max_response_bytes=2000000)

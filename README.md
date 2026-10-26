@@ -2,7 +2,7 @@
 
 **An AI-agent-driven virtual tissue built from real 10x Genomics Xenium data.**
 
-VirtualTissue-Xenium takes one region of a Xenium section (cell segmentation, XY coordinates and gene expression) and turns it into a living simulation in which **every cell is an agent**. Each cell starts from its own measured state at time zero: 20 AUCell pathway scores computed from its transcripts, its polygon and its measured contacts. Whenever something relevant happens to it, the cell asks **Jev** ([TypeSafe](https://typesafe.ai)'s model for structured choices) which of its currently permitted actions to take: crawl toward a tumour cell, degranulate, enter the cell cycle, phagocytose a corpse, secrete a signal, rest. A deterministic physics kernel owns everything that should not be left to a model: space, mechanics, diffusing fields, clocks, damage, death and division.
+VirtualTissue-Xenium takes one region of a Xenium section (cell segmentation, XY coordinates and gene expression) and turns it into a simulation with **agents for the supported cell behaviors and physical context for the remaining cells**. Cells start from their measured time-zero geometry, derived contacts and available AUCell pathway scores. When a supported cell has a choice to make, it asks **Jev** ([TypeSafe](https://typesafe.ai)'s model for structured choices) which of its currently permitted actions to take: crawl toward a tumour cell, degranulate, enter the cell cycle, phagocytose a corpse, secrete a signal, rest. A deterministic physics kernel owns space, mechanics, diffusing fields, clocks, damage, death and division.
 
 Use the same measured starting tissue to ask a specific question and compare a control with a changed assumption. The replay highlights recorded events and local signal peaks; you can click a cell and inspect every decision. Current experiments support declared immune recognition and its negative control. Named drugs, acquired resistance and neutrophil recruitment are not implemented. The [experiment design guide](docs/11_experiment_design.md) separates available experiments from the proposed perturbation workbench.
 
@@ -158,15 +158,16 @@ The same notebooks also run in local Jupyter (`jupyter lab notebooks/`). They de
 
 ### 4.3 How one cell asks Jev (Part 3)
 
-The kernel advances in **10-minute ticks**. A cell is asked only when something relevant happens to it: a new heterotypic contact, a field crossing a threshold, a finished program, a cell-cycle checkpoint, or entry into the region. Each type has a minimum interval between questions (CD8 60 min, or 30 min while touching tumour; CD4 and macrophages 180 min; endothelium 360 min; tumour and fibroblasts 720 min), and a cell is asked at most 24 times per simulated day. Cells that need a decision in the same tick are batched into one `POST https://api.typesafe.ai/v1/systemone` (at most 20 questions or 40 KB per request).
+The kernel advances in **10-minute ticks**. A cell is asked only when something relevant happens to it: a new heterotypic contact, a field crossing a threshold, a finished program, a cell-cycle checkpoint, or entry into the region. Each type has a minimum interval between questions (CD8 60 min, or 30 min while touching tumour; CD4 and macrophages 180 min; endothelium 360 min; tumour and fibroblasts 720 min), and a cell is asked at most 24 times per simulated day. Questions use `POST https://api.typesafe.ai/v1/systemone` (at most 20 questions or 40 KB per request). CD8 questions are batched separately from other cells so their recognition-dependent menus do not enter other cells' request context.
 
 This is a real question from the first round of region R03, slightly shortened:
 
 ```json
 {
   "model": "jev-1.14.0",
-  "state": {"setting": "Independent local cells in an uncalibrated LUAD virtual tissue prototype.",
-            "semantics": "AUCell relative expression scores at t0, conditioned on provisional type and detection depth; unavailable evidence is missing. Scores are not protein activity or validated malignancy. SIM fields and rates are assumptions."},
+  "state": {"setting": "Independent local cells in an uncalibrated Xenium virtual tissue mechanism simulation.",
+            "prompt_version": "vtx-choice-2",
+            "semantics": "AUCell is frozen at t0; daughter scores are inherited, not remeasured. Missing evidence is not zero. Scores are not protein activity. SIM fields and rates are assumptions."},
   "questions": {
     "c11869": {
       "type": "choice",
@@ -180,9 +181,7 @@ This is a real question from the first round of region R03, slightly shortened:
           "sim_state": {"viability": "alive", "damage_au": 0.0, "pdl1": 0.0, "glycolysis": 0.25},
           "fields_sim": {"oxygen": 0.62, "glucose": 0.53, "lactate": 0.15, "ifng": 0.0, "cxcl9": 0.0},
           "contacts": {"columns": ["id", "primary_label", "viability_sim", "pdl1_sim", "provenance"],
-                       "rows": [[11871, "Tumor", "alive", 0.0, "measured_contact_persisting"], ["...", "4 contacts"]]},
-          "recognition_sim": null,
-          "excluded": {"UPREGULATE_PDL1": ["ifng_signal:false"], "SECRETE_VEGFA": ["hypoxia_or_declared_nerve:false"]}
+                       "rows": [[11871, "Tumor", "alive", 0.0, "measured_contact_persisting"], ["...", "4 contacts"]]}
         }
       },
       "criteria": {
@@ -194,7 +193,7 @@ This is a real question from the first round of region R03, slightly shortened:
 }
 ```
 
-The request **never contains** raw expression, gene lists, coordinates, the contract, literature or a desired outcome. The `excluded` block records which actions were not offered and why. Jev returns a `choice`, a probability for **every** offered option and a `confidence`.
+The request **never contains** raw expression, gene lists, coordinates, the contract, literature or a desired outcome. The global recognition flag and `excluded` gate diagnostics stay in the local decision record and are not sent to Jev. Jev returns a `choice`, a probability for **every** offered option and a `confidence`.
 
 ### 4.4 What the kernel does with the answers
 
@@ -204,11 +203,17 @@ Before anything changes, every answer in a round is validated. The returned mode
 |---|---|
 | Space | Power-diagram cells with measured area floors; movement and growth push neighbours |
 | Fields | Oxygen and glucose from vessels; lactate, IFN-γ-like, CXCL9/10-like, VEGF-like, TGF-β-like and matrix on a grid |
-| Killing | `DEGRANULATE` is a 20-minute contact program that deals 1 damage unit. At 2 units the target commits to apoptosis. Killing is licensed only in `declared_recognition` |
-| Division | `ENTER_CYCLE` starts an explicitly accelerated 24 h cycle; growth and division pause when there is no room |
+| Killing | `DEGRANULATE` is a 20-minute contact program. Effective damage is `1 × (1 − exhaustion) / (1 + lactate + PD-L1 × checkpoint_factor)` with the default contract; the checkpoint factor is 1 normally and 0.1 with the internal blockade assumption. At 2 accumulated units the target commits to apoptosis. Killing is licensed only in `declared_recognition`; two pulses need not suffice |
+| Division | `ENTER_CYCLE` starts an explicitly accelerated 24 h cycle. Pressure, compression and the computational population ceiling are reported separately |
 | Corpses | Apoptotic cells emit a find-me signal (120 µm). `EFFEROCYTOSE` removes a corpse in 40 min (capacity 4) |
 
 The menus per cell type are listed in [docs/06](docs/06_your_own_xenium_data.md#5-runtime-labels-and-what-each-type-can-do).
+
+Each CD8 starts with three pulses. One pulse can refill every six simulated hours only while effector and not engaged with a recognized live tumour target. Damage does not decay and prevents subsequent tumour cycle entry. Synchronous cycle starts can produce division waves at 24 and 48 h; these accelerated simulation hours are not calibrated calendar time.
+
+The default population ceiling counts **all bodies ever allocated**, including context and removed cells. Death does not free a slot. R03 starts with 989 bodies, leaving only 11 divisions/recruits before the default ceiling of 1,000. A ceiling-driven plateau is a computational constraint, not evidence of tumour control. Version 0.1.2 reports this rule without changing it.
+
+Compare matched saved runs with `vtx compare RUN_A RUN_B --shared-replays comparison_replays`. The command checks provenance and settings, uses their latest common saved time, and can produce replay copies with common field scales. Mismatched seeds/models/bundles are rejected. See [the results guide](docs/04_part4_results.md).
 
 ---
 
@@ -236,7 +241,7 @@ Part 1 proposes eight regions with the default settings:
 | R07 | 707 + 284 = 991 | 244 | 95 | 225 | 6 | 10 |
 | R08 | 624 + 357 = 981 | 246 | 98 | 179 | 8 | 18 |
 
-**R03** exported in `exploratory_candidates` mode has 989 cells: **526 act** and 463 are context. The acting cells are 263 tumour candidates, 95 CAFs, 71 CD4 T cells, 36 plasma cells, 33 endothelial cells, 10 macrophages, 9 fibroblasts, 7 B cells and **only 2 CD8 T cells**. B and plasma cells have no action menu. The first decision round asks **280 questions in 26 HTTP requests**. With the default population ceiling (1,000 bodies), only 11 new cells can be born. Raise `MAX_POPULATION` to study growth. R04 has many more macrophages, if clearance is your question.
+**R03** exported in `exploratory_candidates` mode has 989 cells: **526 act** and 463 are context. The acting cells are 263 tumour candidates, 95 CAFs, 71 CD4 T cells, 36 plasma cells, 33 endothelial cells, 10 macrophages, 9 fibroblasts, 7 B cells and **only 2 CD8 T cells**. B and plasma cells have no action menu. The first decision round asks **280 questions**; preflight computes the request count for the current payload and batching rules. With the default population ceiling (1,000 bodies), only 11 new cells can be born. Raise `MAX_POPULATION` to study growth. R04 has many more macrophages, if clearance is your question.
 
 ---
 
@@ -285,9 +290,13 @@ Why the biological kernel is vendored and placed on `sys.path` is explained in [
 
 ## 8. Validation status
 
+For **0.1.2**, all **49 tests pass on Python 3.12 and 3.13**, including the existing R03 input bundle. The 48 h local R03 run and 6 h hypoxia stress test retain exactly the 0.1.1 final state, decisions and metrics; only reporting changes. All 278 non-CD8 questions and their request batches are identical between recognition arms at t0. Offline JavaScript checks cover replay logic at 1400×900 and 1920×1080. See the versioned [release report](tests/reports/release_0.1.2.json) for evidence and limits. Browser visual inspection and live Colab/Jev are not claimed for this release.
+
+The following earlier validation records remain available:
+
 | Check | Result |
 |---|---|
-| Engine files match the recorded version; biological runtime remains unchanged | ✔ SHA-256 of all 32 files ([`ORIGINAL_SOURCES.json`](src/virtualtissue_xenium/engine/ORIGINAL_SOURCES.json)), enforced by `tests/test_engine_integrity.py` |
+| Engine files match the recorded version; biological runtime remains unchanged | ✔ SHA-256 of all recorded engine files ([`ORIGINAL_SOURCES.json`](src/virtualtissue_xenium/engine/ORIGINAL_SOURCES.json)), enforced by `tests/test_engine_integrity.py` |
 | Part 1 through the package reproduces the earlier R03 export | ✔ all 39 bundle files byte-identical, including `region.h5ad` and the atlas fingerprint `67f4eb78…` |
 | Own-data route (fresh manifest, filled-in cluster template) | ✔ same 989 R03 cells as the public route; only sample ID and provenance differ |
 | Original engine tests (Jev provider, preparation, R03 integration with mocked Jev) | ✔ budget stop before a round, atomic failed rounds, deterministic resume, rejection of unsafe or modified ZIPs. Run on Python 3.12 and 3.13 |

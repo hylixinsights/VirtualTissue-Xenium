@@ -1,8 +1,8 @@
 {
-  "description": "Vendored engine from 2026-10-25 with current file hashes. Original hashes are retained for revised files. In 0.1.1 only the replay HTML changes; prepared_runtime.py and xenium_runtime/ remain byte-identical to the original bundle runtime.",
+  "description": "Vendored biological and preparation runtime retained byte for byte. Version 0.1.2 adds a reporting adapter, versioned provider payload, comparison accounting and replay updates outside the bundled runtime; original hashes are retained.",
   "original_root": "VirtualTissue/ (Helder Nakaya, local working folders)",
   "preparation_version": "lung5k-preparation-1.1.0",
-  "simulation_version": "xenium-jev-colab-1.1.0",
+  "simulation_version": "xenium-jev-colab-1.1.1",
   "renamed": [
     {
       "from": "Xenium_Public_Lung5K/processing/colab_setup.py",
@@ -12,9 +12,12 @@
   ],
   "files": {
     "colab_setup.py": {
-      "sha256": "2763ae27496e11d52149178812b15833c5d7615e28e261c0b71d8928d1e619ad",
+      "sha256": "bb65c8733343ebdc63c2d2bc781204610438ba0ff35dad281b54aa2ac0fbd2bb",
       "bytes": 4102,
-      "original_path": "Colab_Xenium_Jev/source/colab_setup.py"
+      "original_path": "Colab_Xenium_Jev/source/colab_setup.py",
+      "original_sha256": "2763ae27496e11d52149178812b15833c5d7615e28e261c0b71d8928d1e619ad",
+      "original_bytes": 4102,
+      "revision": "0.1.2: reporting, payload hygiene, replay diagnostics and setup compatibility; biological transitions unchanged."
     },
     "colab_setup_prepare.py": {
       "sha256": "257b6e988b54396f87adb3f18fd7aff9890a23bfff0ba19b8768f2938e9881dd",
@@ -22,14 +25,20 @@
       "original_path": "Xenium_Public_Lung5K/processing/colab_setup.py"
     },
     "jev_provider.py": {
-      "sha256": "bb6b16dcb6e0deda6484a855f7dfae9529b9f36944811828ec8d013c0d8999a4",
-      "bytes": 10342,
-      "original_path": "Colab_Xenium_Jev/source/jev_provider.py"
+      "sha256": "98fc204e0c964638aff28f2bd9db93eea61a99165c9d6d9692aeee69451edb12",
+      "bytes": 10323,
+      "original_path": "Colab_Xenium_Jev/source/jev_provider.py",
+      "original_sha256": "bb6b16dcb6e0deda6484a855f7dfae9529b9f36944811828ec8d013c0d8999a4",
+      "original_bytes": 10342,
+      "revision": "0.1.2: reporting, payload hygiene and replay diagnostics; biological transitions unchanged."
     },
     "player.py": {
-      "sha256": "ce80f7294aa4b2dee3c98af505850fdd3743b57f0de3378c97c2e20e36ce18d9",
-      "bytes": 6319,
-      "original_path": "Colab_Xenium_Jev/source/player.py"
+      "sha256": "2c0c0ef7375144b4a54db47050765bdf3076f7594e1e05fdbaf86c8923d28fdf",
+      "bytes": 9818,
+      "original_path": "Colab_Xenium_Jev/source/player.py",
+      "original_sha256": "ce80f7294aa4b2dee3c98af505850fdd3743b57f0de3378c97c2e20e36ce18d9",
+      "original_bytes": 6319,
+      "revision": "0.1.2: reporting, payload hygiene and replay diagnostics; biological transitions unchanged."
     },
     "prepared_runtime.py": {
       "sha256": "a558d40f5cc4f002308e7bcb22e276f67bb0c26e64b3e6e2f1eb679f86a66972",
@@ -67,17 +76,20 @@
       "original_path": "Xenium_Public_Lung5K/processing/resources/runtime_template.json"
     },
     "simulation_workflow.py": {
-      "sha256": "fb7e6264a17cf79ff919a48aef69bcf549dd8cb33486113e398ab21df9e95f01",
-      "bytes": 15073,
-      "original_path": "Colab_Xenium_Jev/source/simulation_workflow.py"
+      "sha256": "99891dfd2de2865054f752f400099ad26634743a9c746f2e8e0d157c8a9dfbe1",
+      "bytes": 15325,
+      "original_path": "Colab_Xenium_Jev/source/simulation_workflow.py",
+      "original_sha256": "fb7e6264a17cf79ff919a48aef69bcf549dd8cb33486113e398ab21df9e95f01",
+      "original_bytes": 15073,
+      "revision": "0.1.2: reporting, payload hygiene and replay diagnostics; biological transitions unchanged."
     },
     "web/player_template.html": {
-      "sha256": "adc018d57fdb502b7fc26cad5ffbe5ef52f83574f68e143f070bac769111b5cd",
-      "bytes": 49113,
+      "sha256": "b63d7bf84d781454e6baa8754f2ce37e43d086705a662334f4002f286b6abe0e",
+      "bytes": 52468,
       "original_path": "Colab_Xenium_Jev/source/web/player_template.html",
       "original_sha256": "ac164055085e9c0314973f5840ad5e0b5930ce8c2d4d96aebbd882fa481fc3c8",
       "original_bytes": 39889,
-      "revision": "0.1.1: interpretive highlights, field legends, scenario explanation and death counting; biological runtime unchanged."
+      "revision": "0.1.2: reporting, payload hygiene, replay diagnostics and setup compatibility; biological transitions unchanged."
     },
     "xenium_prepare.py": {
       "sha256": "9b5ffee6c95e4b9e1c0e807ea487284d72e5da1772cd9952991e602a9a4a2446",
@@ -173,6 +185,24 @@
       "sha256": "f9684d16ce160d1f2b0e086f705270e0ab10a77b8f1ea9b57e0120c18b38e4ee",
       "bytes": 1280,
       "original_path": "Colab_Xenium_Jev/source/xenium_runtime/v2/scheduler.py  (identical copy in Xenium_Public_Lung5K/processing/)"
+    },
+    "jev_payload.py": {
+      "sha256": "168c03c953361c908f99459ba253bd8afc04324d999df5f33895a14ebedbd17f",
+      "bytes": 2399,
+      "revision": "0.1.2: reporting, payload hygiene and replay diagnostics; biological transitions unchanged.",
+      "original_path": "Added in VirtualTissue-Xenium 0.1.2 outside the bundled biological runtime."
+    },
+    "recorded_simulation.py": {
+      "sha256": "0748434809dcb122a4c9380643dfd7edcd43cc34bddf5d7797da96b3999da924",
+      "bytes": 3033,
+      "revision": "0.1.2: reporting, payload hygiene and replay diagnostics; biological transitions unchanged.",
+      "original_path": "Added in VirtualTissue-Xenium 0.1.2 outside the bundled biological runtime."
+    },
+    "recording_analysis.py": {
+      "sha256": "bf0491d02f270b2b95a93cfd0d83305dfaa7f0096ee0249a5b2f1291a3864e6d",
+      "bytes": 2996,
+      "revision": "0.1.2: reporting, payload hygiene, replay diagnostics and setup compatibility; biological transitions unchanged.",
+      "original_path": "Added in VirtualTissue-Xenium 0.1.2 outside the bundled biological runtime."
     }
   }
 }

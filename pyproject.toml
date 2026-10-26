@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "virtualtissue-xenium"
-version = "0.1.1"
+version = "0.1.2"
 description = "AI-agent-driven virtual tissue simulations built from 10x Genomics Xenium data (segmentation, XY coordinates and gene expression), with each cell deciding through the Jev (TypeSafe) Choice API."
 readme = "README.md"
 license = "MIT"

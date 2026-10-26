@@ -291,8 +291,11 @@ def build_part1() -> Path:
     ''')
     nb.code('''
     #@title Calculate AUCell, reference distributions, and quality checks
-    from virtualtissue_xenium.own_data import require_tumour_interface
+    from virtualtissue_xenium.own_data import require_tumour_interface, preflight_regions
     require_tumour_interface(sample)
+    # Fail before scoring the whole section if no usable region exists.
+    preflight_regions(prep,sample,n_options=N_REGIONS,core_target=CORE_TARGET,
+                      max_total=MAX_TOTAL_CELLS,halo_um=HALO_UM)
     coverage=prep.score_aucell(sample,n_up=AUCELL_TOP_RANKS,min_overlap=5,batch_size=4096)
     display(coverage[['full_genes','panel_genes','panel_coverage','available']])
     print('Cells with AUCell:',int(sample['obs'].aucell_available.sum()))
@@ -314,7 +317,7 @@ def build_part1() -> Path:
     ''')
     nb.code('''
     #@title Read segmentation and propose regions
-    prep.read_geometry(sample)
+    # Geometry was checked before AUCell; refresh score-dependent summaries now.
     region_table=prep.propose_regions(sample,n_options=N_REGIONS,core_target=CORE_TARGET,
                                      max_total=MAX_TOTAL_CELLS,halo_um=HALO_UM)
     display(region_table[['region_id','n_core','n_halo','n_total','tumor_candidate','fibroblast','immune','stroma','cd8_provisional','macrophage_provisional','supported_qc_core','aucell_fraction','x_um','y_um']])
@@ -885,15 +888,20 @@ def build_part4() -> Path:
     ''')
     nb.md('''
     ## ✏️ Compare several runs (optional)
-    List result ZIPs or folders, one per line (e.g. the same region under `baseline_unknown`,
-    `declared_recognition` and `recognition_off`).
+    List result ZIPs or folders, separated by commas. Use the same region, seed, provider,
+    model and settings under `declared_recognition` and `recognition_off`, or identical
+    scenarios for a repeat check. Results are compared at the latest common saved time.
+    Local preview and Jev runs are different providers and cannot form a matched pair.
     ''')
     nb.code('''
     #@title ✏️ Comparison table
     COMPARE_PATHS = ""  #@param {type:"string"}
     paths = [p.strip() for p in COMPARE_PATHS.replace(",", "\\n").splitlines() if p.strip()]
     if paths:
-        display(vtx_results.compare_runs(paths))
+        try:
+            display(vtx_results.compare_runs(paths))
+        except ValueError as error:
+            print("Comparison unavailable:", error)
     else:
         print("Add paths to COMPARE_PATHS (comma-separated) to compare runs.")
     ''')

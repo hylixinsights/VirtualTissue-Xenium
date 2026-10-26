@@ -85,6 +85,9 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
 .field-tools button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:#102b35}
 .field-tools button[data-active="true"]::after{content:" •";color:#73e5b4}
 #fieldStatus{font-size:12px;color:#bac7dc;padding:8px 10px;background:#0b1220e8;border:1px solid var(--line);border-radius:8px;max-width:480px}
+.field-details{flex-basis:100%;font-size:12px;max-width:480px;color:#bac7dc;background:#0b1220e8;border-radius:6px;padding:6px 8px}
+.field-details summary{cursor:pointer}
+#ceilingStatus{font-size:12px;color:#ffd36b;margin-top:10px}
 .field-scale{height:7px;border-radius:4px;margin:7px 0 3px;background:linear-gradient(90deg,#440154,#414487,#2a788e,#22a884,#7ad151,#fde725)}
 .scale-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
 #highlights{display:flex;flex-direction:column;gap:6px}
@@ -112,7 +115,7 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
       <label><input type="checkbox" id="showHighlights" checked> Highlights</label>
       <input type="hidden" id="field" value="auto">
       <div class="field-tools" id="fieldButtons" aria-label="Simulated fields"></div>
-      <div id="fieldStatus" role="status"></div>
+      <details class="field-details"><summary id="fieldSummary">Field values and meaning</summary><div id="fieldStatus" role="status"></div></details>
     </div>
     <div id="tooltip"></div>
   </section>
@@ -128,13 +131,15 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
         <div class="tile"><div class="v" id="tCorpse">–</div><div class="k">corpses present</div></div>
         <div class="tile"><div class="v" id="tDec">–</div><div class="k">AI decisions</div></div>
       </div>
+      <div id="deathBreakdown" class="hint"></div>
+      <div id="ceilingStatus" role="status"></div>
     </div>
     <div><h2 id="legendTitle">Cell types</h2><div id="legend"></div></div>
     <div><h2>Visual key</h2><div class="keys">
       <div><svg width="26" height="14"><line x1="2" y1="7" x2="20" y2="7" stroke="#21e6a8" stroke-width="2"/><path d="M15 3 L21 7 L15 11" fill="none" stroke="#21e6a8" stroke-width="2"/></svg>crawling toward a target</div>
       <div><svg width="26" height="14"><line x1="2" y1="7" x2="22" y2="7" stroke="#ff4d5e" stroke-width="3"/></svg>cytotoxic hit</div>
       <div><svg width="26" height="14"><path d="M13 2 A5 5 0 1 1 8.7 9.5" fill="none" stroke="#fff2dc" stroke-width="2"/></svg>cell-cycle progress</div>
-      <div><svg width="26" height="14"><path d="M13 2 A5 5 0 1 1 8.7 9.5" fill="none" stroke="#9aa3bf" stroke-width="2" stroke-dasharray="2 2"/></svg>cycle paused (no room)</div>
+      <div><svg width="26" height="14"><path d="M13 2 A5 5 0 1 1 8.7 9.5" fill="none" stroke="#9aa3bf" stroke-width="2" stroke-dasharray="2 2"/></svg>cycle paused (inspect cause)</div>
       <div><svg width="26" height="14"><rect x="6" y="2" width="12" height="10" rx="3" fill="#4a4458" stroke="#9a8fa6" stroke-dasharray="2 2"/></svg>dying cell / corpse</div>
       <div><svg width="26" height="14"><circle cx="13" cy="7" r="5" fill="none" stroke="#f2c14e" stroke-width="2"/></svg>phagocytosis</div>
     </div></div>
@@ -214,7 +219,7 @@ function prepare(){
     const ring=[];for(let i=0;i+1<c.poly.length;i+=2)ring.push([c.poly[i],c.poly[i+1]]);c.poly=[[ring]];
   }
   for(const f of P.frames){const m=new Map();f.ids.forEach((id,i)=>m.set(id,i));frameIdx.push(m);}
-  Tmax=P.frames.at(-1).t;
+  Tmax=Math.min(P.frames.at(-1).t,P.comparison_end_min??Infinity);
   for(const k of P.events_kinds)evByKind[k]=[];
   for(const e of P.events){
     const [t,k,c,x]=e,kind=P.events_kinds[k];evByKind[kind].push(e);
@@ -234,7 +239,7 @@ function snapshot(T){
   const A=F[k],B=F[Math.min(k+1,F.length-1)],mA=frameIdx[k],mB=frameIdx[Math.min(k+1,F.length-1)];
   const span=B.t-A.t,al=span>0?Math.max(0,Math.min(1,(T-A.t)/span)):0,s=smooth(al);
   const out=[];
-  const pushCell=(id,x,y,r,src,i,scale,born)=>out.push({id,x,y,r,a:src.a[i],tg:src.tg[i],v:src.v[i],cp:src.cp[i],cb:src.cb?src.cb[i]:0,scale,born});
+  const pushCell=(id,x,y,r,src,i,scale,born)=>out.push({id,x,y,r,a:src.a[i],tg:src.tg[i],v:src.v[i],cp:src.cp[i],cb:src.cb?src.cb[i]:0,br:src.br?.[i]||[],scale,born});
   for(const [id,i] of mA){
     const c=P.cells[id];
     if(mB.has(id)){const j=mB.get(id);pushCell(id,lerp(A.x[i],B.x[j],s),lerp(A.y[i],B.y[j],s),lerp(A.r[i],B.r[j],s),al<.5?A:B,al<.5?i:j,1);}
@@ -298,7 +303,13 @@ const FIELD_HELP={
   ifng:"Produced during CD8 degranulation; can enable PD-L1 and chemokine responses.",
   cxcl9:"A simulated chemokine gradient that can guide T-cell movement.",
   tgfb:"A simulated stromal/macrophage signal that contributes to CD8 exhaustion.",
-  oxygen:"Assumed perfusion and cellular consumption; affects cycling and hypoxic death."
+  oxygen:"Assumed perfusion and cellular consumption; zero is anoxia. Affects cycling and hypoxic death.",
+  glucose:"Assumed perfusion and uptake; gates cycling and CD8 degranulation.",
+  lactate:"Simulated metabolic production; reduces cytotoxic damage and motion and contributes to exhaustion.",
+  vegf:"Produced during VEGF-like secretion programs; can license vessel sprouting when enabled.",
+  matrix:"Deposited matrix persists and decays; contributes to drag during cell motion.",
+  ne:"Declared virtual nerve signal; effects depend on the saved scenario.",
+  cgrp:"Declared virtual nerve signal; effects depend on the saved scenario."
 };
 let fieldFrameCache=null,fieldStatsCache={};
 function currentFieldFrame(){
@@ -306,10 +317,12 @@ function currentFieldFrame(){
   if(fr!==fieldFrameCache){
     fieldFrameCache=fr;fieldStatsCache={};
     if(fr)for(const name of Object.keys(P.field_grid.names)){
+      if(typeof fr[name]!=="string")continue;
       const raw=atob(fr[name]);let min=255,max=0,peak=0;
       for(let i=0;i<raw.length;i++){const v=raw.charCodeAt(i);min=Math.min(min,v);if(v>max){max=v;peak=i;}}
       const scale=P.field_grid.scales[name];
-      fieldStatsCache[name]={raw,min:min/255*scale,max:max/255*scale,peak,nonzero:max>0};
+      const saved=fr.stats?.[name];
+      fieldStatsCache[name]={raw,min:saved?.min??min/255*scale,max:saved?.max??max/255*scale,peak,nonzero:(saved?.max??max)>0};
     }
   }
   return fr;
@@ -317,7 +330,7 @@ function currentFieldFrame(){
 function visibleField(){
   currentFieldFrame();
   if($("field").value!=="auto")return $("field").value;
-  return ["ifng","cxcl9","tgfb","oxygen"].find(k=>fieldStatsCache[k]?.nonzero)||"";
+  return P.auto_field||(P.field_grid.names.oxygen?"oxygen":Object.keys(P.field_grid.names)[0]||"");
 }
 const fmtSIM=v=>v===0?"0":v<.001?v.toExponential(1):v.toFixed(3);
 function updateFieldStatus(name,fr){
@@ -326,17 +339,24 @@ function updateFieldStatus(name,fr){
     b.dataset.active=String(!!fieldStatsCache[b.dataset.field]?.nonzero);
   }
   const stat=fieldStatsCache[name];
-  if(!fr||!stat){$("fieldStatus").textContent=fr?"Field overlay off. Highlights still show recorded events.":"No saved field frame at this time.";return;}
+  if(!name||!fr||!stat){
+    const message=!name?"Field overlay off.":!fr?"No saved field frame at this time.":`${P.field_grid.names[name]}: not saved in this recording.`;
+    $("fieldStatus").textContent=message;$("fieldSummary").textContent=message;return;}
   const auto=$("field").value==="auto"?"Auto · ":"";
-  const description=stat.nonzero?`Current range: ${fmtSIM(stat.min)}–${fmtSIM(stat.max)} SIM`:"No detectable signal in this saved frame.";
+  const disabled=P.field_grid.statuses?.[name]==="disabled";
+  const description=disabled?"Not produced in this scenario.":stat.max===0?
+    (name==="oxygen"?"Oxygen = 0 SIM everywhere (anoxia).":"Recorded value = 0 SIM everywhere in this frame."):
+    stat.min===stat.max?`Uniform value: ${fmtSIM(stat.max)} SIM.`:`Current range: ${fmtSIM(stat.min)}–${fmtSIM(stat.max)} SIM`;
+  $("fieldSummary").textContent=auto+P.field_grid.names[name]+" · "+description;
+  const showScale=!disabled&&(name==="oxygen"||name==="glucose"||P.field_grid.scale_has_signal?.[name]!==false);
   $("fieldStatus").innerHTML=`<strong>${esc(auto+P.field_grid.names[name])}</strong> · ${esc(description)}
-    <div class="field-scale" ${name==="oxygen"?'style="background:linear-gradient(90deg,#1d2b6b,#3f6fb5,#ffd36b)"':""}></div>
-    <div class="scale-ends"><span>0</span><span>${fmtSIM(P.field_grid.scales[name])} SIM · scale fixed for this run</span></div>
+    ${showScale?`<div class="field-scale" ${name==="oxygen"?'style="background:linear-gradient(90deg,#1d2b6b,#3f6fb5,#ffd36b)"':""}></div>
+    <div class="scale-ends"><span>0</span><span>${fmtSIM(P.field_grid.scales[name])} SIM · ${esc(P.field_grid.scale_mode||"fixed for this run")}</span></div>`:""}
     <div style="margin-top:5px">${esc(FIELD_HELP[name]||"")} Saved at ${fmtH(fr.t)}. Approximate SIM values, not measured concentrations.</div>`;
 }
 function drawField(){
   const fr=currentFieldFrame(),name=visibleField();updateFieldStatus(name,fr);
-  if(!name||!fr||!fieldStatsCache[name]?.nonzero)return;
+  if(!name||!fr||!fieldStatsCache[name]||P.field_grid.statuses?.[name]==="disabled")return;
   const key=name+fr.t;const g=P.field_grid,[ny,nx]=g.shape;
   if(key!==fieldKey){fieldKey=key;fieldCanvas.width=nx;fieldCanvas.height=ny;const fc=fieldCanvas.getContext("2d"),img=fc.createImageData(nx,ny);
     const raw=atob(fr[name]);for(let i=0;i<nx*ny;i++){const v=raw.charCodeAt(i)/255;const rgb=name==="oxygen"?rampRGB(["#1d2b6b","#3f6fb5","#ffd36b"],v):rampRGB(VIRIDIS,v);
@@ -347,14 +367,16 @@ function drawField(){
 }
 function rampRGB(stops,v){v=Math.max(0,Math.min(1,v))*(stops.length-1);const i=Math.min(stops.length-2,Math.floor(v)),a=hexRgb(stops[i]),b=hexRgb(stops[i+1]),t=v-i;return a.map((x,k)=>Math.round(lerp(x,b[k],t)));}
 
-const SIGNAL_HIGHLIGHTS={ifng:["IFN-γ-like release","#73e5b4"],cxcl9:["CXCL9/10-like gradient","#48d9d1"],tgfb:["TGF-β-like signal","#bba6ff"]};
+const SIGNAL_HIGHLIGHTS={ifng:["IFN-γ-like field maximum","#73e5b4"],cxcl9:["CXCL9/10-like field maximum","#48d9d1"],tgfb:["TGF-β-like field maximum","#bba6ff"]};
 const EVENT_HIGHLIGHTS={
   cytotoxic_pulse:["Cytotoxic hit","#ff7181",true],
   apoptosis_committed:["Apoptosis committed","#d4a0ff",false],
   hypoxic_necrosis:["Death from hypoxia","#c5cbd8",false],
   exhaustion_transition:["CD8 exhaustion state changed","#f2c14e",false],
   clearance:["Corpse engulfed","#f2c14e",false],
-  division:["Cell division","#ffab7e",false]
+  division:["Cell division","#ffab7e",false],
+  division_blocked_population_ceiling:["Division blocked: population ceiling","#ffd36b",false],
+  division_blocked_local_pressure:["Division blocked: local pressure","#ffd36b",false]
 };
 function highlightsNow(){
   currentFieldFrame();
@@ -363,14 +385,16 @@ function highlightsNow(){
   for(let i=P.events.length-1;i>=0;i--){
     const e=P.events[i];if(e[0]>T)continue;if(T-e[0]>40)break;
     const kind=P.events_kinds[e[1]],style=EVENT_HIGHLIGHTS[kind];if(!style||used.has(kind))continue;
-    const id=style[2]?e[3]:e[2],pos=positions.get(id);if(!pos)continue;
-    used.add(kind);found.push({...pos,id,title:style[0],color:style[1],detail:`${fmtH(e[0])} · cell #${id} · recorded event`});
+    const target=style[2]?e[3]:e[2];let pos=e[4]!=null&&e[5]!=null?{x:e[4],y:e[5]}:positions.get(target),approx=!!e[6];
+    if(!pos){for(let k=lastSnap.k;k>=0;k--){const f=P.frames[k],i=f.ids.indexOf(target);if(i>=0){pos={x:f.x[i],y:f.y[i]};approx=true;break;}}}
+    if(!pos)continue;
+    used.add(kind);found.push({...pos,id:e[2],title:style[0],color:style[1],detail:`${fmtH(e[0])} · cell #${e[2]}${style[2]?` → target #${target}`:""} · recorded event${approx?" · last saved position (approximate)":""}`});
   }
   for(const [field,[title,color]] of Object.entries(SIGNAL_HIGHLIGHTS)){
     const s=fieldStatsCache[field];if(!s?.nonzero)continue;
     const g=P.field_grid,[ny,nx]=g.shape;
     found.push({field,title,color,x:g.origin[0]+s.peak%nx*g.spacing,y:g.origin[1]+Math.floor(s.peak/nx)*g.spacing,
-      detail:`Local peak ≈ ${fmtSIM(s.max)} SIM · saved at ${fmtH(fieldFrameCache.t)}`});
+      detail:`Grid maximum ≈ ${fmtSIM(s.max)} SIM · saved at ${fmtH(fieldFrameCache.t)}`});
   }
   return found.slice(0,3);
 }
@@ -379,16 +403,18 @@ function drawHighlights(){
   const top=document.querySelector(".overlay-tools").getBoundingClientRect().bottom-$("stage").getBoundingClientRect().top+16;
   const placed=[];
   for(const item of highlightsNow()){
-    const [sx,sy]=toScreen(item.x,item.y);if(sx<0||sx>W||sy<top||sy>H-65)continue;
+    const [tx,ty]=toScreen(item.x,item.y);if(top>H-100)continue;
+    const sx=Math.max(12,Math.min(W-12,tx)),sy=Math.max(top,Math.min(H-65,ty));
+    const title=item.title+(tx!==sx||ty!==sy?" (map edge)":"");
     ctx.font="600 12px Inter,system-ui,sans-serif";
-    const bw=Math.min(W-24,ctx.measureText(item.title).width+24),bh=30;
+    const bw=Math.min(W-24,ctx.measureText(title).width+24),bh=30;
     let bx=Math.max(12,Math.min(W-bw-12,sx<W/2?sx+36:sx-bw-36)),by=Math.max(top,Math.min(H-100,sy-40));
     while(placed.some(r=>bx<r.x+r.w&&bx+bw>r.x&&by<r.y+bh+7&&by+bh+7>r.y))by+=bh+10;
     if(by+bh>H-65)continue;placed.push({x:bx,y:by,w:bw});
     const lx=Math.max(bx,Math.min(bx+bw,sx)),ly=by+bh/2;
     ctx.globalAlpha=1;ctx.strokeStyle=item.color;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(sx,sy);ctx.stroke();
     const a=Math.atan2(sy-ly,sx-lx);ctx.beginPath();ctx.moveTo(sx-7*Math.cos(a-.5),sy-7*Math.sin(a-.5));ctx.lineTo(sx,sy);ctx.lineTo(sx-7*Math.cos(a+.5),sy-7*Math.sin(a+.5));ctx.stroke();
-    ctx.fillStyle="#0a1225ed";ctx.beginPath();ctx.roundRect(bx,by,bw,bh,7);ctx.fill();ctx.stroke();ctx.fillStyle=item.color;ctx.fillText(item.title,bx+12,by+20);
+    ctx.fillStyle="#0a1225ed";ctx.beginPath();ctx.roundRect(bx,by,bw,bh,7);ctx.fill();ctx.stroke();ctx.fillStyle=item.color;ctx.fillText(title,bx+12,by+20,bw-24);
   }
 }
 function updateHighlights(){
@@ -474,7 +500,7 @@ function drawInteractions(snap,pos){
     if(act==="DEGRANULATE"&&c.tg){const d=at(c.tg);if(d)line(c,d,"rgba(255,77,94,.55)",Math.max(1,view.s*.5));}
     if(act==="EFFEROCYTOSE"&&c.tg){const d=at(c.tg);if(d)line(c,d,"rgba(242,169,59,.6)",Math.max(1,view.s*.6));}
   });
-  const recent=(kind,win)=>evByKind[kind].filter(e=>e[0]<=T&&T-e[0]<=win);
+  const recent=(kind,win)=>(evByKind[kind]||[]).filter(e=>e[0]<=T&&T-e[0]<=win);
   for(const e of recent("cytotoxic_pulse",40)){const a=at(e[2]),b=at(e[3]);const k=1-(T-e[0])/40;if(a&&b){line(a,b,`rgba(255,77,94,${.9*k})`,Math.max(1.5,view.s*.9));glow(b,"rgba(255,77,94,.9)",b.r*1.6,.7*k);}}
   for(const e of recent("division",60)){const a=at(e[2]);const k=(T-e[0])/60;if(a){ring(a,"#fff2dc",a.r*(1+1.6*k),.9*(1-k),Math.max(1,view.s*.6));glow(a,"rgba(255,180,120,.9)",a.r*1.8,.5*(1-k));}}
   for(const e of recent("apoptosis_committed",60)){const a=at(e[2]);const k=(T-e[0])/60;if(a)glow(a,"rgba(200,120,255,.9)",a.r*1.7,.55*(1-k));}
@@ -495,9 +521,9 @@ function providerName(){return P.provider.startsWith("jev")?"Jev":"local rules";
 
 // ---------------------------------------------------------------- side panel
 function countsAt(T){
-  const cnt=k=>evByKind[k].filter(e=>e[0]<=T).length;
+  const cnt=k=>(evByKind[k]||[]).filter(e=>e[0]<=T).length;
   const deaths=new Set([...(evByKind.apoptosis_committed||[]),...(evByKind.hypoxic_necrosis||[])].filter(e=>e[0]<=T).map(e=>e[2]));
-  return {div:cnt("division"),death:deaths.size,eat:cnt("clearance")};
+  return {div:cnt("division"),death:deaths.size,eat:cnt("clearance"),apoptosis:cnt("apoptosis_committed"),necrosis:cnt("hypoxic_necrosis")};
 }
 function updatePanel(){
   const snap=lastSnap;if(!snap)return;
@@ -508,6 +534,11 @@ function updatePanel(){
     byType[info.l]=(byType[info.l]||0)+1;if(info.l.startsWith("Tumor"))tumor++;}
   const c=countsAt(T);let dec=0;for(const id in P.decisions)for(const d of P.decisions[id])if(d[0]<=T)dec++;
   $("tTumor").textContent=tumor;$("tDiv").textContent=c.div;$("tDeath").textContent=c.death;$("tEat").textContent=c.eat;$("tCorpse").textContent=corpses;$("tDec").textContent=dec.toLocaleString("en-US");
+  $("deathBreakdown").textContent=`Deaths: ${c.apoptosis} apoptosis commitments · ${c.necrosis} hypoxic necroses.`;
+  const cap=P.population_limit;
+  $("ceilingStatus").textContent=cap?.reached_min!=null&&T>=cap.reached_min?
+    `Population ceiling reached at ${fmtH(cap.reached_min)} (${cap.maximum} allocated bodies). Further division/recruitment is blocked by a computational limit.`:
+    cap?.maximum?`Initial growth headroom: ${cap.initial_headroom} bodies. Ceiling includes context and removed bodies.`:"";
   const mode=$("colorMode").value;
   $("legendTitle").innerHTML=mode==="action"?"Current actions":mode==="aucell"?"AUCell score at t0":'Cell types <span class="hint" style="text-transform:none;letter-spacing:0">· click to focus</span>';
   if(mode==="action"){const counts={};for(const c of snap.cells){const info=P.cells[c.id];if(!info||info.o==="halo"||info.o==="occluded"||c.scale<1)continue;const a=P.actions[c.a];counts[a]=(counts[a]||0)+1;}
@@ -520,7 +551,7 @@ function updatePanel(){
 }
 let series=null;
 function buildSeries(){
-  series=P.frames.map((f,k)=>{let n=0,cd8=0;f.ids.forEach((id,i)=>{const info=P.cells[id];if(!info||info.o==="halo"||info.o==="occluded")return;if(f.v[i]!==0)return;if(info.l.startsWith("Tumor"))n++;if(info.l==="T_CD8_cytotoxic")cd8++;});return [f.t,n,cd8];});
+  series=P.frames.filter(f=>f.t<=Tmax).map((f,k)=>{let n=0,cd8=0;f.ids.forEach((id,i)=>{const info=P.cells[id];if(!info||info.o==="halo"||info.o==="occluded")return;if(f.v[i]!==0)return;if(info.l.startsWith("Tumor"))n++;if(info.l==="T_CD8_cytotoxic")cd8++;});return [f.t,n,cd8];});
 }
 function drawChart(){
   const cv=$("chart"),r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);
@@ -551,7 +582,9 @@ function updateInspector(){
   const origin=info.o==="born"?`Daughter of #${info.p}, born at ${fmtH(info.b)}`:info.o==="roi"?"Measured in the Xenium section":"Context cell (no autonomous decisions)";
   const act=c?P.actions[c.a]:"";
   let html=`<div class="title"><i style="background:${type.c}"></i>${type.name} #${selected}</div><div class="meta">${esc(origin)}${info.alt&&info.alt.length&&info.alt[0]!==info.l?` · second annotation: ${esc(info.alt[0].replaceAll("_"," "))}`:""}</div>`;
-  html+=`<dl class="kv"><dt>Status</dt><dd>${esc(status)}</dd><dt>Doing now</dt><dd>${c?esc((ACTION_STYLE[act]||{n:act}).n)+(c.tg?` → #${c.tg}`:""):"—"}</dd>${c&&c.cp>=0?`<dt>Cell cycle</dt><dd>${Math.round(c.cp*100)}% complete${c.cb?" · paused: no room to grow or divide (contact inhibition)":""}</dd>`:""}</dl>`;
+  const causes={population_ceiling:"computational population ceiling",local_pressure:"local pressure",compression:"compression"};
+  const paused=c?.cb?" · paused: "+(c.br.length?c.br.map(r=>causes[r]||r).join(" + "):"cause not recorded in this legacy frame"):"";
+  html+=`<dl class="kv"><dt>Status</dt><dd>${esc(status)}</dd><dt>Doing now</dt><dd>${c?esc((ACTION_STYLE[act]||{n:act}).n)+(c.tg?` → #${c.tg}`:""):"—"}</dd>${c&&c.cp>=0?`<dt>Cell cycle</dt><dd>${Math.round(c.cp*100)}% complete${esc(paused)}</dd>`:""}</dl>`;
   if(info.u){const rows=P.signatures.map((s,j)=>[s,info.u[j]]).filter(r=>r[1]!=null).sort((a,b)=>b[1]-a[1]);
     html+=`<div class="hint">t0 AUCell pathway profile (percentile within type + detection depth)${info.o==="born"?" · inherited from the parent":""}</div><div class="bars">`+rows.map(([s,u])=>`<div class="bar"><span class="name" title="${esc(s)}">${esc(s.replaceAll("_"," ").toLowerCase())}</span><span class="track"><span class="fill" style="display:block;width:${(u*100).toFixed(0)}%;background:${viridis(u)}"></span></span><span class="num">${u.toFixed(2)}</span></div>`).join("")+`</div>`;}
   else html+=`<div class="hint">No AUCell profile (context or unscored cell).</div>`;
@@ -562,8 +595,8 @@ function updateInspector(){
 }
 function drawStrip(){
   const cv=$("strip"),r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);
-  const kinds=[["division","#ff8a5c",0],["apoptosis_committed","#c878ff",4],["clearance","#f2c14e",8]];
-  for(const [k,col,y] of kinds){c.fillStyle=col;for(const e of evByKind[k])c.fillRect(8+(r.width-16)*e[0]/Math.max(1,Tmax),y,1.5,3.5);}
+  const kinds=[["division","#ff8a5c",0],["apoptosis_committed","#c878ff",4],["hypoxic_necrosis","#c5cbd8",4],["clearance","#f2c14e",8]];
+  for(const [k,col,y] of kinds){c.fillStyle=col;for(const e of evByKind[k]||[])if(e[0]<=Tmax)c.fillRect(8+(r.width-16)*e[0]/Math.max(1,Tmax),y,1.5,3.5);}
 }
 
 // ---------------------------------------------------------------- interaction
@@ -589,7 +622,7 @@ function stopRecording(){if(recorder&&recorder.state!=="inactive")recorder.stop(
 function init(){
   prepare();buildSeries();P.__types=new Set(Object.values(P.cells).filter(c=>c.o!=="halo"&&c.o!=="occluded").map(c=>c.l));
   const provider=P.provider.startsWith("mock_jev")?"mocked Jev responses (software test)":P.provider.startsWith("jev")?`Jev${P.model?" ("+P.model+")":""}`:"local rules (free smoke test)";
-  $("subtitle").textContent=`Lung adenocarcinoma · Xenium region ${P.patch.replace("LUAD3_","")} · active cells use ${provider}`;
+  $("subtitle").textContent=`${P.sample_name||P.patch} · active cells use ${provider}`;
   $("badge").textContent=`${fmtH(Tmax)} simulated · ${P.paid_calls} ${P.provider.startsWith("mock_jev")?"mock requests":"API attempts"} · seed ${P.seed} · ${P.stop?P.stop.replaceAll("_"," "):"checkpoint (incomplete)"}`;
   $("scope").textContent=P.scope+" Measured segmentation is shown at t0; subsequent shapes and interpolated motion are a simulation rendering. Cells start from their t0 AUCell percentiles within provisional type and detection-depth group; daughters inherit them.";
   $("signature").innerHTML=P.signatures.map((s,j)=>`<option value="${j}" ${s==="MITOTIC_CELL_CYCLE"?"selected":""}>${s.replaceAll("_"," ").toLowerCase()}</option>`).join("");
@@ -598,7 +631,7 @@ function init(){
     declared_recognition:"Tumour recognition and effector/clearance competence are assumed. Contact-dependent killing is permitted, not guaranteed.",
     recognition_off:"Negative control: tumour recognition is disabled; CD8 cytotoxic killing is not permitted."
   };
-  $("experiment").innerHTML=`<strong>Saved experiment · ${esc(P.scenario)}</strong> — ${esc(scenarioText[P.scenario]||"Read the saved experiment contract for its biological assumptions.")} Replay plays recorded results. Configure a new run to test an intervention.`;
+  $("experiment").innerHTML=`<strong>Saved experiment · ${esc(P.scenario)}</strong> — ${esc(scenarioText[P.scenario]||"Read the saved experiment contract for its biological assumptions.")} Replay plays recorded results; choose a supported recognition scenario when configuring a new run.${P.comparison_notes?" "+esc(P.comparison_notes):""}`;
   $("fieldButtons").innerHTML='<span>Signals</span>'+[["auto","Auto"],["","Off"],...Object.entries(P.field_grid.names)].map(([k,v])=>`<button data-field="${esc(k)}" aria-pressed="false">${esc(v)}</button>`).join("");
   $("fieldButtons").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("field").value=b.dataset.field;fieldKey="";draw();updatePanel();});
   resize();fitView();drawStrip();draw();updatePanel();

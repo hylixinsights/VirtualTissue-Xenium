@@ -19,6 +19,8 @@ import gzip
 import json
 import tempfile
 import zipfile
+import copy
+import warnings
 from pathlib import Path
 
 ACTING_ORIGINS = ("roi", "born", "recruited")  # same set as xenium_runtime.v2.mechanics
@@ -55,7 +57,8 @@ def load_results(path, extract_to=None) -> dict:
     report = json.loads((folder / "run_report.json").read_text())
     episode = json.loads(gzip.decompress((folder / "episode.json.gz").read_bytes()))
     read = lambda name: pd.read_csv(folder / name) if (folder / name).stat().st_size else pd.DataFrame()
-    return dict(folder=folder, report=report, episode=episode, metrics=read("metrics.csv"),
+    config = json.loads((folder / "run_config.json").read_text()) if (folder / "run_config.json").exists() else {}
+    return dict(folder=folder, report=report, episode=episode, config=config, metrics=read("metrics.csv"),
                 events=read("events.csv"), decisions=read("decisions.csv"), replay=folder / "replay.html")
 
 
@@ -69,11 +72,19 @@ def acting_bodies(results) -> set:
     return {b["id"] for b in results["episode"]["bodies"] if b["origin"] in ACTING_ORIGINS}
 
 
-def summary(results) -> dict:
-    """Headline numbers of one run."""
+def summary(results, at_time_min=None) -> dict:
+    """Headline numbers at a saved frame; end-of-run status stays explicit."""
+    from recording_analysis import event_totals, population_limit
     report, episode = results["report"], results["episode"]
-    final = episode["summary"].get("final", {})
-    events = episode["summary"].get("events", {})
+    time = episode["summary"]["time_min"] if at_time_min is None else at_time_min
+    frames = [f for f in episode["frames"] if f["time_min"] == time]
+    if not frames:
+        raise ValueError(f"No saved frame at {time} minutes; discrete events are not interpolated.")
+    frame = frames[-1]
+    labels, actors = labels_by_body(results), acting_bodies(results)
+    tumour = sum(cid in actors and labels[cid].startswith("Tumor") and s["viability"] == "alive"
+                 for cid, s in zip(frame["ids"], frame["states"]))
+    limit = population_limit(episode, time)
     return dict(
         run=results["folder"].name,
         mode=report.get("mode"),
@@ -81,19 +92,21 @@ def summary(results) -> dict:
         provider=episode.get("provider"),
         completed=report.get("completed"),
         stop_reason=report.get("stop_reason") or report.get("error"),
-        simulated_hours=round(report.get("checkpoint_time_min", 0) / 60, 2),
-        cell_decisions=episode["summary"].get("decisions"),
+        simulated_hours=round(time / 60, 4),
+        reached_hours=round(episode["summary"]["time_min"] / 60, 4),
+        requested_hours=episode.get("contract", {}).get("run", {}).get("horizon_min", 0) / 60,
+        cell_decisions=sum(d["time_min"] <= time for d in episode.get("decisions", [])),
+        cell_decisions_whole_run=episode["summary"].get("decisions"),
+        usage_scope="HTTP usage and completion status describe the whole run; outcomes use simulated_hours.",
         invalid_answers=episode["summary"].get("invalid_answers"),
         http_attempts=report.get("usage", {}).get("http_attempts"),
         reused_batches=report.get("usage", {}).get("reused_batches"),
         input_tokens=report.get("usage", {}).get("input_tokens"),
         output_tokens=report.get("usage", {}).get("output_tokens"),
-        tumour_cells_final=final.get("tumour_cells"),
-        divisions=events.get("division", 0),
-        apoptosis_committed=events.get("apoptosis_committed", 0),
-        cytotoxic_pulses=events.get("cytotoxic_pulse", 0),
-        corpses_cleared=events.get("clearance", 0),
-        corpses_degraded=events.get("corpse_degraded", 0),
+        tumour_cells_final=tumour,
+        population_ceiling=limit["maximum"],
+        ceiling_reached_hours=None if limit["reached_min"] is None else limit["reached_min"] / 60,
+        **event_totals(episode, time),
     )
 
 
@@ -192,7 +205,9 @@ def plot_overview(results, figsize=(14, 9)):
 
     events = event_counts(results)
     keep = [k for k in ("division", "cycle_entered", "cytotoxic_pulse", "apoptosis_committed",
-                        "clearance", "corpse_degraded", "cd4_help") if k in events]
+                        "hypoxic_necrosis", "clearance", "corpse_degraded", "cd4_help",
+                        "division_blocked_population_ceiling", "division_blocked_local_pressure",
+                        "division_blocked_compression", "division_blocked_crowding", "growth_blocked_compression") if k in events]
     if keep:
         events[keep].cumsum().plot(ax=axes[1, 0], linewidth=1.8, marker="o", markersize=3)
         axes[1, 0].legend(fontsize=8, frameon=False)
@@ -209,8 +224,97 @@ def plot_overview(results, figsize=(14, 9)):
     return fig
 
 
-def compare_runs(paths):
-    """Summary table for several result ZIPs/folders (one row per run)."""
-    import pandas as pd
+def _comparison_identity(result):
+    """All model assumptions must match except the declared recognition switch."""
+    episode, config = result["episode"], result.get("config", {})
+    contract = copy.deepcopy(episode.get("contract", {}))
+    scenarios = contract.pop("autonomous_scenarios", {})
+    scenario = copy.deepcopy(scenarios.get(episode.get("scenario"), {}))
+    for key in ("title", "recognition"):
+        scenario.pop(key, None)
+    if not scenario or not contract or not config.get("zip_sha256"):
+        raise ValueError("Comparison provenance is incomplete: a contract, active scenario and bundle SHA are required.")
+    return dict(bundle=config["zip_sha256"], atlas=episode.get("atlas_fingerprint"),
+                seed=episode.get("seed"), provider=episode.get("provider"),
+                kernel=episode.get("engine_fingerprint"), prompt=episode.get("prompt_version", "legacy-v1"),
+                reporting=episode.get("reporting_version", "legacy-v1"),
+                software_sources=config.get("sources"), environment=config.get("environment"),
+                decision_limit=episode.get("summary", {}).get("decision_budget", {}).get("limit"),
+                contract=contract, active_scenario=scenario)
 
-    return pd.DataFrame([summary(load_results(p)) for p in paths]).set_index("run")
+
+def compare_runs(paths):
+    """Validate matched runs and report both at their latest common saved time.
+
+    Supports identical scenarios (sham repeats) or the declared-recognition /
+    recognition-off pair. Replicates with different seeds need a separate analysis.
+    The original recordings are never truncated or overwritten.
+    """
+    import pandas as pd
+    runs = [load_results(p) for p in paths]
+    if len(runs) < 2:
+        raise ValueError("Choose at least two matched runs.")
+    scenarios = {r["episode"]["scenario"] for r in runs}
+    if len(scenarios) > 1 and scenarios != {"declared_recognition", "recognition_off"}:
+        raise ValueError("Only declared_recognition and recognition_off form a supported matched pair.")
+    identities = [_comparison_identity(r) for r in runs]
+    differences = sorted({k for identity in identities[1:] for k in identities[0] if identity[k] != identities[0][k]})
+    if differences:
+        raise ValueError("Runs are not matched: " + ", ".join(differences))
+    common = set.intersection(*({f["time_min"] for f in r["episode"]["frames"]} for r in runs))
+    if not common:
+        raise ValueError("Runs have no common saved frame.")
+    time = max(common)
+    messages = []
+    if any(r["episode"]["summary"]["time_min"] > time for r in runs):
+        messages.append(f"Comparison restricted to the common saved time: {time / 60:g} h.")
+    if time == 0:
+        messages.append("Only t0 is shared; no trajectory effect can be compared.")
+    if identities[0]["prompt"] == "legacy-v1" and "jev" in str(identities[0]["provider"]):
+        messages.append("Legacy Jev prompts expose the recognition scenario to all cells; this comparison is potentially confounded.")
+    table = pd.DataFrame([summary(r, time) for r in runs]).set_index("run")
+    if table.ceiling_reached_hours.notna().any():
+        messages.append("Population ceiling reached: growth is constrained by a computational limit.")
+    table["comparison_time_hours"] = time / 60
+    table["comparison_notes"] = " ".join(messages) or "Matched settings; common saved time."
+    for message in messages:
+        warnings.warn(message, UserWarning, stacklevel=2)
+    table.attrs.update(common_time_min=time, warnings=messages)
+    return table
+
+
+def export_comparison_replays(paths, output_dir):
+    """Write copies on shared field scales; comparison validation is mandatory."""
+    from player import write_payload
+    paths = list(paths)
+    table = compare_runs(paths)
+    runs = [load_results(p) for p in paths]
+    payloads = []
+    for result in runs:
+        # A saved HTML contains polygons and pathway profiles needed by the viewer.
+        import base64
+        import re
+        html = result["replay"].read_text()
+        match = re.search(r'<script id="payload"[^>]*>\s*([A-Za-z0-9+/=]+)\s*</script>', html)
+        if not match:
+            raise ValueError("Could not read the saved replay payload.")
+        original = json.loads(gzip.decompress(base64.b64decode(match[1])))
+        # Re-export fields from the complete episode without needing the input atlas.
+        payloads.append((result, original))
+    from player import refresh_payload
+    peaks = {}
+    for result, _ in payloads:
+        for frame in result["episode"]["frames"]:
+            for key, values in frame.get("fields", {}).items():
+                peaks[key] = max(peaks.get(key, 0), max(values, default=0))
+    target = Path(output_dir)
+    target.mkdir(parents=True, exist_ok=True)
+    destinations = []
+    for index, (result, original) in enumerate(payloads, 1):
+        destination = target / f"{index}_{result['folder'].name}_shared_scales.html"
+        updated = refresh_payload(original, result["episode"], scales=peaks)
+        updated["comparison_end_min"] = table.attrs["common_time_min"]
+        updated["comparison_notes"] = table["comparison_notes"].iloc[0]
+        write_payload(updated, destination)
+        destinations.append(destination)
+    return destinations

@@ -2,6 +2,7 @@
 import base64
 import gzip
 import json
+import copy
 from pathlib import Path
 
 import numpy as np
@@ -15,8 +16,11 @@ ACTIONS = ["", "CYCLING", "WAIT", "REST", "HOLD_POSITION", "HOLD_CONTACT", "DISE
 VIABILITY = ["alive", "apoptosis_committed", "dead_intact"]
 EVENTS = ["division", "apoptosis_committed", "intact_death", "clearance", "corpse_degraded", "cytotoxic_pulse",
           "cd4_help", "target_reached", "cycle_entered", "hypoxic_necrosis", "exhaustion_transition",
-          "helped_cd8_cycle_entered"]
-FIELDS = {"ifng": "IFN-γ-like", "cxcl9": "CXCL9/10-like", "oxygen": "Oxygen", "tgfb": "TGF-β-like"}
+          "helped_cd8_cycle_entered", "division_blocked_population_ceiling", "division_blocked_local_pressure",
+          "division_blocked_compression", "division_blocked_crowding", "growth_blocked_compression"]
+FIELDS = {"ifng": "IFN-γ-like", "cxcl9": "CXCL9/10-like", "oxygen": "Oxygen", "tgfb": "TGF-β-like",
+          "glucose": "Glucose", "lactate": "Lactate", "vegf": "VEGF-like", "matrix": "Matrix",
+          "ne": "NE-like", "cgrp": "CGRP-like"}
 
 
 def _polygon(geometry, ox, oy):
@@ -74,21 +78,6 @@ def build_payload(episode, atlas):
                            y=[round(y - oy, 2) for y in f["y"]], r=[round(r, 2) for r in f["rho"]],
                            a=a, tg=tg, v=v, cp=cp, cb=cb))
 
-    grid = episode["field_grid"]
-    field_frames, scales = [], {}
-    for name in FIELDS:
-        peak = max((max(f["fields"][name]) for f in episode["frames"] if f.get("fields")), default=0.)
-        scales[name] = 1. if name == "oxygen" else max(peak, 1e-6)
-    for i, f in enumerate(episode["frames"]):
-        if f.get("fields"):
-            field_frames.append(dict(t=f["time_min"], **{k: _u8(f["fields"][k], scales[k]) for k in FIELDS}))
-
-    events = []
-    for e in episode["events"]:
-        if e["kind"] in EVENTS:
-            events.append([e["time_min"], EVENTS.index(e["kind"]), e.get("cell_id") or 0,
-                           e.get("target_id") or e.get("daughter_id") or 0])
-
     decisions = {}
     for d in episode["decisions"]:
         ans = d.get("answer") or {}
@@ -99,22 +88,88 @@ def build_payload(episode, atlas):
              [[k, round(float(p), 3)] for k, p in top if p >= .005], d.get("wake_reasons", [])[:3], d["status"]])
 
     summary = episode["summary"]
-    return dict(format="virtualtissue-player-1", patch=episode["patch_id"], provider=episode["provider"],
+    base = dict(format="virtualtissue-player-2", patch=episode["patch_id"], provider=episode["provider"],
                 seed=episode["seed"], scenario=episode["scenario"], hours=summary["time_min"] / 60,
                 stop=summary["stop_reason"], paid_calls=episode.get("paid_calls", 0),
                 model=next((a.get("model_returned") for a in episode.get("provider_audit", []) if a.get("model_returned")), None),
                 origin=[ox, oy], signatures=[s.replace("GOBP_", "") for s in signatures],
                 actions=ACTIONS, viability=VIABILITY, events_kinds=EVENTS,
-                cells=cells, frames=frames, events=events, decisions=decisions,
-                field_grid=dict(origin=[grid["origin_um"][0] - ox, grid["origin_um"][1] - oy], spacing=grid["spacing_um"],
-                                shape=grid["shape"], names=FIELDS, scales=scales),
-                fields=field_frames, scope=episode["scope"])
+                cells=cells, frames=frames, decisions=decisions, scope=episode["scope"])
+    return refresh_payload(base, episode)
 
 
-def write_player(episode, atlas, destination):
-    payload = build_payload(episode, atlas)
+def refresh_payload(original, episode, scales=None):
+    """Update a saved player's diagnostics from the full, unchanged episode."""
+    from recording_analysis import population_limit, event_totals
+    payload = copy.deepcopy(original)
+    ox, oy = payload["origin"]
+    grid = episode["field_grid"]
+    available = {k for frame in episode["frames"] for k in frame.get("fields", {})}
+    peaks = {k: max((max(f.get("fields", {}).get(k, []), default=0) for f in episode["frames"]), default=0)
+             for k in FIELDS}
+    limits = {k: max(peaks[k], (scales or {}).get(k, 0), 1 if k in ("oxygen", "glucose") else 1e-6) for k in FIELDS}
+    scenario = episode.get("contract", {}).get("autonomous_scenarios", {}).get(episode["scenario"], {})
+    statuses = {k: "available" if k in available else "unavailable" for k in FIELDS}
+    disabled = set()
+    if scenario:
+        if scenario.get("recognition") is not True or scenario.get("effector_competence") is not True:
+            disabled.add("ifng")
+        disabled.update(k for k in ("ne", "cgrp") if scenario.get("nerve") != k)
+        if scenario.get("fields") is False:
+            disabled.update(set(FIELDS)-{"oxygen", "glucose"})
+    for k in disabled & available:
+        if peaks[k] == 0:
+            statuses[k] = "disabled"
+    field_frames = []
+    for frame in episode["frames"]:
+        fields = {k: v for k, v in frame.get("fields", {}).items() if k in FIELDS}
+        if fields:
+            field_frames.append(dict(t=frame["time_min"],
+                stats={k: dict(min=min(v), max=max(v)) for k, v in fields.items() if v},
+                **{k: _u8(v, limits[k]) for k, v in fields.items()}))
+    # Prefer an event's exact coordinates. Legacy episodes use the latest saved
+    # position at/before the event and explicitly label that approximation.
+    events, positions, cursor = [], {}, 0
+    frames = episode["frames"]
+    for event in episode["events"]:
+        while cursor < len(frames) and frames[cursor]["time_min"] <= event["time_min"]:
+            frame = frames[cursor]
+            positions.update({cid: [x, y] for cid, x, y in zip(frame["ids"], frame["x"], frame["y"])})
+            cursor += 1
+        if event["kind"] not in EVENTS:
+            continue
+        target = event.get("target_id") or event.get("daughter_id") or 0
+        use_target = event["kind"] == "cytotoxic_pulse"
+        pos = event.get("target_position_um" if use_target else "position_um")
+        approximate = pos is None
+        if pos is None:
+            pos = positions.get(target if use_target else event.get("cell_id"))
+        events.append([event["time_min"], EVENTS.index(event["kind"]), event.get("cell_id") or 0, target,
+                       None if pos is None else round(pos[0]-ox, 2),
+                       None if pos is None else round(pos[1]-oy, 2), approximate])
+    for frame, saved in zip(payload["frames"], frames):
+        frame["br"] = [(s.get("cycle") or {}).get("block_reasons", []) for s in saved["states"]]
+    payload.update(format="virtualtissue-player-2", events_kinds=EVENTS, events=events,
+                   sample_name=episode.get("sample_name") or episode["patch_id"],
+                   prompt_version=episode.get("prompt_version", "legacy-v1"),
+                   population_limit=population_limit(episode), event_totals=event_totals(episode),
+                   field_grid=dict(origin=[grid["origin_um"][0]-ox, grid["origin_um"][1]-oy],
+                                   spacing=grid["spacing_um"], shape=grid["shape"], names=FIELDS,
+                                   scales=limits, statuses=statuses,
+                                   scale_has_signal={k: max(peaks[k], (scales or {}).get(k, 0)) > 0 for k in FIELDS},
+                                   scale_mode="shared across compared runs" if scales is not None else "fixed for this run"),
+                   fields=field_frames, auto_field="oxygen" if "oxygen" in available else next(iter(available), ""))
+    return payload
+
+
+def write_payload(payload, destination):
     raw = gzip.compress(json.dumps(payload, separators=(",", ":")).encode(), mtime=0)
     data = base64.b64encode(raw).decode("ascii")
     html = TEMPLATE.read_text(encoding="utf8").replace("__PAYLOAD__", data)
     Path(destination).write_text(html, encoding="utf8")
     return Path(destination)
+
+
+def write_player(episode, atlas, destination):
+    payload = build_payload(episode, atlas)
+    return write_payload(payload, destination)

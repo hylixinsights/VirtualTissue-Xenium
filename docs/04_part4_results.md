@@ -26,8 +26,8 @@ Locally (`vtx run` or Jupyter), the same structure lives under the results folde
 | **`replay.html`** | Self-contained interactive viewer (≈ 0.3–10 MB). Opens offline in Chrome, Firefox, Edge or Safari, with no key and no network |
 | `run_report.json` | `completed`, `stop_reason`, `error`, `provider_error`, `checkpoint_time_min`, `usage` (`http_attempts`, `reused_batches`, `input_tokens`, `output_tokens`), episode `summary` |
 | `episode.json.gz` | The complete trajectory: `frames` (every 20 simulated min: ids, x, y, size, state of each body, fields), `bodies` (id, label, origin `roi`/`halo`/`occluded`/`born`, parent, birth time, fate), `decisions`, `events`, `metrics`, `summary`, fingerprints |
-| `decisions.csv` | One row per cell question: `time_min`, `cell_id`, `provider`, `wake_reasons`, `observation` (what was sent), `options` (the menu, with gates), `answer` (choice, probabilities, confidence), `status` |
-| `events.csv` | `time_min`, `kind`, `cell_id`, … for `division`, `cycle_entered`, `cytotoxic_pulse`, `apoptosis_committed`, `intact_death`, `clearance`, `corpse_degraded`, `program_started/completed`, `target_reached`, `division_blocked_crowding`, `growth_blocked_compression`, `exhaustion_transition`, `hypoxic_necrosis`, … |
+| `decisions.csv` | One row per cell question: `time_min`, `cell_id`, `provider`, `wake_reasons`, `observation` (full local record; recognition and exclusion diagnostics are omitted from the Jev payload), `options` (the menu, with gates), `answer` (choice, probabilities, confidence), `status` |
+| `events.csv` | `time_min`, `kind`, `cell_id`, … for `division`, `cycle_entered`, `cytotoxic_pulse`, `apoptosis_committed`, `intact_death`, `clearance`, `corpse_degraded`, `program_started/completed`, `target_reached`, `division_blocked_population_ceiling`, `division_blocked_local_pressure`, `division_blocked_compression`, `growth_blocked_compression`, `exhaustion_transition`, `hypoxic_necrosis`, … |
 | `metrics.csv` | Every 10 simulated min: `tumour_cells`, `tumour_area_um2`, `kills`, `born`, `decisions`, `cd8_tumour_contacts`, `cd8_within_20um_of_tumour`, `oxygen_tumour_mean`, `hypoxic_tumour_fraction`, `pressure_mean/max`, `pressure_by_label`, … (dict columns are JSON) |
 | `jev_journal.jsonl` | Hash-chained log of every request intent and result. Used to resume. The key is never present |
 | `effective_contract.json` | The contract actually used (scenario, horizon, population ceiling, model) |
@@ -48,13 +48,13 @@ The input bundle is **not** copied into the results. Keep it to reproduce the ru
 |---|---|
 | **Play / pause** (or the space bar), **restart**, the **time slider**, **speed** (0.5–4 simulated h per second) | Navigate in time. The view starts from the **measured** segmentation and cross-fades into the simulated cells within the first 20 min |
 | **Color** | `Cell type` (default) · `Current action` · `AUCell score at t0` (then pick a signature, e.g. mitotic cell cycle) |
-| **Signals** | Visible buttons for Auto, Off, IFN-γ-like, CXCL9/10-like, oxygen and TGF-β-like. Auto prioritises detectable IFN-γ, CXCL9/10, then TGF-β; otherwise oxygen. A dot marks a nonzero saved field. |
-| **Highlights** | Up to three arrow callouts and clickable cards for recorded recent events and local signal maxima. A peak is not a statistical or biological anomaly. |
+| **Signals** | Buttons for Auto, Off and all ten fields: IFN-γ-like, CXCL9/10-like, oxygen, TGF-β-like, glucose, lactate, VEGF-like, matrix, NE-like and CGRP-like. Auto stays on oxygen throughout the run, including zero. Expand the field summary for meaning and scale. Missing data, disabled production, zero and uniform values are distinct. |
+| **Highlights** | Up to three arrow callouts and clickable cards for recorded recent events and field maxima. Removed cells retain event coordinates; legacy positions are marked approximate. A peak is not a statistical or biological anomaly. |
 | **Context** | Show or hide the grey context cells |
-| **Interactions** | Arrows (crawling toward a target), red flashes (cytotoxic hits), cycle rings (dashed when paused for lack of space), bursts (division), grey shrinking corpses, gold flashes (phagocytosis) |
+| **Interactions** | Arrows (crawling toward a target), red flashes (cytotoxic hits), cycle rings (dashed when paused; inspect the recorded cause), bursts (division), grey shrinking corpses, gold flashes (phagocytosis) |
 | Mouse wheel / drag / double-click | Zoom, pan, fit to view |
 | Hover a cell | Tooltip with type and current state |
-| **Click a cell** | **Inspector:** its t0 AUCell percentiles as bars, its lineage, and every decision it made, with the menu and Jev's probabilities |
+| **Click a cell** | **Inspector:** its t0 AUCell percentiles as bars, its parent, and its latest six decisions with the top probabilities. Full menus, exclusions and decision history are in the saved episode and Python tables |
 | Legend (cell types) | Click a type to hide or show it |
 | Right panel | Live counters (tumour candidates, divisions, deaths, phagocytosed, corpses, AI decisions), a tumour-count chart and a recent-events feed |
 | **● Record video** | Records the canvas as a `.webm` file while it plays |
@@ -74,7 +74,7 @@ This notebook needs no API key and does not install the simulation stack. It onl
 | Interactive replay | — | `replay.html` inline |
 | Overview | — | Four panels (living acting cells per type, cumulative decisions, cumulative events, choices by type); first/last population; choice × type table; events per 6 h |
 | One cell | **`CELL_ID`** (0 = the first cell that decided) | Every decision of that cell, with the full probability distribution and its wake reasons |
-| Compare runs | **`COMPARE_PATHS`** (comma-separated) | One row per run: mode, scenario, stop reason, hours, decisions, requests, tokens, tumour cells, divisions, deaths, clearance |
+| Compare runs | **`COMPARE_PATHS`** (comma-separated) | Validated matched settings and outcomes at the latest common saved time; separate achieved/requested horizons, death mechanisms and ceiling warnings |
 
 ![Overview figure](images/results_overview_local_preview.jpg)
 
@@ -119,6 +119,26 @@ tumour.groupby(pd.cut(tumour.mitotic_pct, [0, .25, .5, .75, 1]), observed=False)
 
 ## Reading highlights and fields
 
-Arrow labels and clickable cards show up to three recent recorded events (within 40 simulated minutes) and local secretion-field peaks at the current saved frame. A local maximum is not a biological anomaly. Field values reconstructed from the replay are approximate (8-bit display encoding); the scale is fixed across each run and may differ between runs. Use common scales for quantitative comparisons. Zero-field frames are explicitly labelled. TNF-alpha is not implemented.
+Arrow labels and clickable cards show up to three recent recorded events (within 40 simulated minutes) and field maxima at the current saved frame. A maximum is not a secretion location or a biological anomaly. Field colours are approximate (8-bit display encoding); 0.1.2 also saves each frame's unquantized minimum and maximum for the legend. The scale is fixed across each run and may differ between runs. Use common scales for quantitative comparisons. Zero-field frames are explicitly labelled; inactive fields do not display the internal normalization floor as a signal scale. TNF-alpha is not implemented.
 
 The scenario banner explains when CD8 killing is disabled. The cumulative death tile counts apoptosis commitments plus hypoxic necrosis, without recounting completion of apoptosis. Playback controls display existing results; they do not launch an intervention or call Jev.
+
+## 7. Matched comparisons in 0.1.2
+
+```bash
+vtx compare run_declared_results.zip run_off_results.zip --shared-replays comparison_replays
+```
+
+```python
+paths = ["run_declared_results.zip", "run_off_results.zip"]
+table = R.compare_runs(paths)
+replays = R.export_comparison_replays(paths, "comparison_replays")
+```
+
+The supported pair is `declared_recognition` versus `recognition_off`; identical-scenario sham repeats are also accepted. Bundle SHA, atlas, seed, provider/model, software, environment, decision limit and contract must match except the recognition switch. Different seeds require a separate replicate analysis. Incomplete provenance or incompatible settings raise a clear error.
+
+Outcomes are evaluated at the latest timestamp saved in both runs. A 9.5 h endpoint and an 18.67 h endpoint are never compared as equivalent. The common saved frame may be earlier than the shorter endpoint because frames are discrete. `simulated_hours` and `comparison_time_hours` identify the comparison time; `reached_hours`, `requested_hours`, completion status and HTTP usage still describe the original run. No source recording is truncated.
+
+Replay copies use the same scales and comparison endpoint, but their controls are not synchronized. Fields are recovered from the full episode. Opening an old standalone HTML cannot recover fields that were never exported into it.
+
+`summary()` reports apoptosis, hypoxic necrosis, unique deaths, division-block events by cause, growth-compression blocks and the time the cumulative population ceiling was reached. Counts of block events are not counts of missed divisions. Legacy crowding events below the pressure threshold can be attributed to the ceiling; ambiguous legacy events remain explicitly unspecified. Legacy Jev comparisons warn that old prompts exposed recognition flags.
