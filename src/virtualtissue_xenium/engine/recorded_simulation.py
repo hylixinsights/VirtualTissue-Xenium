@@ -58,6 +58,7 @@ class RecordedSimulation(AutonomousSimulation):
     def episode(self):
         episode = super().episode()
         episode.update(reporting_version=REPORTING_VERSION, prompt_version=PROMPT_VERSION,
+                       prompt_context=getattr(self, "prompt_context", None),
                        sample_name=self.atlas.get("provenance", {}).get("sample_id") or self.atlas["patch_id"],
                        population_limit_semantics="All allocated bodies, including context and removed bodies; computational limit.")
         episode.pop("fingerprint")

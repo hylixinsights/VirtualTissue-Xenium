@@ -135,5 +135,37 @@ class ProviderTests(unittest.TestCase):
             build_batches(rows(1), MODEL, dict(PARAMS, max_payload_bytes=1))
 
 
+class RoundingTieTests(unittest.TestCase):
+    """Jev rounds probabilities to 0.01; its choice may trail the rounded maximum by one step."""
+
+    def _check(self, probs, choice):
+        import jev_provider
+        from xenium_runtime.engine import validate_answer
+        body = dict(model="jev-1.14.0", questions={"c1": dict(criteria={k: "" for k in probs})})
+        response = dict(model="jev-1.14.0", answers={"c1": dict(type="choice", choice=choice,
+                                                               probabilities=probs, confidence=.6)})
+        answers, repairs = jev_provider.validate_response(response, body)
+        validate_answer(answers["c1"], {k: None for k in probs})  # the bundled kernel must accept it
+        return answers["c1"], repairs["c1"]
+
+    def test_choice_one_step_below_maximum_is_kept_and_recorded(self):
+        for probs in ({"REMAIN_QUIESCENT": .50, "ENTER_CYCLE": .49},          # sums to 0.99
+                      {"A": .34, "B": .33, "C": .33}, {"A": .34, "B": .33, "C": .32}):
+            answer, repairs = self._check(probs, "ENTER_CYCLE" if "ENTER_CYCLE" in probs else "B")
+            self.assertIn("choice_tied_with_maximum_within_rounding", repairs)
+            self.assertIn("reported_probabilities", answer)
+            self.assertAlmostEqual(sum(answer["probabilities"].values()), 1)
+
+    def test_larger_gap_is_still_rejected(self):
+        import jev_provider
+        with self.assertRaises(jev_provider.ProviderError):
+            self._check({"REMAIN_QUIESCENT": .51, "ENTER_CYCLE": .49}, "ENTER_CYCLE")
+
+    def test_exact_maximum_is_unchanged(self):
+        answer, repairs = self._check({"REMAIN_QUIESCENT": .7, "ENTER_CYCLE": .3}, "REMAIN_QUIESCENT")
+        self.assertEqual(repairs, [])
+        self.assertNotIn("reported_probabilities", answer)
+
+
 if __name__ == "__main__":
     unittest.main()

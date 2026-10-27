@@ -24,7 +24,7 @@ import importlib
 import sys
 from pathlib import Path
 
-__version__ = "0.1.2"
+__version__ = "0.1.3.dev0"
 
 #: Folder that holds the engine modules and their recorded resources.
 ENGINE_DIR = Path(__file__).resolve().parent / "engine"
@@ -34,7 +34,7 @@ DATASETS_DIR = Path(__file__).resolve().parent / "datasets"
 
 #: Versions written by the engine itself (kept here for documentation).
 PREPARATION_VERSION = "lung5k-preparation-1.1.0"
-SIMULATION_VERSION = "xenium-jev-colab-1.1.1"
+SIMULATION_VERSION = "xenium-jev-colab-1.1.2"
 
 _ENGINE_MODULES = {
     "prepare": "xenium_prepare",

@@ -636,8 +636,9 @@ def build_part2_4() -> Path:
 
     `RUN_NAME` names the results folder; for your own sample, use a name such as `MySample_R01_jev01`.
     Keep the name and every setting unchanged to **resume**; use a new name
-    for a different scenario, duration or seed. Rough scale for R03: the first round asks 280 questions in 26 requests;
-    a 24 h validation run with mocked answers needed 122 requests. Real Jev choices may need more, so start with a
+    for a different scenario, duration, tissue or seed. With its declared lung tissue, R03 asks 280 questions in
+    25 requests at t0; use your preflight count. An earlier 24 h validation run with mocked answers needed
+    122 requests. Real Jev choices may need more, so start with a
     small cap and resume with a larger one (saved answers are reused).
     ''')
     nb.code('''
@@ -646,6 +647,8 @@ def build_part2_4() -> Path:
     RUN_MODE = "Jev" #@param ["Jev", "Local preview (no API)"]
     SCENARIO = "baseline_unknown" #@param ["baseline_unknown", "declared_recognition", "recognition_off"]
     JEV_MODEL = "jev-1.14.0" #@param ["jev-1.14.0", "jev-1.13.0"]
+    TISSUE = "" #@param {type:"string"}
+    # Empty uses SOURCE.json; set this for older own-data bundles without a tissue declaration.
     HORIZON_HOURS = 24 #@param {type:"number"}
     SEED = 21 #@param {type:"integer"}
     MAX_POPULATION = 1000 #@param {type:"integer"}
@@ -659,7 +662,7 @@ def build_part2_4() -> Path:
     # Whole hours are stored as integers so that the run configuration (and resuming) is stable.
     horizon_hours = int(HORIZON_HOURS) if float(HORIZON_HOURS).is_integer() else HORIZON_HOURS
     SETTINGS = dict(model=JEV_MODEL, scenario=SCENARIO, seed=SEED, horizon_hours=horizon_hours,
-                    max_decisions=MAX_CELL_DECISIONS, max_population=MAX_POPULATION)
+                    max_decisions=MAX_CELL_DECISIONS, max_population=MAX_POPULATION, tissue=TISSUE or None)
     MODE = "jev" if RUN_MODE == "Jev" else "local_preview"
     RUN_DIR = RESULT_ROOT / (RUN_NAME + ("_local_preview" if MODE == "local_preview" else ""))
     workflow.effective_contract(BUNDLE, SETTINGS)
@@ -682,7 +685,7 @@ def build_part2_4() -> Path:
     for note in experiment_notes(SETTINGS, PREFLIGHT):
         print(note)
     display(pd.DataFrame([dict(cell_type=k, actors=v) for k,v in PREFLIGHT["acting_composition"].items()]))
-    print(json.dumps({k:PREFLIGHT[k] for k in ("total_cells", "acting_cells", "context_cells", "initial_cell_questions", "initial_http_batches", "growth_headroom", "static_preflight_passed")}, indent=2))
+    print(json.dumps({k:PREFLIGHT[k] for k in ("total_cells", "acting_cells", "context_cells", "initial_cell_questions", "initial_http_batches", "growth_headroom", "static_preflight_passed", "t0_activity", "prompt_context")}, indent=2))
     if MAX_HTTP_ATTEMPTS < PREFLIGHT["initial_http_batches"] and MODE == "jev":
         print("The allowance cannot cover the first round. Increase it before starting; otherwise no POST is sent.")
     PREVIEW_DIR = RESULT_ROOT / "preflight" / RUN_NAME
@@ -774,6 +777,7 @@ def build_part2_4() -> Path:
     if report_path.exists():
         RES = vtx_results.load_results(RUN_DIR)
         display(pd.Series(vtx_results.summary(RES), name="value").to_frame())
+        print("Tumour cycle diagnostics:", vtx_results.tumour_cycle_diagnostics(RES))
         fig = vtx_results.plot_overview(RES)
         fig.savefig(RUN_DIR / "overview.png", dpi=150)
         plt.show()
@@ -858,6 +862,7 @@ def build_part4() -> Path:
     shutil.rmtree(extract_to, ignore_errors=True)
     RES = vtx_results.load_results(results_path, extract_to=extract_to)
     display(pd.Series(vtx_results.summary(RES), name="value").to_frame())
+    print("Tumour cycle diagnostics:", vtx_results.tumour_cycle_diagnostics(RES))
     ''')
     nb.code('''
     #@title Interactive replay

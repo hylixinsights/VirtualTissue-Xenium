@@ -139,7 +139,7 @@ def decision_table(results):
     rows = []
     for d in results["episode"]["decisions"]:
         answer = d.get("answer") or {}
-        probabilities = answer.get("probabilities") or {}
+        probabilities = answer.get("reported_probabilities") or answer.get("probabilities") or {}
         choice = answer.get("choice")
         target = None
         if choice and ":" in choice:
@@ -147,8 +147,15 @@ def decision_table(results):
         rows.append(dict(hours=d["time_min"] / 60, cell_id=d["cell_id"], cell_type=labels.get(d["cell_id"]),
                          choice=choice, target_id=target, probability=probabilities.get(answer.get("choice")),
                          confidence=answer.get("confidence"), n_options=len(d.get("options") or {}),
-                         status=d.get("status"), provider=d.get("provider")))
+                         status=d.get("status"), provider=d.get("provider"),
+                         probability_source="reported" if "reported_probabilities" in answer else "validated"))
     return pd.DataFrame(rows)
+
+
+def tumour_cycle_diagnostics(results, at_time_min=None):
+    """P(ENTER_CYCLE), choices and the binary decision margin, from saved results."""
+    from recording_analysis import tumour_cycle_diagnostics as diagnose
+    return diagnose(results["episode"], at_time_min)
 
 
 def choice_counts(results):
@@ -171,7 +178,8 @@ def cell_history(results, cell_id: int):
             continue
         answer = d.get("answer") or {}
         rows.append(dict(hours=d["time_min"] / 60, choice=answer.get("choice"), confidence=answer.get("confidence"),
-                         probabilities=answer.get("probabilities"), wake_reasons=d.get("wake_reasons"),
+                         probabilities=answer.get("reported_probabilities") or answer.get("probabilities"),
+                         probability_repairs=answer.get("probability_repairs", []), wake_reasons=d.get("wake_reasons"),
                          status=d.get("status")))
     return pd.DataFrame(rows)
 
@@ -237,6 +245,7 @@ def _comparison_identity(result):
     return dict(bundle=config["zip_sha256"], atlas=episode.get("atlas_fingerprint"),
                 seed=episode.get("seed"), provider=episode.get("provider"),
                 kernel=episode.get("engine_fingerprint"), prompt=episode.get("prompt_version", "legacy-v1"),
+                prompt_context=config.get("prompt_context") or episode.get("prompt_context"),
                 reporting=episode.get("reporting_version", "legacy-v1"),
                 software_sources=config.get("sources"), environment=config.get("environment"),
                 decision_limit=episode.get("summary", {}).get("decision_budget", {}).get("limit"),

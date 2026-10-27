@@ -81,7 +81,7 @@ def build_payload(episode, atlas):
     decisions = {}
     for d in episode["decisions"]:
         ans = d.get("answer") or {}
-        probs = ans.get("probabilities") or {}
+        probs = ans.get("reported_probabilities") or ans.get("probabilities") or {}
         top = sorted(probs.items(), key=lambda kv: -kv[1])[:4]
         decisions.setdefault(d["cell_id"], []).append(
             [d["time_min"], ans.get("choice") or d["status"], round(float(ans.get("confidence") or 0), 2),

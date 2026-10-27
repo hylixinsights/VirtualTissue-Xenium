@@ -1,5 +1,7 @@
 # Validation reports
 
+`release_0.1.3.json` records the development candidate's 69 passing tests on Python 3.12/3.13, unchanged input runtime, rounding and tissue-context checks, t0 activity diagnostics, a 48 h local comparison, mocked Parts 2–4 notebooks and a 24-request ablation dry run. No live Jev requests were sent; the effect of the new default prompt on proliferation remains pending.
+
 `release_0.1.2.json` records the 2026-10-26 checks for version 0.1.2: Python 3.12/3.13 suites, unchanged local biological trajectories, real-bundle prompt comparison, matched-run accounting, mocked notebooks and offline replay logic. It explicitly separates these checks from live service and browser validation.
 
 The files below are the earlier 2026-10-25 records for package 0.1.0:

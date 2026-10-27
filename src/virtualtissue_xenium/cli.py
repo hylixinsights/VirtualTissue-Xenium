@@ -52,7 +52,7 @@ def cmd_verify(a):
 def cmd_own_data(a):
     from .own_data import create_data_folder
     create_data_folder(a.xenium_outs, a.data_dir, a.sample_id, include_optional=a.include_optional,
-                       source_page=a.source_page, license=a.license, attribution=a.attribution)
+                       source_page=a.source_page, license=a.license, attribution=a.attribution, tissue=a.tissue)
 
 
 def cmd_annotation_template(a):
@@ -134,7 +134,7 @@ def cmd_prepare(a):
 # --------------------------------------------------------------------------- Parts 2-4
 def _settings(a):
     return dict(model=a.model, scenario=a.scenario, seed=a.seed, horizon_hours=a.hours,
-                max_decisions=a.max_decisions, max_population=a.max_population)
+                max_decisions=a.max_decisions, max_population=a.max_population, tissue=a.tissue)
 
 
 def cmd_check(a):
@@ -153,7 +153,7 @@ def cmd_check(a):
     wf.write_json(out / "first_request_preview.json", first_request)
     _print_json({k: facts[k] for k in ("total_cells", "acting_cells", "context_cells", "acting_composition",
                                        "initial_cell_questions", "initial_http_batches", "growth_headroom",
-                                       "static_preflight_passed")})
+                                       "static_preflight_passed", "t0_activity", "prompt_context")})
     print("Verified bundle:", bundle["atlas"]["patch_id"], "| ZIP SHA-256:", bundle["zip_sha256"])
     print("Preflight files:", out)
 
@@ -166,13 +166,13 @@ def cmd_run(a):
     settings = _settings(a)
     wf.effective_contract(bundle, settings)
     from .experiments import experiment_notes
-    for note in experiment_notes(settings):
+    facts, _ = wf.preflight(bundle, settings)
+    for note in experiment_notes(settings, facts):
         print(note)
     mode = "jev" if a.mode == "jev" else "local_preview"
     run_dir = workdir / (a.run_name + ("_local_preview" if mode == "local_preview" else ""))
     key = ""
     if mode == "jev":
-        facts, _ = wf.preflight(bundle, settings)
         print(f"First round: {facts['initial_cell_questions']} cell questions in {facts['initial_http_batches']} "
               f"HTTP requests. Allowance for this run: {a.max_http_attempts} requests.")
         if not a.yes:
@@ -195,6 +195,8 @@ def cmd_explore(a):
     from . import results as R
     res = R.load_results(a.results)
     _print_json(R.summary(res))
+    print("Tumour cycle decision diagnostics (reported probabilities):")
+    _print_json(R.tumour_cycle_diagnostics(res))
     import pandas as pd
     with pd.option_context("display.width", 200, "display.max_columns", 40):
         print("\nLiving acting cells per type (first and last saved frame):")
@@ -237,6 +239,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("own-data", help="Create a Part 1 data folder from your own Xenium output.")
     s.add_argument("xenium_outs"); s.add_argument("data_dir"); s.add_argument("--sample-id", required=True)
     s.add_argument("--include-optional", action="store_true"); s.add_argument("--source-page")
+    s.add_argument("--tissue", help="Declared tissue description saved in SOURCE.json and used by Jev.")
     s.add_argument("--license"); s.add_argument("--attribution"); s.set_defaults(func=cmd_own_data)
     s = sub.add_parser("annotation-template", help="Draft a cluster annotation map for your sample.")
     s.add_argument("data_dir"); s.add_argument("out"); s.add_argument("--top-n", type=int, default=15)
@@ -259,6 +262,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_prepare)
 
     def sim_options(s):
+        s.add_argument("--tissue", help="Override SOURCE.json tissue for this run; recorded in its fingerprint.")
         s.add_argument("--scenario", default="baseline_unknown", choices=SCENARIOS)
         s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--hours", type=float, default=24)
         s.add_argument("--seed", type=int, default=21); s.add_argument("--max-population", type=int, default=1000)

@@ -20,11 +20,11 @@ from xenium_runtime.io import canonical, fingerprint
 from recorded_simulation import RecordedSimulation as AutonomousSimulation
 from xenium_runtime.v2.episode import validate_episode
 from xenium_runtime.v2.policy import ScoreAwareLocalPolicy
-from jev_payload import PROMPT_VERSION, build_batches, payload
+from jev_payload import PROMPT_VERSION, build_batches, payload, declared_tissue
 from player import write_player
 from jev_provider import JevProvider
 
-VERSION = "xenium-jev-colab-1.1.1"
+VERSION = "xenium-jev-colab-1.1.2"
 SOURCE = Path(__file__).resolve().parent
 
 
@@ -118,19 +118,70 @@ def effective_contract(bundle, settings):
 
 
 def create_sim(bundle, settings, policy=None):
-    return AutonomousSimulation(bundle["atlas"], effective_contract(bundle, settings),
+    sim = AutonomousSimulation(bundle["atlas"], effective_contract(bundle, settings),
              scenario=settings["scenario"], seed=settings["seed"], policy=policy or ScoreAwareLocalPolicy(),
              max_decisions=settings["max_decisions"], stop_on_provider_failure=True)
+    sim.prompt_context = prompt_context(bundle, settings)
+    return sim
+
+
+def prompt_context(bundle, settings):
+    tissue = declared_tissue(settings.get("tissue"))
+    origin = "settings" if tissue else "undeclared"
+    if not tissue:
+        source = json.loads((bundle["folder"] / "SOURCE.json").read_text())
+        tissue = declared_tissue(source.get("tissue"))
+        if tissue:
+            origin = "SOURCE.json"
+    return dict(version=PROMPT_VERSION, tissue=tissue, tissue_source=origin,
+                state=payload([], settings["model"], tissue=tissue)["state"])
+
+
+def t0_activity(sim, rows, selected_rows):
+    """Who is asked in the first round, who lacks AUCell, and CD8 access to tumour.
+
+    The kernel wakes cells only on events (new relevant contact, field-threshold
+    crossing, program or cycle completion, ROI entry). An acting cell that is never
+    eligible for a question never chooses an autonomous program. Mechanical
+    displacement is still possible. Selection by the decision cap is separate.
+    """
+    from xenium_runtime.v2.mechanics import TUMOUR
+    t = sim.tissue
+    eligible = Counter(r["observation"]["primary_label"] for r in rows)
+    asked = Counter(r["observation"]["primary_label"] for r in selected_rows)
+    by_type = {}
+    for g in range(len(t.ids)):
+        if not t.acts[g]:
+            continue
+        row = by_type.setdefault(t.labels[g], dict(acting=0, eligible_at_t0=0, asked_at_t0=0, without_aucell=0))
+        row["acting"] += 1
+        row["without_aucell"] += not sim.observation_cell(g).get("signatures")
+    for label, row in by_type.items():
+        row.update(eligible_at_t0=eligible[label], asked_at_t0=asked[label],
+                   deferred_by_decision_cap=eligible[label] - asked[label])
+    cd8 = [g for g in range(len(t.ids)) if t.acts[g] and t.labels[g] == "T_CD8_cytotoxic"]
+    radius = sim.p.get("sensing_radius_um", 60)
+    alive_tumour = lambda k: t.acts[k] and t.present[k] and t.labels[k] in TUMOUR and sim.bio[k]["viability"] == "alive"
+    touching = sum(any(alive_tumour(k) for k in sim.neighbours.get(g, [])) for g in cd8)
+    near = sum(sim.nearest(g, alive_tumour, radius) is not None for g in cd8)
+    return dict(by_type=by_type, cd8=dict(acting=len(cd8), touching_tumour=touching,
+                tumour_within_sensing_radius=near, sensing_radius_um=radius,
+                without_question_at_t0=len(cd8) - eligible["T_CD8_cytotoxic"],
+                asked_at_t0=asked["T_CD8_cytotoxic"],
+                deferred_by_decision_cap=eligible["T_CD8_cytotoxic"] - asked["T_CD8_cytotoxic"]))
 
 
 def preflight(bundle, settings):
     sim = create_sim(bundle, settings)
     # Same seeded selection rule used by the kernel if the cell-question cap is smaller than a round.
     rows = sim.requests()
+    eligible_rows = rows
     if len(rows) > settings["max_decisions"]:
         rows = sorted(rows, key=lambda r: fingerprint(dict(seed=sim.seed, time_min=sim.time,
                     cell_id=r["cell_id"], purpose="bounded_pilot_selection")))[:settings["max_decisions"]]
-    batches = build_batches(rows, settings["model"], sim.contract["provider"])
+    activity = t0_activity(sim, eligible_rows, rows)
+    context = sim.prompt_context
+    batches = build_batches(rows, settings["model"], sim.contract["provider"], tissue=context["tissue"])
     counts = Counter(label for label, acts in zip(sim.tissue.labels, sim.tissue.acts) if acts)
     facts = dict(total_cells=len(bundle["atlas"]["cells"]), acting_cells=int(sim.tissue.acts.sum()),
                  context_cells=int((~sim.tissue.acts).sum()), acting_composition=dict(counts),
@@ -138,7 +189,7 @@ def preflight(bundle, settings):
                  growth_headroom=settings["max_population"] - len(bundle["atlas"]["cells"]),
                  initially_cycling_or_eligible=sum(bool(s.get("cycle")) for s in sim.bio) +
                      sum("ENTER_CYCLE" in r["options"] for r in rows),
-                 prompt_version=PROMPT_VERSION,
+                 prompt_version=PROMPT_VERSION, prompt_context=context, t0_activity=activity,
                  scenario=sim.scenario, t0_fidelity=sim.fidelity, zip_sha256=bundle["zip_sha256"])
     # A fresh static simulation checks one mechanical tick without asking any provider.
     null = AutonomousSimulation(bundle["atlas"], bundle["contract"], scenario="static", seed=settings["seed"])
@@ -148,7 +199,7 @@ def preflight(bundle, settings):
     if null.decisions or not np.allclose(before, null.tissue.xy, rtol=0, atol=1e-8):
         raise ValueError("Static preflight failed.")
     facts["static_preflight_passed"] = True
-    return facts, payload(batches[0], settings["model"]) if batches else None
+    return facts, payload(batches[0], settings["model"], tissue=context["tissue"]) if batches else None
 
 
 def atomic_bytes(path, raw):
@@ -174,7 +225,7 @@ def versions():
 def run_context(bundle, settings):
     sources = {p.relative_to(SOURCE).as_posix(): sha256(p) for p in sorted(SOURCE.rglob("*"))
                if p.is_file() and p.suffix in (".py", ".html", ".txt")}
-    return dict(version=VERSION, prompt_version=PROMPT_VERSION, zip_sha256=bundle["zip_sha256"], atlas_fingerprint=bundle["atlas"]["fingerprint"],
+    return dict(version=VERSION, prompt_version=PROMPT_VERSION, prompt_context=prompt_context(bundle, settings), zip_sha256=bundle["zip_sha256"], atlas_fingerprint=bundle["atlas"]["fingerprint"],
                 original_contract_fingerprint=fingerprint(bundle["contract"]),
                 effective_contract_fingerprint=fingerprint(effective_contract(bundle, settings)),
                 settings=settings, sources=sources, environment=versions())
@@ -232,6 +283,7 @@ def run(bundle, settings, output_dir, *, api_key="", max_http_attempts=600, tran
             shutil.copyfile(bundle["folder"] / name, folder / ("input_" + name))
         provider = (JevProvider(api_key, settings["model"], effective_contract(bundle, settings)["provider"],
                     max_http_attempts, folder / "jev_journal.jsonl", context, transport=transport,
+                    tissue=context["prompt_context"]["tissue"],
                     pause_s=0 if transport else .25,
                     progress=lambda n, cap, hits: progress(f"Jev requests recorded: {n}/{cap}; cached batches reused: {hits}") if n % 10 == 0 else None)
                     if mode == "jev" else ScoreAwareLocalPolicy())
@@ -257,7 +309,9 @@ def run(bundle, settings, output_dir, *, api_key="", max_http_attempts=600, tran
         episode = json.loads(gzip.decompress((folder / "episode.json.gz").read_bytes()))
         validate_episode(episode, bundle["atlas"])
         usage = provider.usage() if isinstance(provider, JevProvider) else dict(http_attempts=0)
+        from recording_analysis import tumour_cycle_diagnostics
         report = dict(version=VERSION, mode=mode, test_transport=transport is not None,
+                      tumour_cycle_diagnostics=tumour_cycle_diagnostics(episode),
                       completed=error is None and sim.stop_reason == "horizon_reached",
                       error=error, provider_error=getattr(provider, "last_error", None),
                       checkpoint_time_min=episode["summary"]["time_min"], stop_reason=sim.stop_reason,

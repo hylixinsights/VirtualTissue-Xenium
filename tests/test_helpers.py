@@ -139,7 +139,8 @@ class OwnDataTests(unittest.TestCase):
 
     def test_create_folder_template_validate_and_activate(self):
         data = Path(self.temp.name) / "data"
-        own_data.create_data_folder(self.outs, data, "MY_SAMPLE", progress=lambda m: None)
+        own_data.create_data_folder(self.outs, data, "MY_SAMPLE", tissue="human breast carcinoma", progress=lambda m: None)
+        self.assertEqual(json.loads((data / "SOURCE.json").read_text())["tissue"], "human breast carcinoma")
         manifest = json.loads((data / "DOWNLOAD_MANIFEST.json").read_text())
         self.assertTrue(manifest["complete"])
         self.assertEqual({f["path"] for f in manifest["files"]}, {f"raw/{n}" for n in own_data.REQUIRED_FILES})
