@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3 — unreleased
+
+* Default Jev prompt `vtx-choice-3` uses declared tissue from `SOURCE.json` or `--tissue` / notebook `TISSUE`, restores concise t0 semantics, and records the resolved prompt context. Recognition-arm isolation remains in place. The effect on tumour proliferation is awaiting live Jev validation; see [validation and usage](docs/12_jev_feedback_013.md).
+* Accept a reported choice within one 0.01 rounding step before normalization. Preserve exact reported probabilities and repair metadata while giving the unchanged bundled kernel a normalized tie. Rejected serializable answers are journaled for audit; no automatic retry is added.
+* Preflight reports AUCell coverage by acting type, CD8 access to tumour and t0 eligibility separately from the decision cap. Results report cycle probabilities and decision margins using original reported values.
+* Add prompt snapshots and a bounded, dry-by-default ablation tool with fixed groups, durable request intents and refusal to resend an existing experiment. Existing input bundles remain compatible; use new run names with this version.
+* Advance the simulation workflow marker so Colab requests a restart when 0.1.2 simulation modules are already loaded during an upgrade.
+
 ## 0.1.2 — 2026-10-26
 
 * Results include hypoxic necrosis, unique deaths and division blocks by cause. `vtx compare` validates matching provenance/settings and compares the latest common saved frame. Original runs remain intact; optional replay copies share field scales and the comparison endpoint.

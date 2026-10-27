@@ -95,7 +95,7 @@ else:
     own_data.check_xenium_files(XENIUM_OUTS)
     own_data.create_data_folder(
         XENIUM_OUTS, DATA_DIR, sample_id=SAMPLE_ID,
-        include_optional=False,
+        include_optional=False, tissue="human breast carcinoma",  # replace with your declared tissue
         source_page=None, license=None, attribution="My lab, unpublished")
 
 print("Data folder ready:", DATA_DIR)
@@ -235,9 +235,11 @@ In step 8, choose an ID that appears in **your** region gallery; `R03` from the 
 After [installing the package](08_local_installation.md), run the following from the repository folder. Replace the input path and sample name; these examples use new local folders:
 
 ```bash
-vtx own-data /absolute/path/to/MySample_outs data/MySample --sample-id MySample_Region1
+vtx own-data /absolute/path/to/MySample_outs data/MySample --sample-id MySample_Region1 --tissue "human breast carcinoma"
 vtx annotation-template data/MySample MySample_clusters.json
 ```
+
+Replace the tissue description with your sample's declaration. This context is saved in `SOURCE.json` and used in the default Jev prompt. Existing bundles can use `vtx check/run --tissue` or notebook `TISSUE` without re-preparation. See [the 0.1.3 notes](12_jev_feedback_013.md) for validation limits and AUCell/CD8 diagnostics. This command accepts an extracted folder, not a download link or ZIP.
 
 **Stop here to edit and save `MySample_clusters.json` as described in §3.2.** Then validate it:
 

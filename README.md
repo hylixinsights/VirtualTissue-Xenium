@@ -160,14 +160,14 @@ The same notebooks also run in local Jupyter (`jupyter lab notebooks/`). They de
 
 The kernel advances in **10-minute ticks**. A cell is asked only when something relevant happens to it: a new heterotypic contact, a field crossing a threshold, a finished program, a cell-cycle checkpoint, or entry into the region. Each type has a minimum interval between questions (CD8 60 min, or 30 min while touching tumour; CD4 and macrophages 180 min; endothelium 360 min; tumour and fibroblasts 720 min), and a cell is asked at most 24 times per simulated day. Questions use `POST https://api.typesafe.ai/v1/systemone` (at most 20 questions or 40 KB per request). CD8 questions are batched separately from other cells so their recognition-dependent menus do not enter other cells' request context.
 
-This is a real question from the first round of region R03, slightly shortened:
+This example uses a first-round R03 cell and the current prompt, slightly shortened:
 
 ```json
 {
   "model": "jev-1.14.0",
-  "state": {"setting": "Independent local cells in an uncalibrated Xenium virtual tissue mechanism simulation.",
-            "prompt_version": "vtx-choice-2",
-            "semantics": "AUCell is frozen at t0; daughter scores are inherited, not remeasured. Missing evidence is not zero. Scores are not protein activity. SIM fields and rates are assumptions."},
+  "state": {"setting": "Independent local cells in an uncalibrated virtual tissue prototype of Human lung invasive acinar adenocarcinoma, FFPE.",
+            "prompt_version": "vtx-choice-3",
+            "semantics": "AUCell relative expression scores at t0, conditioned on provisional type and detection depth; unavailable evidence is missing. Scores are not protein activity or validated malignancy. SIM fields and rates are assumptions."},
   "questions": {
     "c11869": {
       "type": "choice",
@@ -194,6 +194,8 @@ This is a real question from the first round of region R03, slightly shortened:
 ```
 
 The request **never contains** raw expression, gene lists, coordinates, the contract, literature or a desired outcome. The global recognition flag and `excluded` gate diagnostics stay in the local decision record and are not sent to Jev. Jev returns a `choice`, a probability for **every** offered option and a `confidence`.
+
+The default `vtx-choice-3` prompt uses the tissue declared in `SOURCE.json` or an explicit `--tissue` / notebook `TISSUE` override. Tissue context can introduce literature priors. AUCell still stays fixed during the run and is inherited by daughters. The reported 0.1.2 proliferation regression motivated this wording change; recovery has not yet been demonstrated with live Jev. Preflight now reports AUCell coverage and CD8 access to tumour, and results include cycle-probability diagnostics. See [0.1.3 changes and validation](docs/12_jev_feedback_013.md).
 
 ### 4.4 What the kernel does with the answers
 
@@ -290,7 +292,9 @@ Why the biological kernel is vendored and placed on `sys.path` is explained in [
 
 ## 8. Validation status
 
-For **0.1.2**, all **49 tests pass on Python 3.12 and 3.13**, including the existing R03 input bundle. The 48 h local R03 run and 6 h hypoxia stress test retain exactly the 0.1.1 final state, decisions and metrics; only reporting changes. All 278 non-CD8 questions and their request batches are identical between recognition arms at t0. Offline JavaScript checks cover replay logic at 1400×900 and 1920×1080. See the versioned [release report](tests/reports/release_0.1.2.json) for evidence and limits. Browser visual inspection and live Colab/Jev are not claimed for this release.
+For the **0.1.3 development candidate**, all **69 tests pass on Python 3.12 and 3.13**, including the existing R03 input bundle. All 19 bundled Python files remain unchanged. A 48 h local run preserves the reference final state, decisions and metrics; 278 non-CD8 questions and batches remain identical across recognition arms. Mocked end-to-end checks accept 263 rounded cycle choices and preserve their reported probabilities. Parts 2–4 notebooks pass with mocked Colab/Jev, including resume with no new calls. The ablation dry run plans 24 requests but sends none. See the [0.1.3 validation report](tests/reports/release_0.1.3.json) and [prompt validation gate](docs/12_jev_feedback_013.md). Live Jev, Breast 5K recovery, browser visual inspection and a new end-to-end Part 1 run are not claimed.
+
+Earlier 0.1.2 validation, including the hypoxia stress test, remains recorded in its [release report](tests/reports/release_0.1.2.json).
 
 The following earlier validation records remain available:
 

@@ -152,7 +152,8 @@ class PromptTests(unittest.TestCase):
         a[1]["observation"]["primary_label"]="T_CD8_cytotoxic"
         batches=build_batches(a,"jev-1.14.0",dict(max_questions=20,max_payload_bytes=100000))
         self.assertEqual([[r["cell_id"] for r in batch] for batch in batches],[[0,2],[1]])
-        self.assertIn("frozen",payload(a,"jev-1.14.0")["state"]["semantics"])
+        self.assertNotIn("frozen",payload(a,"jev-1.14.0")["state"]["semantics"])
+        self.assertIn("at t0",payload(a,"jev-1.14.0")["state"]["semantics"])
 
 
 class PreparationTests(unittest.TestCase):

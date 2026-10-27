@@ -141,13 +141,15 @@ def check_xenium_files(raw_dir) -> dict:
 
 
 def write_manifest(data_dir, sample_id: str, *, source_page: str | None = None, license: str | None = None,
-                   attribution: str | None = None, notes: str | None = None) -> Path:
+                   attribution: str | None = None, notes: str | None = None, tissue: str | None = None) -> Path:
     """Write ``DOWNLOAD_MANIFEST.json`` and ``SOURCE.json`` for files already in ``<data_dir>/raw``.
 
     Every regular file in ``raw/`` is listed with its size and SHA-256 (Part 1
     re-checks them on every run, so do not edit files afterwards).
     """
     data_dir = Path(data_dir)
+    from jev_payload import declared_tissue
+    tissue = declared_tissue(tissue)
     raw = data_dir / "raw"
     summary = check_xenium_files(raw)
     roles = {**REQUIRED_FILES, **OPTIONAL_FILES}
@@ -159,7 +161,7 @@ def write_manifest(data_dir, sample_id: str, *, source_page: str | None = None, 
                           registered_utc=now))
     manifest = dict(sample_id=sample_id, source_page=source_page, files=files, complete=True,
                     created_by="virtualtissue_xenium.own_data.write_manifest")
-    source = dict(sample_id=sample_id, source_page=source_page, license_as_stated=license, attribution=attribution,
+    source = dict(sample_id=sample_id, source_page=source_page, license_as_stated=license, attribution=attribution, tissue=tissue,
                   notes=notes, registered_utc=now, xenium_summary=summary,
                   scope="Original Xenium output files; no normalization, annotation or scoring performed.")
     (data_dir / "DOWNLOAD_MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n")
@@ -169,12 +171,14 @@ def write_manifest(data_dir, sample_id: str, *, source_page: str | None = None, 
 
 def create_data_folder(xenium_output_dir, data_dir, sample_id: str, *, include_optional: bool = False,
                        source_page: str | None = None, license: str | None = None,
-                       attribution: str | None = None, progress=print) -> Path:
+                       attribution: str | None = None, tissue: str | None = None, progress=print) -> Path:
     """Copy the files Part 1 needs from a Xenium output folder and register them.
 
     ``xenium_output_dir`` is the instrument/XOA output folder (often called ``outs``).
     Nothing in it is modified. ``data_dir`` must be a new or empty folder.
     """
+    from jev_payload import declared_tissue
+    tissue = declared_tissue(tissue)
     src, data_dir = Path(xenium_output_dir), Path(data_dir)
     raw = data_dir / "raw"
     if raw.exists() and any(raw.iterdir()):
@@ -187,7 +191,7 @@ def create_data_folder(xenium_output_dir, data_dir, sample_id: str, *, include_o
             shutil.copy2(src / name, raw / name)
         elif name in REQUIRED_FILES:
             raise FileNotFoundError(f"{name} not found in {src}.")
-    write_manifest(data_dir, sample_id, source_page=source_page, license=license, attribution=attribution)
+    write_manifest(data_dir, sample_id, source_page=source_page, license=license, attribution=attribution, tissue=tissue)
     progress(f"Data folder ready: {data_dir}")
     return data_dir
 

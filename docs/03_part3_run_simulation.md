@@ -14,6 +14,7 @@
 | `RUN_MODE` | `Jev` | `Jev` = paid Choice API calls · `Local preview (no API)` = programmed rules | Local preview results get the suffix `_local_preview` |
 | `SCENARIO` | `baseline_unknown` | Declared assumptions about recognition and effector competence (§2) | |
 | `JEV_MODEL` | `jev-1.14.0` | Pinned model version; the run stops if the API returns another model | `jev-1.13.0` was used by the LUAD3 prototype |
+| `TISSUE` | blank | Declared tissue used by prompt `vtx-choice-3`; blank reads `SOURCE.json` | CLI: `--tissue`. Recorded in the run fingerprint; use the same context in paired runs |
 | `HORIZON_HOURS` | 24 | Simulated time | Multiple of 10 min; max 168 h (7 days) |
 | `SEED` | 21 | Seeds tie-breaking, motility, ordering | Same seed + same answers → same trajectory |
 | `MAX_POPULATION` | 1000 | Ceiling on allocated bodies (dead/removed bodies still count) | Must be ≥ the starting cells and ≤ 5000. R03 starts with 989, so only 11 births are possible by default |
@@ -41,9 +42,10 @@ The *Preflight* cell:
 * runs one **static** mechanical step and checks that nothing moves (`static_preflight_passed`);
 * builds the **first decision round** exactly as the run would: how many cells will be asked (`initial_cell_questions`) and in how many HTTP requests (`initial_http_batches`);
 * saves `first_request_preview.json`, the literal JSON body of the first request, so you can read what Jev will receive;
+* reports AUCell coverage per acting type, CD8–tumour contacts/proximity, eligible questions and those deferred by the decision cap;
 * warns if `MAX_HTTP_ATTEMPTS` cannot cover even the first round. In that case the run would stop before sending anything.
 
-For R03 the first round is **280 questions in 26 requests**. Later rounds depend on what happens: contacts form, programs finish, cycle checkpoints arrive. The first-round count is therefore not a forecast of the total. A 24 h validation run on R03 with mocked answers that followed the local rules needed 122 requests. Real Jev choices can need more or fewer. Start with a small cap, look at the results, then resume with a larger cap (§6).
+For the tested R03 bundle with its declared lung tissue, the `vtx-choice-3` first round is **280 questions in 25 requests**. Longer tissue descriptions or different inputs can change batching; use your preflight count. Later rounds depend on what happens: contacts form, programs finish, cycle checkpoints arrive. The first-round count is therefore not a forecast of the total. An earlier 24 h validation run on R03 with mocked answers that followed the local rules needed 122 requests. Real Jev choices can need more or fewer. Start with a small cap, look at the results, then resume with a larger cap (§6).
 
 ## 4. The Jev key and START_RUN
 
@@ -74,14 +76,14 @@ every 10 simulated minutes (one tick):
 
 One request = `{"model", "state", "questions"}`. Each question is a `choice` with:
 
-* `instructions.local_observation` — `time_min`, `primary_label`, `identity`, `t0_aucell_percentile` and `t0_aucell_raw` (the 20 signatures, missing ones absent), `t0_aucell_provenance`, `sim_state` (viability, damage, effector pulses, exhaustion, glycolysis, PD-L1, polarisation), `fields_sim` (oxygen, glucose, lactate, IFN-γ-like, CXCL9-like, VEGF-like, TGF-β-like, matrix), `local_pressure_sim`, `contacts` (id, label, viability, PD-L1, provenance). The global `recognition_sim` and `excluded` diagnostics are omitted from provider payloads in prompt `vtx-choice-2` and retained in local decision records;
+* `instructions.local_observation` — `time_min`, `primary_label`, `identity`, `t0_aucell_percentile` and `t0_aucell_raw` (the 20 signatures, missing ones absent), `t0_aucell_provenance`, `sim_state` (viability, damage, effector pulses, exhaustion, glycolysis, PD-L1, polarisation), `fields_sim` (oxygen, glucose, lactate, IFN-γ-like, CXCL9-like, VEGF-like, TGF-β-like, matrix), `local_pressure_sim`, `contacts` (id, label, viability, PD-L1, provenance). The global `recognition_sim` and `excluded` diagnostics remain omitted from `vtx-choice-3` provider payloads and retained in local decision records;
 * `criteria` — the permitted options and their one-line descriptions. Targeted actions are keyed `ACTION:<target_id>`.
 
 It never contains raw counts, gene lists, coordinates, the contract or a desired outcome. See the full real example in the [README](../README.md#43-how-one-cell-asks-jev-part-3).
 
 ### How answers are validated
 
-The returned model must equal `JEV_MODEL`. Question IDs and option keys must match exactly. Probabilities and confidence must be finite and in [0, 1], and the probabilities must sum to 1 within a rounding tolerance (they are then renormalised and the repair is logged). The choice must be a maximum-probability option. If any answer in a round fails, **no decision of that round is applied** and the run stops with `provider_failed`. There are **no automatic retries or redirects**, and no fallback to local rules.
+The returned model must equal `JEV_MODEL`. Question IDs and option keys must match exactly. Probabilities and confidence must be finite and in [0, 1], and the probabilities must sum to 1 within a rounding tolerance. The choice must be a maximum-probability option or trail it by at most one reported rounding step (`0.01 + 1e-9`, before normalization). A compatibility copy ties an accepted near-maximum choice and is normalized for the unchanged kernel; exact reported probabilities and repairs remain in the answer and journal. See the [rounding and prompt notes](12_jev_feedback_013.md). If any answer in a round fails, **no decision of that round is applied** and the run stops with `provider_failed`. There are **no automatic retries or redirects**, and no fallback to local rules.
 
 ### Stop reasons (`run_report.json → stop_reason`)
 

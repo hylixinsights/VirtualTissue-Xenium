@@ -1,0 +1,55 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "setting": "Independent local cells in an uncalibrated virtual tissue prototype of human breast carcinoma.",
+    "semantics": "AUCell relative expression scores at t0, conditioned on provisional type and detection depth; unavailable evidence is missing. Scores are not protein activity or validated malignancy. SIM fields and rates are assumptions.",
+    "prompt_version": "vtx-choice-3"
+  },
+  "questions": {
+    "c0": {
+      "type": "choice",
+      "instructions": {
+        "task": "Choose one permitted local behavior for this cell.",
+        "local_observation": {
+          "time_min": 0,
+          "primary_label": "Tumor",
+          "t0_aucell_raw": {}
+        }
+      },
+      "criteria": {
+        "WAIT": "Wait",
+        "ENTER_CYCLE": "Enter cycle"
+      }
+    },
+    "c1": {
+      "type": "choice",
+      "instructions": {
+        "task": "Choose one permitted local behavior for this cell.",
+        "local_observation": {
+          "time_min": 0,
+          "primary_label": "T_CD8_cytotoxic",
+          "t0_aucell_raw": {}
+        }
+      },
+      "criteria": {
+        "WAIT": "Wait",
+        "ENTER_CYCLE": "Enter cycle"
+      }
+    },
+    "c2": {
+      "type": "choice",
+      "instructions": {
+        "task": "Choose one permitted local behavior for this cell.",
+        "local_observation": {
+          "time_min": 0,
+          "primary_label": "Tumor",
+          "t0_aucell_raw": {}
+        }
+      },
+      "criteria": {
+        "WAIT": "Wait",
+        "ENTER_CYCLE": "Enter cycle"
+      }
+    }
+  }
+}

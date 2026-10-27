@@ -45,3 +45,5 @@ Part 1 ──► simulation_input_<REGION>_<HHMMSS_ffffff>.zip ──► Parts 2
 | **Scenario** | `baseline_unknown`, `declared_recognition` or `recognition_off`: declared assumptions about antigen recognition and effector competence. |
 
 [11 · Experiment design](11_experiment_design.md): useful control/intervention comparisons, proposed perturbation controls, measured versus assumed baseline, and the requirements for non-cancer tissue and other platforms.
+
+[12 · Jev feedback and 0.1.3](12_jev_feedback_013.md): declared tissue, rounding compatibility, t0 diagnostics and prompt validation.

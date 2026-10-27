@@ -17,6 +17,7 @@ from xenium_runtime.providers import BudgetExhausted
 from jev_payload import build_batches, payload
 
 ENDPOINT = "https://api.typesafe.ai/v1/systemone"
+ROUNDING_STEP = 0.01
 
 
 class ProviderError(RuntimeError):
@@ -49,11 +50,23 @@ def validate_response(response, body):
         if total <= 0 or abs(total - 1) > min(.02, .005 * len(p)) + 1e-9:
             raise ProviderError("Probabilities do not sum to one within rounding tolerance.")
         choice = a.get("choice")
-        if choice not in p or p[choice] < max(p.values()) - 1e-6:
+        top = max(p.values())
+        # Jev reports probabilities at 0.01 resolution, so its choice can trail the
+        # rounded maximum by one step. A larger gap is a real contradiction.
+        if not isinstance(choice, str) or choice not in p or p[choice] < top - ROUNDING_STEP - 1e-9:
             raise ProviderError("Choice is absent or is not a maximum-probability option.")
         repairs[qid] = [] if abs(total - 1) < 1e-12 else ["normalized_rounded_probability_sum"]
-        result[qid] = dict(choice=choice, probabilities={k: v / total for k, v in p.items()},
-                           confidence=a["confidence"])
+        answer = dict(choice=choice, probabilities={k: v / total for k, v in p.items()}, confidence=a["confidence"])
+        if p[choice] < top:
+            # Keep Jev's choice. The bundled kernel accepts only a maximum-probability
+            # choice, so the kernel copy ties the choice with the maximum; the values
+            # Jev reported stay in the journal and in reported_probabilities.
+            tied = {**p, choice: top}
+            answer.update(probabilities={k: v / sum(tied.values()) for k, v in tied.items()})
+            repairs[qid].append("choice_tied_with_maximum_within_rounding")
+        if repairs[qid]:
+            answer.update(reported_probabilities=dict(p), probability_repairs=list(repairs[qid]))
+        result[qid] = answer
     return result, repairs
 
 
@@ -61,17 +74,18 @@ class JevProvider:
     name = "jev_choice_journal_v1"
 
     def __init__(self, key, model, parameters, limit, journal, context, *,
-                 timeout_s=120, pause_s=.25, transport=None, progress=None):
+                 timeout_s=120, pause_s=.25, transport=None, progress=None, tissue=None):
         if not re.fullmatch(r"jev-\d+\.\d+\.\d+", model):
             raise ValueError("Use a pinned Jev version, for example jev-1.14.0.")
         if type(limit) is not int or limit < 1:
             raise ValueError("HTTP attempt limit must be a positive integer.")
         self.key, self.model, self.p, self.limit = key, model, parameters, limit
+        self.tissue = tissue
         if transport is not None:
             self.name = "mock_jev_choice_software_test"
         self.timeout_s, self.pause_s = timeout_s, pause_s
         self.journal = Path(journal)
-        self.context = fingerprint(context)
+        self.context = fingerprint(dict(run=context, prompt_state=payload([], model, tissue=tissue)["state"]))
         self.transport, self.progress = transport or self._remote, progress
         self.requests, self.cache_hits, self.audit = 0, 0, []
         self.cache, self.failed, self.last_error = {}, False, None
@@ -132,8 +146,8 @@ class JevProvider:
             raise ProviderError("Transport or response decoding failed; usage is unknown. No automatic retry was made.") from None
 
     def choose(self, requests):
-        batches = build_batches(requests, self.model, self.p)
-        bodies = [payload(batch, self.model) for batch in batches]
+        batches = build_batches(requests, self.model, self.p, tissue=self.tissue)
+        bodies = [payload(batch, self.model, tissue=self.tissue) for batch in batches]
         hashes = [fingerprint(body) for body in bodies]
         for h in hashes:
             if h in self.cache and self.cache[h].get("status") != "valid":
@@ -150,12 +164,13 @@ class JevProvider:
                 intent = self._append(dict(phase="intent", request_hash=h, request=body, usage="unknown"))
                 self.cache[h] = intent
                 self.requests += 1
+                safe = None
                 try:
                     response = self.transport(body)
                     # Whitelist persisted response fields; never persist arbitrary response extras.
-                    safe = {k: response.get(k) for k in ("model", "answers", "usage")} if isinstance(response, dict) else {}
-                    if self.key:
-                        safe = json.loads(canonical(safe).decode().replace(self.key, "[redacted]"))
+                    whitelisted = {k: response.get(k) for k in ("model", "answers", "usage")} if isinstance(response, dict) else {}
+                    serialized = canonical(whitelisted).decode()
+                    safe = json.loads(serialized.replace(self.key, "[redacted]") if self.key else serialized)
                     answers, repairs = validate_response(safe, body)
                     result = dict(phase="result", request_hash=h, status="valid", response=safe,
                                   answers=answers, repairs=repairs, usage=safe.get("usage", "unknown"))
@@ -165,8 +180,11 @@ class JevProvider:
                     self.last_error = str(e) if isinstance(e, ProviderError) else "Transport or response validation failed."
                     if self.key:
                         self.last_error = self.last_error.replace(self.key, "[redacted]")
-                    self.cache[h] = self._append(dict(phase="result", request_hash=h, status="failed",
-                                                     error=self.last_error, usage="unknown"))
+                    failed = dict(phase="result", request_hash=h, status="failed", error=self.last_error, usage="unknown")
+                    if isinstance(e, ProviderError) and isinstance(safe, dict) and safe.get("answers") is not None:
+                        # Keep the whitelisted response so a rejected answer can be audited.
+                        failed.update(response=safe, usage=safe.get("usage", "unknown"))
+                    self.cache[h] = self._append(failed)
                     self.audit.append(dict(request_hash=h, cached=False, status="failed", error=self.last_error))
                     raise ProviderError(self.last_error) from None
                 self.cache[h] = self._append(result)

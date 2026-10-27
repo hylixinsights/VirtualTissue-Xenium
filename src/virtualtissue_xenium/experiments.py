@@ -26,6 +26,29 @@ def experiment_notes(settings, facts=None):
             if cd8 < 10:
                 notes.append("Low CD8 count: outcomes may depend on a few cells and their contacts. "
                              "The warning threshold of 10 is a usability heuristic, not a validated biological cutoff.")
+        activity = facts.get("t0_activity")
+        if activity and cd8:
+            c = activity["cd8"]
+            notes.append(f"CD8 access at t0: {c['touching_tumour']} of {c['acting']} touch a live tumour cell; "
+                         f"{c['tumour_within_sensing_radius']} have one within {c['sensing_radius_um']:g} µm. "
+                         f"{c['without_question_at_t0']} have no eligible question at t0; "
+                         f"{c['deferred_by_decision_cap']} eligible questions are deferred by the decision cap. Cells decide only when an event "
+                         "wakes them (new tumour contact, field-threshold crossing, end of a program); a CD8 cell "
+                         "that is never woken cannot choose an autonomous movement program.")
+        if activity:
+            missing = {k: v["without_aucell"] for k, v in activity["by_type"].items() if v["without_aucell"]}
+            if missing:
+                total = sum(v["acting"] for v in activity["by_type"].values())
+                notes.append(f"No t0 AUCell for {sum(missing.values())} of {total} acting cells "
+                             f"({', '.join(f'{k} {v}/{activity['by_type'][k]['acting']}' for k, v in sorted(missing.items()))}). "
+                             "Check detected-gene depth (--aucell-top-ranks), QC and gene-set overlap in the preparation audit. Missing scores gate no "
+                             "action or kernel rate; Jev sees them as missing, and the local preview rules never "
+                             "start a tumour cycle without a MITOTIC_CELL_CYCLE score.")
+        if facts.get("prompt_context"):
+            context = facts["prompt_context"]
+            notes.append(f"Jev prompt {context['version']}: tissue = {context['tissue'] or 'not declared'} "
+                         f"(source: {context['tissue_source']}). Tissue context can introduce literature priors; "
+                         "the effect on ENTER_CYCLE has not yet been validated with live Jev.")
         notes.append(f"Growth headroom: {facts['growth_headroom']} new bodies before the population ceiling. "
                      "This limit includes context and removed bodies.")
         eligible = facts.get("initially_cycling_or_eligible", 0)
