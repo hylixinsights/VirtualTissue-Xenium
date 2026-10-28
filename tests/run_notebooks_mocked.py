@@ -144,6 +144,8 @@ def main():
     ns = execute("Part2-4_Run_Jev_Simulation.ipynb", sim, content, log, calls, downloads, shown, mounts)
     result = ns["RESULT"]
     assert result["report"]["completed"], result["report"]
+    assert result["episode"]["prompt_context"]["mode"] == "none"
+    assert result["episode"]["prompt_context"]["tissue"] is None
     first_calls = len(calls)
     assert first_calls == result["report"]["usage"]["http_attempts"] > 0
     backup = drive_root / "VirtualTissue" / "Simulation_Results"
@@ -165,11 +167,14 @@ def main():
 
     # Upload path + free local preview.
     local = dict(sim, INPUT_SOURCE="upload", RUN_MODE="Local preview (no API)", RUN_NAME="local_check",
-                 SAVE_RESULTS_TO_DRIVE=False)
+                 SAVE_RESULTS_TO_DRIVE=False, CONTEXT_MODE="custom", TISSUE="human breast carcinoma")
     ns = execute("Part2-4_Run_Jev_Simulation.ipynb", local, content, log, calls, downloads, shown, mounts, upload=bundle)
     assert ns["RESULT"]["report"]["completed"] and ns["RESULT"]["report"]["usage"]["http_attempts"] == 0
     assert len(calls) == first_calls
-    report["local_preview_upload"] = dict(decisions=ns["RESULT"]["episode"]["summary"]["decisions"])
+    custom_context = ns["RESULT"]["episode"]["prompt_context"]
+    assert custom_context["mode"] == "custom" and custom_context["tissue"] == "human breast carcinoma"
+    report["local_preview_upload"] = dict(decisions=ns["RESULT"]["episode"]["summary"]["decisions"],
+                                         prompt_context=custom_context)
 
     # A matched control must use the same provider, seed, model and contract.
     control = dict(sim, SCENARIO="recognition_off", RUN_NAME="notebook_control")

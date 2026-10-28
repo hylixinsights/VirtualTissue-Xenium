@@ -134,7 +134,8 @@ def cmd_prepare(a):
 # --------------------------------------------------------------------------- Parts 2-4
 def _settings(a):
     return dict(model=a.model, scenario=a.scenario, seed=a.seed, horizon_hours=a.hours,
-                max_decisions=a.max_decisions, max_population=a.max_population, tissue=a.tissue)
+                max_decisions=a.max_decisions, max_population=a.max_population,
+                tissue=a.tissue, context_mode=a.context_mode)
 
 
 def cmd_check(a):
@@ -239,7 +240,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("own-data", help="Create a Part 1 data folder from your own Xenium output.")
     s.add_argument("xenium_outs"); s.add_argument("data_dir"); s.add_argument("--sample-id", required=True)
     s.add_argument("--include-optional", action="store_true"); s.add_argument("--source-page")
-    s.add_argument("--tissue", help="Declared tissue description saved in SOURCE.json and used by Jev.")
+    s.add_argument("--tissue", help="Tissue description saved in SOURCE.json; available when bundle context is explicitly selected.")
     s.add_argument("--license"); s.add_argument("--attribution"); s.set_defaults(func=cmd_own_data)
     s = sub.add_parser("annotation-template", help="Draft a cluster annotation map for your sample.")
     s.add_argument("data_dir"); s.add_argument("out"); s.add_argument("--top-n", type=int, default=15)
@@ -262,7 +263,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_prepare)
 
     def sim_options(s):
-        s.add_argument("--tissue", help="Override SOURCE.json tissue for this run; recorded in its fingerprint.")
+        s.add_argument("--context-mode", choices=["none", "custom", "bundle"],
+                       help="Context sent to Jev: none (default), custom text, or SOURCE.json tissue. Supplying --context/--tissue alone selects custom.")
+        s.add_argument("--context", "--tissue", dest="tissue",
+                       help="User-supplied tissue context (one line, up to 300 characters); recorded in the run fingerprint.")
         s.add_argument("--scenario", default="baseline_unknown", choices=SCENARIOS)
         s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--hours", type=float, default=24)
         s.add_argument("--seed", type=int, default=21); s.add_argument("--max-population", type=int, default=1000)
@@ -301,6 +305,8 @@ def main(argv=None):
     except ValueError as exc:
         if args.command == "compare":
             parser.exit(2, f"Comparison stopped: {exc}\n")
+        if args.command in ("check", "run"):
+            parser.exit(2, f"Configuration stopped: {exc}\n")
         raise
 
 

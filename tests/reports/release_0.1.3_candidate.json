@@ -1,0 +1,485 @@
+{
+  "date": "2026-10-27",
+  "status": "development candidate; live Jev validation pending",
+  "package_version": "0.1.3.dev0",
+  "base_commit": "5482cbd",
+  "prompt_version": "vtx-choice-3",
+  "pytest": {
+    "3.12": {
+      "passed": 69,
+      "skipped": 0,
+      "subtests_passed": 6
+    },
+    "3.13": {
+      "passed": 69,
+      "skipped": 0,
+      "subtests_passed": 6
+    }
+  },
+  "bundled_python_files_unchanged": 19,
+  "r03_preflight": {
+    "total_cells": 989,
+    "acting_cells": 526,
+    "context_cells": 463,
+    "acting_composition": {
+      "Tumor": 263,
+      "T_CD4": 71,
+      "Macrophage": 10,
+      "CAF": 95,
+      "Endothelial": 33,
+      "Plasma_cell": 36,
+      "T_CD8_cytotoxic": 2,
+      "B_cell": 7,
+      "Fibroblast": 9
+    },
+    "initial_cell_questions": 280,
+    "initial_http_batches": 25,
+    "growth_headroom": 11,
+    "initially_cycling_or_eligible": 263,
+    "prompt_version": "vtx-choice-3",
+    "prompt_context": {
+      "version": "vtx-choice-3",
+      "tissue": "Human lung invasive acinar adenocarcinoma, FFPE",
+      "tissue_source": "SOURCE.json",
+      "state": {
+        "setting": "Independent local cells in an uncalibrated virtual tissue prototype of Human lung invasive acinar adenocarcinoma, FFPE.",
+        "semantics": "AUCell relative expression scores at t0, conditioned on provisional type and detection depth; unavailable evidence is missing. Scores are not protein activity or validated malignancy. SIM fields and rates are assumptions.",
+        "prompt_version": "vtx-choice-3"
+      }
+    },
+    "t0_activity": {
+      "by_type": {
+        "Tumor": {
+          "acting": 263,
+          "eligible_at_t0": 263,
+          "asked_at_t0": 263,
+          "without_aucell": 0,
+          "deferred_by_decision_cap": 0
+        },
+        "T_CD4": {
+          "acting": 71,
+          "eligible_at_t0": 0,
+          "asked_at_t0": 0,
+          "without_aucell": 2,
+          "deferred_by_decision_cap": 0
+        },
+        "Macrophage": {
+          "acting": 10,
+          "eligible_at_t0": 1,
+          "asked_at_t0": 1,
+          "without_aucell": 0,
+          "deferred_by_decision_cap": 0
+        },
+        "CAF": {
+          "acting": 95,
+          "eligible_at_t0": 14,
+          "asked_at_t0": 14,
+          "without_aucell": 7,
+          "deferred_by_decision_cap": 0
+        },
+        "Endothelial": {
+          "acting": 33,
+          "eligible_at_t0": 0,
+          "asked_at_t0": 0,
+          "without_aucell": 3,
+          "deferred_by_decision_cap": 0
+        },
+        "Plasma_cell": {
+          "acting": 36,
+          "eligible_at_t0": 0,
+          "asked_at_t0": 0,
+          "without_aucell": 4,
+          "deferred_by_decision_cap": 0
+        },
+        "T_CD8_cytotoxic": {
+          "acting": 2,
+          "eligible_at_t0": 2,
+          "asked_at_t0": 2,
+          "without_aucell": 0,
+          "deferred_by_decision_cap": 0
+        },
+        "B_cell": {
+          "acting": 7,
+          "eligible_at_t0": 0,
+          "asked_at_t0": 0,
+          "without_aucell": 1,
+          "deferred_by_decision_cap": 0
+        },
+        "Fibroblast": {
+          "acting": 9,
+          "eligible_at_t0": 0,
+          "asked_at_t0": 0,
+          "without_aucell": 9,
+          "deferred_by_decision_cap": 0
+        }
+      },
+      "cd8": {
+        "acting": 2,
+        "touching_tumour": 2,
+        "tumour_within_sensing_radius": 2,
+        "sensing_radius_um": 60,
+        "without_question_at_t0": 0,
+        "asked_at_t0": 2,
+        "deferred_by_decision_cap": 0
+      }
+    },
+    "scenario": {
+      "angiogenesis": false,
+      "assumed_competence_profile": "autonomous_exploratory_v1",
+      "blockade": false,
+      "clearance_competence": true,
+      "effector_competence": true,
+      "fields": true,
+      "identity_policy": "primary_annotation",
+      "motility": true,
+      "nerve": "none",
+      "nonperfused_fraction": 0.0,
+      "recognition": true,
+      "recruitment": false,
+      "title": "declared recognition",
+      "tumour_cycle": true,
+      "warburg": false
+    },
+    "t0_fidelity": {
+      "fitted": {
+        "variant": "fitted",
+        "iou_by_type": {
+          "B_cell": {
+            "n": 7,
+            "q25": 0.6615,
+            "median": 0.7073,
+            "q75": 0.7705
+          },
+          "CAF": {
+            "n": 95,
+            "q25": 0.5338,
+            "median": 0.646,
+            "q75": 0.7299
+          },
+          "Endothelial": {
+            "n": 33,
+            "q25": 0.4725,
+            "median": 0.5671,
+            "q75": 0.6934
+          },
+          "Fibroblast": {
+            "n": 9,
+            "q25": 0.6664,
+            "median": 0.6856,
+            "q75": 0.8331
+          },
+          "Macrophage": {
+            "n": 10,
+            "q25": 0.6565,
+            "median": 0.722,
+            "q75": 0.7957
+          },
+          "Plasma_cell": {
+            "n": 36,
+            "q25": 0.55,
+            "median": 0.6689,
+            "q75": 0.7524
+          },
+          "T_CD4": {
+            "n": 71,
+            "q25": 0.6619,
+            "median": 0.7379,
+            "q75": 0.796
+          },
+          "T_CD8_cytotoxic": {
+            "n": 2,
+            "q25": 0.735,
+            "median": 0.7564,
+            "q75": 0.7777
+          },
+          "Tumor": {
+            "n": 263,
+            "q25": 0.6665,
+            "median": 0.7326,
+            "q75": 0.7985
+          },
+          "all_roi": {
+            "n": 526,
+            "q25": 0.6263,
+            "median": 0.7074,
+            "q75": 0.7834
+          }
+        },
+        "contacts_any_roi": {
+          "measured": 1045,
+          "simulated": 898,
+          "shared": 806,
+          "precision": 0.8976,
+          "recall": 0.7713,
+          "f1": 0.8296
+        },
+        "contacts_roi_roi": {
+          "measured": 676,
+          "simulated": 583,
+          "shared": 518,
+          "precision": 0.8885,
+          "recall": 0.7663,
+          "f1": 0.8229
+        },
+        "contacts_cd8_tumour": {
+          "measured": 3,
+          "simulated": 1,
+          "shared": 1,
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5
+        },
+        "area_ratio_simulated_over_measured": {
+          "n": 526,
+          "q25": 1.0,
+          "median": 1.0,
+          "q75": 1.0
+        },
+        "definitions": {
+          "measured_contact": "polygon gap <= 1 um (H04)",
+          "simulated_contact": "power-adjacent and gap <= 1.0 um (shared interface = gap 0)",
+          "iou": "area(measured ∩ simulated) / area(measured ∪ simulated), ROI cells"
+        }
+      },
+      "unfitted": {
+        "variant": "equal_area_radius_unfitted",
+        "iou_by_type": {
+          "B_cell": {
+            "n": 7,
+            "q25": 0.6574,
+            "median": 0.6834,
+            "q75": 0.7683
+          },
+          "CAF": {
+            "n": 95,
+            "q25": 0.5287,
+            "median": 0.6333,
+            "q75": 0.7248
+          },
+          "Endothelial": {
+            "n": 33,
+            "q25": 0.4687,
+            "median": 0.5671,
+            "q75": 0.6934
+          },
+          "Fibroblast": {
+            "n": 9,
+            "q25": 0.6664,
+            "median": 0.6711,
+            "q75": 0.8331
+          },
+          "Macrophage": {
+            "n": 10,
+            "q25": 0.6696,
+            "median": 0.7705,
+            "q75": 0.7794
+          },
+          "Plasma_cell": {
+            "n": 36,
+            "q25": 0.5614,
+            "median": 0.6548,
+            "q75": 0.7506
+          },
+          "T_CD4": {
+            "n": 71,
+            "q25": 0.6321,
+            "median": 0.74,
+            "q75": 0.7942
+          },
+          "T_CD8_cytotoxic": {
+            "n": 2,
+            "q25": 0.7333,
+            "median": 0.753,
+            "q75": 0.7727
+          },
+          "Tumor": {
+            "n": 263,
+            "q25": 0.6403,
+            "median": 0.7062,
+            "q75": 0.7875
+          },
+          "all_roi": {
+            "n": 526,
+            "q25": 0.6125,
+            "median": 0.6904,
+            "q75": 0.7724
+          }
+        },
+        "contacts_any_roi": {
+          "measured": 1045,
+          "simulated": 758,
+          "shared": 710,
+          "precision": 0.9367,
+          "recall": 0.6794,
+          "f1": 0.7876
+        },
+        "contacts_roi_roi": {
+          "measured": 676,
+          "simulated": 493,
+          "shared": 460,
+          "precision": 0.9331,
+          "recall": 0.6805,
+          "f1": 0.787
+        },
+        "contacts_cd8_tumour": {
+          "measured": 3,
+          "simulated": 1,
+          "shared": 1,
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5
+        },
+        "area_ratio_simulated_over_measured": {
+          "n": 526,
+          "q25": 0.8825,
+          "median": 0.9409,
+          "q75": 0.9862
+        },
+        "definitions": {
+          "measured_contact": "polygon gap <= 1 um (H04)",
+          "simulated_contact": "power-adjacent and gap <= 1.0 um (shared interface = gap 0)",
+          "iou": "area(measured ∩ simulated) / area(measured ∪ simulated), ROI cells"
+        }
+      },
+      "weight_fit": {
+        "iterations": 80,
+        "fallback_iterations": 0,
+        "hidden": 0,
+        "area_ratio_quantiles": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "kappa_at_bounds": 1
+      }
+    },
+    "zip_sha256": "d92d7be10cd720f873869214ce92d3f623ec60e1777da036311fd5e5e12a6a56",
+    "static_preflight_passed": true
+  },
+  "non_cd8_arm_isolation": {
+    "non_cd8_questions": 278,
+    "non_cd8_batches": 24,
+    "identical": true,
+    "prompt_context": {
+      "version": "vtx-choice-3",
+      "tissue": "Human lung invasive acinar adenocarcinoma, FFPE",
+      "tissue_source": "SOURCE.json",
+      "state": {
+        "setting": "Independent local cells in an uncalibrated virtual tissue prototype of Human lung invasive acinar adenocarcinoma, FFPE.",
+        "semantics": "AUCell relative expression scores at t0, conditioned on provisional type and detection depth; unavailable evidence is missing. Scores are not protein activity or validated malignancy. SIM fields and rates are assumptions.",
+        "prompt_version": "vtx-choice-3"
+      }
+    }
+  },
+  "rounding_end_to_end": {
+    "passed": true,
+    "actual_network_calls": 0,
+    "mock_http_batches": 25,
+    "accepted_rounded_cycle_choices": 263,
+    "invalid_answers": 0,
+    "reported_probability_mean": 0.49,
+    "tissue_override_sent_and_recorded": true
+  },
+  "local_48h": {
+    "completed": true,
+    "checks": {
+      "final_state_fingerprint": true,
+      "decisions": true,
+      "metrics": true
+    },
+    "final_state_fingerprint": "e6b7dbff3f3b38486618b35e84975250a2027ea152ccf5e1e3aeb76016f7bc3a",
+    "events": {
+      "cd4_help": 25,
+      "cycle_entered": 99,
+      "cytotoxic_pulse": 6,
+      "division": 11,
+      "division_blocked_population_ceiling": 83,
+      "exhaustion_transition": 2,
+      "growth_blocked_compression": 63,
+      "program_cancelled": 2,
+      "program_completed": 488,
+      "program_started": 502,
+      "roi_entered": 8,
+      "roi_exited": 11
+    }
+  },
+  "mocked_integration": {
+    "passed": true,
+    "versions": {
+      "python": "3.13.17",
+      "system": "Darwin",
+      "machine": "arm64",
+      "packages": {
+        "numpy": "2.3.5",
+        "scipy": "1.17.1",
+        "pandas": "2.3.3",
+        "shapely": "2.2.0",
+        "h5py": "3.16.0",
+        "anndata": "0.12.19",
+        "pyarrow": "19.0.1"
+      }
+    },
+    "zip_sha256": "d92d7be10cd720f873869214ce92d3f623ec60e1777da036311fd5e5e12a6a56",
+    "initial_cells": 989,
+    "initial_questions": 280,
+    "initial_batches": 25,
+    "mock_http_batches": 34,
+    "actual_network_calls": 0,
+    "simulated_minutes": 60,
+    "decisions": 362,
+    "events": {
+      "cycle_entered": 78,
+      "cytotoxic_pulse": 2,
+      "growth_blocked_compression": 1,
+      "program_completed": 2,
+      "program_started": 98
+    },
+    "deterministic_resume": true,
+    "cap_before_round": true,
+    "partial_round_failure_atomic": true,
+    "interrupted_checkpoint_preserved": true,
+    "unsafe_and_modified_input_rejected": true,
+    "elapsed_seconds": 16.23,
+    "final_state_fingerprint": "3f7f63a67bb4bf09ea4d93e40b4a3af37ce5bf5fe961cce1f81b571cdab002b9"
+  },
+  "notebooks": {
+    "parts_2_to_4_passed": true,
+    "part1_rerun": false,
+    "restore_from_drive": {
+      "new_http_calls": 0,
+      "reused_batches": 34
+    },
+    "actual_jev_network_calls": 0,
+    "mocked_http_attempts": 60,
+    "secret_absent_from_outputs": true
+  },
+  "ablation": {
+    "dry_run": true,
+    "canary_cells": 20,
+    "fixed_groups": 2,
+    "planned_requests": 24,
+    "payloads_sha256": "028f1f6f9e35289bfd4bba490dc2fcd4a4dbe42fe73d13fbc37ebf75952c03f2",
+    "live_jev_calls": 0
+  },
+  "player_logic": {
+    "passed": true,
+    "viewports": [
+      "1400x900",
+      "1920x1080"
+    ],
+    "browser_visual_inspection": false
+  },
+  "packaging": {
+    "wheel_built": true,
+    "version": "0.1.3.dev0"
+  },
+  "limits": [
+    "No live Jev calls or paid credits; proliferation recovery remains unverified.",
+    "No breast HTML/result files were present in Revision_v1.2; Breast 5K behavior was not reproduced.",
+    "URL/ZIP/GEO import and non-tumour models remain out of scope.",
+    "Existing input bundles are supported; earlier saved runs require their original software.",
+    "Part 1 was not rerun end to end; registration metadata and preparation regressions are covered by the suites."
+  ]
+}

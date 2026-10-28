@@ -160,7 +160,7 @@ The same notebooks also run in local Jupyter (`jupyter lab notebooks/`). They de
 
 The kernel advances in **10-minute ticks**. A cell is asked only when something relevant happens to it: a new heterotypic contact, a field crossing a threshold, a finished program, a cell-cycle checkpoint, or entry into the region. Each type has a minimum interval between questions (CD8 60 min, or 30 min while touching tumour; CD4 and macrophages 180 min; endothelium 360 min; tumour and fibroblasts 720 min), and a cell is asked at most 24 times per simulated day. Questions use `POST https://api.typesafe.ai/v1/systemone` (at most 20 questions or 40 KB per request). CD8 questions are batched separately from other cells so their recognition-dependent menus do not enter other cells' request context.
 
-This example uses a first-round R03 cell and the current prompt, slightly shortened:
+This example uses a first-round R03 cell with `--context-mode bundle`, slightly shortened:
 
 ```json
 {
@@ -195,7 +195,7 @@ This example uses a first-round R03 cell and the current prompt, slightly shorte
 
 The request **never contains** raw expression, gene lists, coordinates, the contract, literature or a desired outcome. The global recognition flag and `excluded` gate diagnostics stay in the local decision record and are not sent to Jev. Jev returns a `choice`, a probability for **every** offered option and a `confidence`.
 
-The default `vtx-choice-3` prompt uses the tissue declared in `SOURCE.json` or an explicit `--tissue` / notebook `TISSUE` override. Tissue context can introduce literature priors. AUCell still stays fixed during the run and is inherited by daughters. The reported 0.1.2 proliferation regression motivated this wording change; recovery has not yet been demonstrated with live Jev. Preflight now reports AUCell coverage and CD8 access to tumour, and results include cycle-probability diagnostics. See [0.1.3 changes and validation](docs/12_jev_feedback_013.md).
+Prompt `vtx-choice-3` makes additional tissue context optional. The default is **no additional context**. Supply your own text with `--context "human breast carcinoma"` (alias `--tissue`), or explicitly select `--context-mode bundle` to use `SOURCE.json`. The notebook exposes `CONTEXT_MODE` (`none`, `custom`, `bundle`) and `TISSUE` for custom text. The choice is recorded in the run fingerprint. Tissue context can introduce literature priors. AUCell stays fixed and is inherited by daughters. Recovery of proliferation has not yet been demonstrated with live Jev. Preflight reports AUCell coverage and CD8 access to tumour; results include cycle-probability diagnostics. See [0.1.3 changes and validation](docs/12_jev_feedback_013.md).
 
 ### 4.4 What the kernel does with the answers
 
@@ -292,7 +292,7 @@ Why the biological kernel is vendored and placed on `sys.path` is explained in [
 
 ## 8. Validation status
 
-For the **0.1.3 development candidate**, all **69 tests pass on Python 3.12 and 3.13**, including the existing R03 input bundle. All 19 bundled Python files remain unchanged. A 48 h local run preserves the reference final state, decisions and metrics; 278 non-CD8 questions and batches remain identical across recognition arms. Mocked end-to-end checks accept 263 rounded cycle choices and preserve their reported probabilities. Parts 2–4 notebooks pass with mocked Colab/Jev, including resume with no new calls. The ablation dry run plans 24 requests but sends none. See the [0.1.3 validation report](tests/reports/release_0.1.3.json) and [prompt validation gate](docs/12_jev_feedback_013.md). Live Jev, Breast 5K recovery, browser visual inspection and a new end-to-end Part 1 run are not claimed.
+For **0.1.3**, all **78 tests pass on Python 3.12 and 3.13**, including the existing R03 input bundle and explicit context selection. All 19 bundled Python files remain unchanged. The preceding development-candidate validation preserved the reference 48 h local final state, decisions and metrics and accepted 263 rounded cycle choices in an end-to-end mock. Release checks confirm that 278 non-CD8 questions and batches remain identical across recognition arms in all three context modes. Parts 2–4 notebooks pass with mocked Colab/Jev, including no-context defaults, custom text and resume with no new calls. See the [0.1.3 validation report](tests/reports/release_0.1.3.json) and [optional prompt validation](docs/12_jev_feedback_013.md). Live Jev, Breast 5K recovery, browser visual inspection and a new end-to-end Part 1 run are not claimed.
 
 Earlier 0.1.2 validation, including the hypoxia stress test, remains recorded in its [release report](tests/reports/release_0.1.2.json).
 

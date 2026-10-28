@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "virtualtissue-xenium"
-version = "0.1.3.dev0"
+version = "0.1.3"
 description = "AI-agent-driven virtual tissue simulations built from 10x Genomics Xenium data (segmentation, XY coordinates and gene expression), with each cell deciding through the Jev (TypeSafe) Choice API."
 readme = "README.md"
 license = "MIT"
@@ -64,7 +64,7 @@ Issues = "https://github.com/hylixinsights/VirtualTissue-Xenium/issues"
 packages = ["src/virtualtissue_xenium"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "tests", "docs", "notebooks", "README.md", "LICENSE", "CHANGELOG.md", "CITATION.cff", "requirements.txt", "pyproject.toml"]
+include = ["src", "tests", "docs", "notebooks", "tools", "README.md", "LICENSE", "CHANGELOG.md", "CITATION.cff", "requirements.txt", "pyproject.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

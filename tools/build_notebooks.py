@@ -647,8 +647,10 @@ def build_part2_4() -> Path:
     RUN_MODE = "Jev" #@param ["Jev", "Local preview (no API)"]
     SCENARIO = "baseline_unknown" #@param ["baseline_unknown", "declared_recognition", "recognition_off"]
     JEV_MODEL = "jev-1.14.0" #@param ["jev-1.14.0", "jev-1.13.0"]
+    CONTEXT_MODE = "none" #@param ["none", "custom", "bundle"]
     TISSUE = "" #@param {type:"string"}
-    # Empty uses SOURCE.json; set this for older own-data bundles without a tissue declaration.
+    # none: no additional tissue context; custom: enter your context in TISSUE;
+    # bundle: use the tissue explicitly recorded in SOURCE.json (leave TISSUE empty).
     HORIZON_HOURS = 24 #@param {type:"number"}
     SEED = 21 #@param {type:"integer"}
     MAX_POPULATION = 1000 #@param {type:"integer"}
@@ -662,10 +664,12 @@ def build_part2_4() -> Path:
     # Whole hours are stored as integers so that the run configuration (and resuming) is stable.
     horizon_hours = int(HORIZON_HOURS) if float(HORIZON_HOURS).is_integer() else HORIZON_HOURS
     SETTINGS = dict(model=JEV_MODEL, scenario=SCENARIO, seed=SEED, horizon_hours=horizon_hours,
-                    max_decisions=MAX_CELL_DECISIONS, max_population=MAX_POPULATION, tissue=TISSUE or None)
+                    max_decisions=MAX_CELL_DECISIONS, max_population=MAX_POPULATION,
+                    tissue=TISSUE or None, context_mode=CONTEXT_MODE)
     MODE = "jev" if RUN_MODE == "Jev" else "local_preview"
     RUN_DIR = RESULT_ROOT / (RUN_NAME + ("_local_preview" if MODE == "local_preview" else ""))
     workflow.effective_contract(BUNDLE, SETTINGS)
+    print("Jev context:", workflow.prompt_context(BUNDLE, SETTINGS))
     print("Output folder:", RUN_DIR)
     print("Run mode:", RUN_MODE)
     ''')

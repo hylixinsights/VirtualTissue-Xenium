@@ -120,6 +120,46 @@ def test_tissue_changes_journal_and_comparison_identity(tmp_path):
         results.compare_runs(["a", "b"])
 
 
+def test_context_is_opt_in_and_custom_text_does_not_fall_back_to_metadata(tmp_path):
+    bundle = dict(folder=tmp_path)
+    (tmp_path / "SOURCE.json").write_text(json.dumps(dict(tissue="human lung adenocarcinoma")))
+    wf = vtx.workflow
+    default = wf.prompt_context(bundle, dict(model=MODEL))
+    assert default["mode"] == "none" and default["tissue"] is None
+    assert "lung" not in default["state"]["setting"]
+    custom = wf.prompt_context(bundle, dict(model=MODEL, tissue="human breast carcinoma"))
+    assert custom["mode"] == "custom" and custom["tissue_source"] == "settings"
+    assert "human breast carcinoma" in custom["state"]["setting"]
+    source = wf.prompt_context(bundle, dict(model=MODEL, context_mode="bundle"))
+    assert source["tissue"] == "human lung adenocarcinoma" and source["tissue_source"] == "SOURCE.json"
+    (tmp_path / "SOURCE.json").unlink()
+    assert wf.prompt_context(bundle, dict(model=MODEL)) == default
+    assert wf.prompt_context(bundle, dict(model=MODEL, tissue="human breast carcinoma")) == custom
+
+
+@pytest.mark.parametrize("settings", [
+    dict(context_mode="custom"), dict(context_mode="custom", tissue=" "),
+    dict(context_mode="none", tissue="breast"), dict(context_mode="bundle", tissue="breast"),
+    dict(context_mode="bundle"), dict(context_mode="invalid"),
+])
+def test_ambiguous_or_empty_context_choices_fail_before_requests(tmp_path, settings):
+    (tmp_path / "SOURCE.json").write_text("{}")
+    with pytest.raises(ValueError):
+        vtx.workflow.prompt_context(dict(folder=tmp_path), dict(model=MODEL, **settings))
+
+
+def test_cli_exposes_context_choice_and_keeps_tissue_alias(tmp_path):
+    from virtualtissue_xenium import cli
+    parser = cli.build_parser()
+    bundle = dict(folder=tmp_path)
+    for option in ("--context", "--tissue"):
+        args = parser.parse_args(["check", "bundle.zip", option, "human breast carcinoma"])
+        context = vtx.workflow.prompt_context(bundle, cli._settings(args))
+        assert context["mode"] == "custom" and context["tissue"] == "human breast carcinoma"
+    args = parser.parse_args(["check", "bundle.zip"])
+    assert vtx.workflow.prompt_context(bundle, cli._settings(args))["mode"] == "none"
+
+
 def test_cycle_diagnostics_use_reported_values_and_binary_denominator():
     def decision(value, choice, time=0, other=None):
         p = dict(REMAIN_QUIESCENT=1-value, ENTER_CYCLE=value)
@@ -201,8 +241,11 @@ def test_real_bundle_preflight_does_not_confuse_scheduler_with_decision_cap(tmp_
     assert sum(v["deferred_by_decision_cap"] for v in activity["by_type"].values()) == 279
     assert activity["cd8"]["touching_tumour"] == 2
     assert activity["cd8"]["without_question_at_t0"] == 0
-    assert facts["prompt_context"]["tissue_source"] == "SOURCE.json"
+    assert facts["prompt_context"]["mode"] == "none"
+    assert facts["prompt_context"]["tissue"] is None
     assert body["state"] == facts["prompt_context"]["state"]
+    source_facts, _ = wf.preflight(bundle, dict(settings, context_mode="bundle"))
+    assert source_facts["prompt_context"]["tissue_source"] == "SOURCE.json"
     settings["tissue"] = "human breast carcinoma"
     sim = wf.create_sim(bundle, settings)
     assert sim.episode()["prompt_context"]["tissue"] == "human breast carcinoma"
