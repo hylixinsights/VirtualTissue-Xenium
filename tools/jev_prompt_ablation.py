@@ -155,7 +155,9 @@ def main(argv=None):
     ap.add_argument("--per-quartile", type=int, default=5)
     ap.add_argument("--repeats", type=int, default=2)
     ap.add_argument("--variants", nargs="+", choices=list(variants(None)))
-    ap.add_argument("--tissue", help="Override the declared tissue in SOURCE.json.")
+    ap.add_argument("--context-mode", choices=["none", "custom", "bundle"],
+                    help="Default: none; --context/--tissue alone selects custom. Bundle context is opt-in.")
+    ap.add_argument("--context", "--tissue", dest="tissue", help="User-supplied context for v3.")
     ap.add_argument("--reference", help="JSON containing t0_tumour from a saved legacy run.")
     ap.add_argument("--seed", type=int, default=21)
     ap.add_argument("--send", action="store_true")
@@ -170,7 +172,7 @@ def main(argv=None):
     if (out / "ablation_journal.jsonl").exists():
         ap.error("An ablation journal already exists. Preserve it and use a new directory for a new experiment.")
     bundle = vtx.workflow.extract_bundle(a.bundle_zip, out / "cache")
-    context = vtx.workflow.prompt_context(bundle, dict(model=a.model, tissue=a.tissue))
+    context = vtx.workflow.prompt_context(bundle, dict(model=a.model, tissue=a.tissue, context_mode=a.context_mode))
     makers = variants(context["tissue"])
     if a.variants:
         makers = {k: makers[k] for k in dict.fromkeys(a.variants)}

@@ -24,7 +24,7 @@ from jev_payload import PROMPT_VERSION, build_batches, payload, declared_tissue
 from player import write_player
 from jev_provider import JevProvider
 
-VERSION = "xenium-jev-colab-1.1.2"
+VERSION = "xenium-jev-colab-1.1.3"
 SOURCE = Path(__file__).resolve().parent
 
 
@@ -126,14 +126,27 @@ def create_sim(bundle, settings, policy=None):
 
 
 def prompt_context(bundle, settings):
+    """Resolve an explicit context choice; bundle metadata is opt-in."""
     tissue = declared_tissue(settings.get("tissue"))
-    origin = "settings" if tissue else "undeclared"
-    if not tissue:
+    mode = settings.get("context_mode")
+    if mode is None:
+        mode = "custom" if tissue else "none"
+    if mode not in ("none", "custom", "bundle"):
+        raise ValueError("Context mode must be none, custom or bundle.")
+    if mode != "custom" and tissue:
+        raise ValueError("Supplied context requires --context-mode custom (not none or bundle).")
+    origin = "none"
+    if mode == "custom":
+        if not tissue:
+            raise ValueError("Custom context requires text in --context / --tissue (notebook TISSUE).")
+        origin = "settings"
+    elif mode == "bundle":
         source = json.loads((bundle["folder"] / "SOURCE.json").read_text())
         tissue = declared_tissue(source.get("tissue"))
-        if tissue:
-            origin = "SOURCE.json"
-    return dict(version=PROMPT_VERSION, tissue=tissue, tissue_source=origin,
+        if not tissue:
+            raise ValueError("SOURCE.json has no tissue context. Choose custom and supply text, or choose none.")
+        origin = "SOURCE.json"
+    return dict(version=PROMPT_VERSION, mode=mode, tissue=tissue, tissue_source=origin,
                 state=payload([], settings["model"], tissue=tissue)["state"])
 
 

@@ -61,6 +61,14 @@ class SetupTests(unittest.TestCase):
         self.assertIn("previous simulation code", result["changed_packages"])
         probe.assert_not_called()
 
+    def test_loaded_candidate_workflow_requires_restart_after_release(self):
+        with patch.dict(sys.modules, {"simulation_workflow": types.SimpleNamespace(VERSION="xenium-jev-colab-1.1.2")}), \
+             patch.object(colab_setup, "changed_loaded_packages", return_value=[]), \
+             patch.object(colab_setup.subprocess, "run") as probe:
+            result = colab_setup.setup_environment(vtx.ENGINE_DIR, install_packages=False)
+        self.assertFalse(result["ready"])
+        probe.assert_not_called()
+
     def test_notebooks_are_valid_english_and_have_edit_markers(self):
         for name in NOTEBOOKS:
             nb = json.loads((ROOT / "notebooks" / name).read_text())

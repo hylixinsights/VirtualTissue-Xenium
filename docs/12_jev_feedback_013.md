@@ -7,10 +7,11 @@ the proliferation reports, but the available breast results and model provenance
 do not establish which wording change caused it. Recovery of tumour growth with
 the new prompt has **not been validated with live Jev**.
 
-## Declared tissue in the default prompt
+## Choose whether to supply tissue context
 
-`vtx-choice-3` uses the tissue explicitly recorded in `SOURCE.json`, for example
-human breast carcinoma. It restores the concise t0 AUCell semantics used before
+Version 0.1.3 is published with tissue context as an explicit user choice. The
+default sends no additional tissue context, even if `SOURCE.json` contains a
+tissue description. Prompt `vtx-choice-3` restores the concise t0 AUCell semantics used before
 0.1.2 and removes the sentence about frozen scores from the prompt. Scores still
 remain fixed during the simulation; daughters inherit them. This is a wording
 change, not dynamic transcriptomics. Tissue context can introduce literature
@@ -21,6 +22,19 @@ request. CD8 questions remain in separate batches, preserving the 0.1.2 control
 isolation. Menus, argmax choice handling, clocks, wake rules and biological rates
 are unchanged. No probability threshold was lowered to force growth.
 
+| Choice | CLI | Notebook |
+|---|---|---|
+| No additional tissue context (default) | omit context options, or `--context-mode none` | `CONTEXT_MODE = "none"`; leave `TISSUE` empty |
+| Your own description | `--context "human breast carcinoma"` (alias `--tissue`) | `CONTEXT_MODE = "custom"`; enter your description in `TISSUE` |
+| Tissue already recorded in the bundle | `--context-mode bundle` | `CONTEXT_MODE = "bundle"`; leave `TISSUE` empty |
+
+Custom text is a single line, up to 300 characters. Supplying `--context` or
+`--tissue` selects custom mode when `--context-mode` is omitted. Explicit custom
+mode requires nonempty text. Bundle mode requires a nonempty `SOURCE.json.tissue`.
+Conflicting choices stop before inference rather than silently discarding text.
+With no additional context, the prompt still identifies the model's generic human
+tumour-interface scope; it does not infer an organ or diagnosis.
+
 ```bash
 vtx own-data /path/to/outs data/Breast --sample-id Breast5K \
   --tissue "human breast carcinoma"
@@ -29,17 +43,17 @@ vtx annotation-template data/Breast Breast_clusters.json
 vtx check-annotations Breast_clusters.json --data-dir data/Breast
 ```
 
-For an already prepared bundle without tissue metadata, use the same override in
-preflight and the new run. In the notebook, set `TISSUE` (blank uses `SOURCE.json`).
+The registration command stores provenance; it does not automatically enable
+context in later simulations. For any bundle, use the same context choice in
+preflight and the new run:
 
 ```bash
-vtx check Breast_R01.zip --tissue "human breast carcinoma" --workdir check_Breast
+vtx check Breast_R01.zip --context "human breast carcinoma" --workdir check_Breast
 vtx run Breast_R01.zip results --run-name Breast_R01_013 \
-  --tissue "human breast carcinoma" --mode local
+  --context "human breast carcinoma" --mode local
 ```
 
-No tissue is inferred from filenames. Undeclared data use an explicitly labelled
-generic human tumour-interface context. The resolved tissue, its source and the
+No tissue is inferred from filenames. The selected mode, resolved tissue, its source and the
 full prompt state are recorded in `preflight.json`, `run_config.json` and the
 episode. Changing this context requires a new run name; `vtx compare` rejects
 comparisons with different prompt contexts.
@@ -87,7 +101,7 @@ within 0.1 of 0.5. These are decision-weighted summaries, not independent-cell
 estimates. Nonbinary menus have a separate margin against the best alternative.
 Local preview diagnostics describe its rule-based answers, not Jev evidence.
 
-## Prompt validation before release
+## Optional prompt validation
 
 The free snapshot tests pin the 0.1.2 comparator and current prompt. The ablation
 tool holds cells, menus, model and question groups fixed. The semantics-only
@@ -96,14 +110,14 @@ The six variants are `legacy_v1`, `v2`, `v2_legacy_setting`,
 `v2_legacy_semantics`, `v2_with_excluded` and the actual shipped `v3`.
 
 ```bash
-python tools/jev_prompt_ablation.py R03.zip ablation_dry \
+python tools/jev_prompt_ablation.py R03.zip ablation_dry --context-mode bundle \
   --reference R03_jev04_t0_tumour_reference.json
 # Paid experiment, only when explicitly authorized by the operator:
-python tools/jev_prompt_ablation.py R03.zip ablation_paid \
+python tools/jev_prompt_ablation.py R03.zip ablation_paid --context-mode bundle \
   --reference R03_jev04_t0_tumour_reference.json --send --max-requests 24
-# Smaller candidate canary: 20 cells, two repeats, normally four requests:
+# Smaller v3 canary: 20 cells, two repeats, normally four requests:
 python tools/jev_prompt_ablation.py R03.zip canary_v3 \
-  --variants v3 --send --max-requests 4
+  --context-mode bundle --variants v3 --send --max-requests 4
 ```
 
 The reference JSON and R03 bundle are external evidence, not included in the
@@ -113,7 +127,8 @@ before the first request. Both byte and question limits are enforced. Requests
 are journaled before sending. Existing journals refuse a new send, including
 after interruption, and the first failure stops the experiment.
 
-Before declaring the proliferation regression resolved or tagging a release,
+This release does not claim that tumour proliferation has recovered. Before
+declaring the proliferation regression resolved for a chosen context,
 record the authorized live ablation/canary and review these predefined criteria:
 
 1. P(ENTER_CYCLE) increases across mitotic quartiles; the top-quartile mean is

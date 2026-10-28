@@ -46,7 +46,8 @@ def experiment_notes(settings, facts=None):
                              "start a tumour cycle without a MITOTIC_CELL_CYCLE score.")
         if facts.get("prompt_context"):
             context = facts["prompt_context"]
-            notes.append(f"Jev prompt {context['version']}: tissue = {context['tissue'] or 'not declared'} "
+            notes.append(f"Jev prompt {context['version']}: context mode = {context['mode']}; "
+                         f"tissue = {context['tissue'] or 'not declared'} "
                          f"(source: {context['tissue_source']}). Tissue context can introduce literature priors; "
                          "the effect on ENTER_CYCLE has not yet been validated with live Jev.")
         notes.append(f"Growth headroom: {facts['growth_headroom']} new bodies before the population ceiling. "

@@ -12,12 +12,12 @@
   ],
   "files": {
     "colab_setup.py": {
-      "sha256": "b3fbc4cd1866f4a9ccbd98dafe8018c1cb8d151e0009ef459408ea1454dfa115",
+      "sha256": "cc5d64e90bc4b3ee47913372b41a64f0803b84a8050327ca3cd9457b692daafc",
       "bytes": 4102,
       "original_path": "Colab_Xenium_Jev/source/colab_setup.py",
       "original_sha256": "2763ae27496e11d52149178812b15833c5d7615e28e261c0b71d8928d1e619ad",
       "original_bytes": 4102,
-      "revision": "0.1.3: require a session restart when the 0.1.2 workflow is already loaded."
+      "revision": "0.1.3: require restart after upgrading from 0.1.2 or the 0.1.3 development candidate."
     },
     "colab_setup_prepare.py": {
       "sha256": "257b6e988b54396f87adb3f18fd7aff9890a23bfff0ba19b8768f2938e9881dd",
@@ -76,12 +76,12 @@
       "original_path": "Xenium_Public_Lung5K/processing/resources/runtime_template.json"
     },
     "simulation_workflow.py": {
-      "sha256": "7ae61e1d2e6df09237a51a609042249a08c896bd7ef4a92c3e557509ba302472",
-      "bytes": 18391,
+      "sha256": "454d856d2dccb5b7fef217751607c60b6059686eaf70d8e5a2d8b4303a2c9dd9",
+      "bytes": 19108,
       "original_path": "Colab_Xenium_Jev/source/simulation_workflow.py",
       "original_sha256": "fb7e6264a17cf79ff919a48aef69bcf549dd8cb33486113e398ab21df9e95f01",
       "original_bytes": 15073,
-      "revision": "0.1.3: record resolved prompt context, t0 eligibility/coverage/contact diagnostics and tumour cycle decision summaries."
+      "revision": "0.1.3: explicit none/custom/bundle context selection; no automatic tissue context; record context and activity/cycle diagnostics."
     },
     "web/player_template.html": {
       "sha256": "b63d7bf84d781454e6baa8754f2ce37e43d086705a662334f4002f286b6abe0e",

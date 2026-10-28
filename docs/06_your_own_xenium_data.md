@@ -239,7 +239,7 @@ vtx own-data /absolute/path/to/MySample_outs data/MySample --sample-id MySample_
 vtx annotation-template data/MySample MySample_clusters.json
 ```
 
-Replace the tissue description with your sample's declaration. This context is saved in `SOURCE.json` and used in the default Jev prompt. Existing bundles can use `vtx check/run --tissue` or notebook `TISSUE` without re-preparation. See [the 0.1.3 notes](12_jev_feedback_013.md) for validation limits and AUCell/CD8 diagnostics. This command accepts an extracted folder, not a download link or ZIP.
+Replace the tissue description with your sample's declaration. This context is saved in `SOURCE.json`; using it in Jev requires choosing `--context-mode bundle` or notebook `CONTEXT_MODE = "bundle"`. For your own text, use `vtx check/run --context` (alias `--tissue`) or notebook `CONTEXT_MODE = "custom"` with `TISSUE`. The default sends no additional tissue context. Existing bundles need no re-preparation. See [the 0.1.3 notes](12_jev_feedback_013.md) for validation limits and AUCell/CD8 diagnostics. This command accepts an extracted folder, not a download link or ZIP.
 
 **Stop here to edit and save `MySample_clusters.json` as described in §3.2.** Then validate it:
 

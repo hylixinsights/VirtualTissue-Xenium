@@ -14,7 +14,8 @@
 | `RUN_MODE` | `Jev` | `Jev` = paid Choice API calls · `Local preview (no API)` = programmed rules | Local preview results get the suffix `_local_preview` |
 | `SCENARIO` | `baseline_unknown` | Declared assumptions about recognition and effector competence (§2) | |
 | `JEV_MODEL` | `jev-1.14.0` | Pinned model version; the run stops if the API returns another model | `jev-1.13.0` was used by the LUAD3 prototype |
-| `TISSUE` | blank | Declared tissue used by prompt `vtx-choice-3`; blank reads `SOURCE.json` | CLI: `--tissue`. Recorded in the run fingerprint; use the same context in paired runs |
+| `CONTEXT_MODE` | `none` | `none`: no additional context; `custom`: your text; `bundle`: tissue from `SOURCE.json` | CLI: `--context-mode`. Recorded in the run fingerprint |
+| `TISSUE` | blank | Your tissue/context description when `CONTEXT_MODE = "custom"` | CLI: `--context` (alias `--tissue`); supplying text alone selects custom. Use the same context in paired runs |
 | `HORIZON_HOURS` | 24 | Simulated time | Multiple of 10 min; max 168 h (7 days) |
 | `SEED` | 21 | Seeds tie-breaking, motility, ordering | Same seed + same answers → same trajectory |
 | `MAX_POPULATION` | 1000 | Ceiling on allocated bodies (dead/removed bodies still count) | Must be ≥ the starting cells and ≤ 5000. R03 starts with 989, so only 11 births are possible by default |
@@ -22,6 +23,11 @@
 | `MAX_CELL_DECISIONS` | 10000 | Cap on individual cell questions | If a round exceeds what is left, a seeded subset is asked and the run stops after it |
 
 The cell checks the values and builds the *effective contract*: the bundle's contract with your scenario, horizon, population ceiling and model applied. The bundle itself is never modified.
+
+Context is optional. The default does not read tissue metadata into the prompt.
+For custom context, enter a single line of up to 300 characters; for bundle
+context, `SOURCE.json` must contain a tissue description. Preflight shows the exact
+resolved prompt. These choices affect what Jev sees, not the measured AUCell scores.
 
 ## 2. Scenarios
 
