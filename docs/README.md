@@ -1,8 +1,12 @@
 # VirtualTissue-Xenium documentation
 
+**V2 starts with the [ordered workflow](v2/WORKFLOW.md), [context and guidebook contract](v2/CONTEXT_AND_GUIDEBOOK.md), [datasets](v2/DATASETS.md), and [v0.1.3 review](v2/CODE_REVIEW_V0_1_3.md).**
+
+The guides below describe the preserved v0.1.3 lung-specific `vtx` workflow. Its original README is available at the [v0.1.3 tag](https://github.com/hylixinsights/VirtualTissue-Xenium/blob/v0.1.3/README.md). Install its pinned environment with `pip install -e '.[legacy,notebooks]'`.
+
 Start with the route that matches your goal:
 
-* **Public example in Colab:** follow the [README quick start](../README.md#2-quick-start-in-google-colab); use [05](05_google_colab.md) for Drive and runtime details.
+* **Public example in Colab:** follow the [v0.1.3 README quick start](https://github.com/hylixinsights/VirtualTissue-Xenium/blob/v0.1.3/README.md#2-quick-start-in-google-colab); use [05](05_google_colab.md) for Drive and runtime details.
 * **Your own Xenium sample:** read [06](06_your_own_xenium_data.md) first to check suitability, prepare the files and review your cluster map. It gives Colab, local Jupyter and command-line routes.
 * **Your own computer:** install with [08](08_local_installation.md), then choose the public example or your own data. Replace notebook Drive paths with local paths before running input cells.
 * **Saved results only:** go directly to [04](04_part4_results.md). No API key is needed.

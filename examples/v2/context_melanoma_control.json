@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "tissue": "skin melanoma",
+  "organism": "human",
+  "disease": "melanoma",
+  "assay": "xenium",
+  "sampling": {
+    "design": "subsampled",
+    "description": "Synthetic 24-cell engineering fixture. Replace with actual experimental sampling metadata.",
+    "missing_populations": [
+      "cells outside the selected region"
+    ]
+  },
+  "perturbations": [],
+  "recognition": false,
+  "time_step_hours": 1,
+  "interaction_mode": "spatial",
+  "neighbor_radius_um": 30,
+  "max_neighbors": 20,
+  "action_priors": {},
+  "context_modifiers": [
+    {
+      "action": "ACTIVATE",
+      "lineages": [
+        "T_CD8"
+      ],
+      "multiplier": 2,
+      "reason": "Illustrative treatment sensitivity assumption; retain matched untreated and no-modifier controls.",
+      "when": {
+        "perturbation": "anti-PD1"
+      }
+    }
+  ]
+}

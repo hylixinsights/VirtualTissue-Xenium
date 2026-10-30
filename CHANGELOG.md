@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0a1 — 2026-10-30
+
+* Introduce the separate `vtx2` research workflow for annotated AnnData, JSON and Xenium input, explicit tissue/disease/perturbation/sampling context and panel-aware expression guidebooks.
+* Add lineage-restricted actions, per-cell seeded categorical sampling, concurrent bounded Jev requests, synchronous commit barriers, abstract local signals, alive-capacity accounting and auditable state transitions. Preserve the original physical engine and `vtx` interface.
+* Persist immutable API intents/results, configuration-bound cache, atomic checkpoints, run locks, per-cell probabilities, provenance, offline replay and matched shared-endpoint comparisons.
+* Package verified skin melanoma and WT/Tg brain source manifests, bounded download/ROI/annotation adapters, executable examples, a notebook, code review and an ordered parallel/sequential development plan.
+* Keep the JSON core dependency-free; scientific input support is the `xenium` extra and the unchanged pinned legacy stack is the `legacy` extra.
+* Record real-data compatibility checks and a live Jev protocol test. Preferences, timescales and state transitions remain uncalibrated assumptions; biological predictive validation and learned transition models remain future work.
+
 ## 0.1.3 — 2026-10-28
 
 * Jev prompt `vtx-choice-3` makes tissue context a user choice: none (default), custom text (`--context`, alias `--tissue`), or explicitly selected bundle metadata (`--context-mode bundle`). The notebook exposes `CONTEXT_MODE` and `TISSUE`. Concise t0 semantics and recognition-arm isolation are preserved, and the resolved context is recorded. The effect on tumour proliferation is awaiting live Jev validation; see [validation and usage](docs/12_jev_feedback_013.md).

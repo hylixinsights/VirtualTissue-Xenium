@@ -1,0 +1,39 @@
+{
+  "id": "brain_tg_5_7m",
+  "title": "Mouse brain TgCRND8 Alzheimer-like pathology at 5.7 months",
+  "organism": "Mus musculus",
+  "tissue": "brain",
+  "disease": "TgCRND8 Alzheimer-like pathology",
+  "assay": "xenium",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "10x Genomics; indicate any processing or annotation changes.",
+  "source_page": "https://www.10xgenomics.com/datasets/xenium-in-situ-analysis-of-alzheimers-disease-mouse-model-brain-coronal-sections-from-one-hemisphere-over-a-time-course-1-standard",
+  "verified_on": "2026-10-30",
+  "annotation_status": "Cell types and lineage require investigator review; vendor clustering is not annotation.",
+  "files": [
+    {
+      "path": "cell_feature_matrix.h5",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_TgCRND8_5_7_months/Xenium_V1_FFPE_TgCRND8_5_7_months_cell_feature_matrix.h5",
+      "bytes": 4634237,
+      "sha256": "a7c19b9d371cfaaf9542737b9cdb8e104bbfcde703e05bb00801bfb6f7d8c3d6"
+    },
+    {
+      "path": "cells.csv.gz",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_TgCRND8_5_7_months/Xenium_V1_FFPE_TgCRND8_5_7_months_cells.csv.gz",
+      "bytes": 3055560,
+      "sha256": "5f4a72be50abad11c2e694bac3cbc61e455f0c31fd588c7826619b9910009acf"
+    },
+    {
+      "path": "metrics_summary.csv",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_TgCRND8_5_7_months/Xenium_V1_FFPE_TgCRND8_5_7_months_metrics_summary.csv",
+      "bytes": 850,
+      "sha256": "0c2c33097cc8675565d2cf6d11e9fe7947a1615eca32637c373ee4605e43391b"
+    }
+  ],
+  "notes": [
+    "One male mouse at this genotype/age; independent animals, not repeatedly measured cells.",
+    "248-gene brain base panel plus 99 custom targets (one base target removed in final validation).",
+    "Age-matched pair is suitable for technical context tests; no donor replication at each genotype/age."
+  ]
+}

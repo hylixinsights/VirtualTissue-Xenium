@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "tissue": "human brain cortex",
+  "organism": "human",
+  "disease": "no disease intervention declared; verify the donor metadata",
+  "assay": "xenium",
+  "sampling": {
+    "design": "subsampled",
+    "description": "A selected region of one section; transcript panel and segmentation limit what is represented.",
+    "missing_populations": ["cells outside the selected region", "unsegmented cells"]
+  },
+  "perturbations": [],
+  "recognition": false,
+  "time_step_hours": 1,
+  "interaction_mode": "spatial",
+  "neighbor_radius_um": 30,
+  "max_neighbors": 20,
+  "action_priors": {},
+  "context_modifiers": []
+}

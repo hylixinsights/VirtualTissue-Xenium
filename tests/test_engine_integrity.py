@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+import tomllib
 import unittest
 from pathlib import Path
 
@@ -40,9 +41,8 @@ class EngineIntegrity(unittest.TestCase):
     def test_pyproject_pins_equal_engine_requirements(self):
         req = [l.strip() for l in (vtx.ENGINE_DIR / "requirements-colab.txt").read_text().splitlines()
                if l.strip() and not l.startswith("#")]
-        text = (ROOT / "pyproject.toml").read_text()
-        block = text.split("dependencies = [", 1)[1].split("]", 1)[0]
-        pins = re.findall(r'"([^"]+)"', block)
+        project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+        pins = project["optional-dependencies"]["legacy"]
         self.assertEqual(pins, req)
 
     def test_package_import_needs_only_the_standard_library(self):
