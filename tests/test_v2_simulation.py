@@ -175,3 +175,28 @@ def test_missing_jev_answers_do_not_silently_apply_local_choices(tmp_path):
     assert report["stop_reason"] == "provider_stopped_before_round_commit"
     assert json.loads((tmp_path / "frames.json").read_text())[0]["cells"] == initialize(bundle)
     assert (tmp_path / "decisions.jsonl").read_text() == ""
+
+
+def test_kill_target_is_nearest_in_spatial_mode_and_seeded_in_well_mixed():
+    base = cells()
+    # Two live malignant neighbours: "a_far" sorts first by ID but sits farther away.
+    base.append(dict(cell_id="a_far", cell_type="reviewed_malignant", lineage="malignant",
+                     expression={"ACTB": 10}, sample_id="sample_A", x=20, y=0))
+    base[0]["cell_id"] = "z_near"
+    bundle = prepare(base, context(), assayed_genes=["ACTB"])
+    rows, _ = decision_rows(initialize(bundle), bundle["guidebook"], bundle["context"], seed=21, step=0)
+    cd8 = next(r for r in rows if r["cell_id"] == "cd8")
+    assert cd8["targets"] == ["z_near", "a_far"] and cd8["target_rule"] == "nearest_centroid_then_id"
+    proposals = [dict(cell_id="cd8", action="KILL", targets=cd8["targets"], corpses=[], target_rule=cd8["target_rule"])]
+    _, events = commit(initialize(bundle), proposals, max_population=10, seed=4, step=0)
+    assert events[0]["target"] == "z_near" and events[0]["target_rule"] == "nearest_centroid_then_id"
+    # Well-mixed: no distance exists, so the order is a seeded draw and both targets occur across seeds.
+    mixed = prepare([{k: v for k, v in c.items() if k not in ("x", "y")} for c in base],
+                    dict(context("scrna"), interaction_mode="well_mixed"), assayed_genes=["ACTB"])
+    firsts = set()
+    for seed in range(20):
+        rows, _ = decision_rows(initialize(mixed), mixed["guidebook"], mixed["context"], seed=seed, step=0)
+        cd8 = next(r for r in rows if r["cell_id"] == "cd8")
+        assert cd8["target_rule"] == "seeded_uniform_draw"
+        firsts.add(cd8["targets"][0])
+    assert firsts == {"z_near", "a_far"}

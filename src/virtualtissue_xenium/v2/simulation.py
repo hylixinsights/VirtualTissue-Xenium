@@ -81,6 +81,7 @@ def initialize(bundle):
 
 def decision_rows(cells, guidebook, context, *, seed, step):
     graph = interaction_graph(cells, context, seed=seed, step=step)
+    spatial = context.get("interaction_mode", "spatial" if context["assay"] == "xenium" else "well_mixed") == "spatial"
     rows = []
     for cid in sorted(cells):
         cell = cells[cid]
@@ -88,8 +89,17 @@ def decision_rows(cells, guidebook, context, *, seed, step):
             continue
         neighbors = [cells[n] for n in graph[cid]]
         incoming_signal = sum(n["signal"] for n in neighbors)/max(1, len(neighbors))
-        licensed_targets = sorted(n["cell_id"] for n in neighbors if n["status"] == "alive" and n["lineage"] == "malignant")
-        corpses = sorted(n["cell_id"] for n in neighbors if n["status"] == "dead")
+        # Target order decides which neighbor a KILL or CLEAR_CORPSE acts on first.
+        # Spatial graphs are nearest-first (interaction_graph sorts by distance,
+        # then ID); well-mixed neighborhoods have no distance, so the order is a
+        # seeded per-cell draw. Lexicographic cell-ID order would be a hidden bias.
+        if spatial:
+            ordered, target_rule = list(graph[cid]), "nearest_centroid_then_id"
+        else:
+            ordered, target_rule = list(graph[cid]), "seeded_uniform_draw"
+            seeded_rng(seed, "target_order", step, cid).shuffle(ordered)
+        licensed_targets = [n for n in ordered if cells[n]["status"] == "alive" and cells[n]["lineage"] == "malignant"]
+        corpses = [n for n in ordered if cells[n]["status"] == "dead"]
         entry = guidebook["cells"][cell["guidebook_id"]]
         actions, prior, excluded = {}, {}, {}
         for action, spec in sorted(entry["actions"].items()):
@@ -128,7 +138,7 @@ def decision_rows(cells, guidebook, context, *, seed, step):
                        live_malignant_targets=len(licensed_targets), corpses=len(corpses),
                        incoming_signal=incoming_signal))
         rows.append(dict(cell_id=cid, actions=actions, prior=prior, observation=observation,
-                         excluded=excluded, targets=licensed_targets, corpses=corpses))
+                         excluded=excluded, targets=licensed_targets, corpses=corpses, target_rule=target_rule))
     return rows, graph
 
 
@@ -158,7 +168,12 @@ def draw(probabilities, rng):
 
 
 def commit(cells, proposals, *, max_population, seed, step):
-    """Deaths precede divisions. Target conflicts resolve by a seeded stable order."""
+    """Deaths precede divisions. Target conflicts resolve by a seeded stable order.
+
+    Each proposal's ``targets``/``corpses`` arrive already ordered by the rule
+    recorded in ``target_rule`` (nearest centroid in spatial mode, a seeded draw
+    in well-mixed mode); the first still-available entry is acted on.
+    """
     next_cells = deepcopy(cells)
     events, doomed, cleared = [], set(), set()
     for cell in next_cells.values():
@@ -174,14 +189,14 @@ def commit(cells, proposals, *, max_population, seed, step):
             if targets:
                 target = targets[0]
                 doomed.add(target)
-                events.append(dict(kind="kill", cell_id=cid, target=target))
+                events.append(dict(kind="kill", cell_id=cid, target=target, target_rule=p.get("target_rule")))
             else:
                 events.append(dict(kind="conflict_blocked", cell_id=cid, action=action))
         elif action == "CLEAR_CORPSE":
             targets = [t for t in p["corpses"] if t not in cleared]
             if targets:
                 cleared.add(targets[0])
-                events.append(dict(kind="clear_corpse", cell_id=cid, target=targets[0]))
+                events.append(dict(kind="clear_corpse", cell_id=cid, target=targets[0], target_rule=p.get("target_rule")))
             else:
                 events.append(dict(kind="conflict_blocked", cell_id=cid, action=action))
     for cid in doomed:
@@ -275,7 +290,9 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
         probability_semantics="guidebook prior (local) or normalized prior^(1-alpha)*Jev^alpha; seeded categorical sample",
         kernel="vtx-discrete-context-2.0", assumptions=dict(signal_retention_per_step=.5, signal_increment=1.0,
             signal_activation_multiplier="1 + mean neighbor signal from previous snapshot",
-            kill="one licensed KILL commits one target death per step", division="one daughter per selected action per step",
+            kill="one licensed KILL commits one target death per step; target = nearest live malignant neighbor (spatial) or seeded draw (well_mixed)",
+            clearance="target = nearest corpse (spatial) or seeded draw (well_mixed)",
+            division="one daughter per selected action per step",
             geometry="fixed centroids; daughter offset 2 um; no mechanics; capped nearest-neighbor graph",
             simultaneous="snapshot proposals; death/clearance conflicts first; surviving actors divide/change state"))
     identity = digest(config)
@@ -313,7 +330,8 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
             answer = answers.get(cid)
             probabilities = distribution(row["prior"], answer, jev_weight)
             action = draw(probabilities, seeded_rng(seed, "decision", step, cid))
-            proposals.append(dict(cell_id=cid, action=action, targets=row["targets"], corpses=row["corpses"]))
+            proposals.append(dict(cell_id=cid, action=action, targets=row["targets"], corpses=row["corpses"],
+                                  target_rule=row["target_rule"]))
             decisions.append(dict(step=step, time_hours=step*bundle["context"]["time_step_hours"], cell_id=cid,
                 action=action, prior=row["prior"], jev=answer, applied_probabilities=probabilities,
                 observation=row["observation"], excluded=row["excluded"],
