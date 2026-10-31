@@ -1,0 +1,132 @@
+{
+  "date": "2026-10-30",
+  "datasets": [
+    {
+      "dataset_id": "melanoma_5k",
+      "ok": true,
+      "files": [
+        {
+          "path": "cell_feature_matrix.h5",
+          "ok": true,
+          "bytes": 44041809,
+          "sha256": "443ad56e7253ee8339a8a7bddf96b53d397a7a35551eb38dae80df5701b10bba"
+        },
+        {
+          "path": "cells.parquet",
+          "ok": true,
+          "bytes": 2289204,
+          "sha256": "6b5852ed0fa27c74e77707f32a815f8c362bf934234da2d5f9667ac120ff2958"
+        },
+        {
+          "path": "metrics_summary.csv",
+          "ok": true,
+          "bytes": 2189,
+          "sha256": "bcd3475bcc49a3385802e887ca9d9b79f7718a3d0d9c0f4a358c86880978e3f1"
+        },
+        {
+          "path": "gene_panel.json",
+          "ok": true,
+          "bytes": 2933339,
+          "sha256": "a27ac41a051819d23e90ec8b112b64cebea5514d6e168dfb518bdf6ddb788c94"
+        },
+        {
+          "path": "analysis.tar.gz",
+          "ok": true,
+          "bytes": 30851022,
+          "sha256": "ec7b73eddfda0dc95ba48f97de6e5d816babc2775678735458d089ba4f632254"
+        },
+        {
+          "path": "experiment.xenium",
+          "ok": true,
+          "bytes": 2323,
+          "sha256": "0d8dbac202c9ebd297f091dfaf9d4e17a502e527775126af1464b39e982be848"
+        }
+      ],
+      "adapter_smoke_test": {
+        "selected_cells": 1000,
+        "assayed_gene_expression_targets": 5006,
+        "center_um": [
+          174.19956970214844,
+          2299.126220703125
+        ],
+        "min_nonzero_expression_features": 0,
+        "max_nonzero_expression_features": 1431,
+        "annotation_status": "Explicit synthetic unreviewed labels for engineering test only; biological annotation still required.",
+        "n_vendor_clusters_present": 991
+      }
+    },
+    {
+      "dataset_id": "brain_tg_5_7m",
+      "ok": true,
+      "files": [
+        {
+          "path": "cell_feature_matrix.h5",
+          "ok": true,
+          "bytes": 4634237,
+          "sha256": "a7c19b9d371cfaaf9542737b9cdb8e104bbfcde703e05bb00801bfb6f7d8c3d6"
+        },
+        {
+          "path": "cells.csv.gz",
+          "ok": true,
+          "bytes": 3055560,
+          "sha256": "5f4a72be50abad11c2e694bac3cbc61e455f0c31fd588c7826619b9910009acf"
+        },
+        {
+          "path": "metrics_summary.csv",
+          "ok": true,
+          "bytes": 850,
+          "sha256": "0c2c33097cc8675565d2cf6d11e9fe7947a1615eca32637c373ee4605e43391b"
+        }
+      ],
+      "adapter_smoke_test": {
+        "selected_cells": 1000,
+        "assayed_gene_expression_targets": 347,
+        "center_um": [
+          844.3943786621094,
+          870.3839691162109
+        ],
+        "min_nonzero_expression_features": 10,
+        "max_nonzero_expression_features": 144,
+        "annotation_status": "Explicit synthetic unreviewed labels for engineering test only; biological annotation still required.",
+        "n_vendor_clusters_present": 0
+      }
+    },
+    {
+      "dataset_id": "brain_wt_5_7m",
+      "ok": true,
+      "files": [
+        {
+          "path": "cell_feature_matrix.h5",
+          "ok": true,
+          "bytes": 5362551,
+          "sha256": "3168fb4035ca9cc5637d24ab6e3e7a1b28ba78ed356e78a8b95cbd16756b44fe"
+        },
+        {
+          "path": "cells.csv.gz",
+          "ok": true,
+          "bytes": 3045252,
+          "sha256": "3e6c04cf3658a0d66172870973b1569b1a5148c1d20a3e61764348bb413ef4ac"
+        },
+        {
+          "path": "metrics_summary.csv",
+          "ok": true,
+          "bytes": 857,
+          "sha256": "28587e055111920ff7070f42aab518c322511c10f17d80300182034d6947fd89"
+        }
+      ],
+      "adapter_smoke_test": {
+        "selected_cells": 1000,
+        "assayed_gene_expression_targets": 347,
+        "center_um": [
+          836.6107360839843,
+          834.4094726562499
+        ],
+        "min_nonzero_expression_features": 1,
+        "max_nonzero_expression_features": 151,
+        "annotation_status": "Explicit synthetic unreviewed labels for engineering test only; biological annotation still required.",
+        "n_vendor_clusters_present": 0
+      }
+    }
+  ],
+  "biological_validation": false
+}

@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0a1",
+  "date": "2026-10-30",
+  "python": "3.12.14",
+  "platform": "darwin",
+  "tests": {
+    "command": "python -m pytest tests -q",
+    "passed": 157,
+    "skipped": 3,
+    "subtests_passed": 6,
+    "warnings": 5,
+    "scope": "All collected legacy and v2 tests; three optional real-bundle tests skipped because VTX_TEST_BUNDLE is unset."
+  },
+  "environment": {
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "pandas": "2.3.3",
+    "h5py": "3.16.0",
+    "anndata": "0.12.19",
+    "pyarrow": "19.0.1",
+    "decoupler": "2.3.0",
+    "pytest": "9.1.1"
+  },
+  "environment_note": "Existing Python3.12 scientific environment plus isolated temporary test dependencies. This is not the exact pinned legacy environment; original engine file hashes and legacy pin equivalence passed. Python3.13 CI is configured but not executed locally.",
+  "notebook": {
+    "format_validated": true,
+    "code_cells_executed": 7,
+    "api_calls": 0,
+    "method": "Sequential execution of all Python cells in local repository; notebook renderer and live Colab not tested."
+  },
+  "javascript": {
+    "legacy_player_logic_passed": true,
+    "tested_viewports": [
+      "1400x900",
+      "1920x1080"
+    ],
+    "new_replay_syntax_check_passed": true,
+    "browser_visual_review": false,
+    "browser_review_note": "Local-file browser access was blocked by browser URL policy; no browser workaround attempted."
+  },
+  "packaging": {
+    "wheel_built": true,
+    "sdist_built": true,
+    "clean_environment_install_without_dependencies": true,
+    "installed_vtx2_help_passed": true
+  },
+  "real_data_report": "REAL_DATA_SMOKE_TEST.json",
+  "live_api_report": "LIVE_API_SMOKE_TEST.json",
+  "biological_predictive_validation": false
+}

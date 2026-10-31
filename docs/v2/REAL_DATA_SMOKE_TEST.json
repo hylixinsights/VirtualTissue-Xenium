@@ -1,0 +1,422 @@
+{
+  "date": "2026-10-30",
+  "test_scope": "Real count matrices and measured coordinates through annotated adapter, guidebook preparation, preflight, synchronous local simulation, decision log/checkpoint and replay generation.",
+  "biological_validation": false,
+  "live_jev_test": false,
+  "seed": 21,
+  "requested_steps_per_dataset": 3,
+  "datasets": [
+    {
+      "dataset_id": "melanoma_5k",
+      "source_page": "https://www.10xgenomics.com/datasets/xenium-prime-ffpe-human-skin",
+      "selected_cells": 1000,
+      "measured_sample_cells": 112551,
+      "assayed_gene_expression_targets": 5006,
+      "selected_region_center_um": [
+        174.19956970214844,
+        2299.126220703125
+      ],
+      "annotation_status": "Every cell explicitly unreviewed; lineage unknown; not a reviewed biological annotation.",
+      "gene_sets_source": "Default illustrative human signatures",
+      "guidebook_fingerprint": "4648f59a13587f8974e0c17f475b9fb304095fcfdb05520f7f45bd68134610f9",
+      "coverage": {
+        "cell_cycle": {
+          "signature_size": 8,
+          "assayed_gene_count": 8,
+          "panel_coverage": 1.0,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 214,
+          "signature_genes": [
+            "CCNB1",
+            "CDK1",
+            "MCM2",
+            "MCM5",
+            "MKI67",
+            "PCNA",
+            "TOP2A",
+            "UBE2C"
+          ]
+        },
+        "cytotoxic": {
+          "signature_size": 6,
+          "assayed_gene_count": 3,
+          "panel_coverage": 0.5,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 25,
+          "signature_genes": [
+            "CTSW",
+            "GNLY",
+            "GZMB",
+            "GZMH",
+            "NKG7",
+            "PRF1"
+          ]
+        },
+        "activation": {
+          "signature_size": 6,
+          "assayed_gene_count": 3,
+          "panel_coverage": 0.5,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 21,
+          "signature_genes": [
+            "CD69",
+            "FOS",
+            "IFNG",
+            "IL2RA",
+            "JUN",
+            "TNFRSF9"
+          ]
+        },
+        "exhaustion_associated": {
+          "signature_size": 6,
+          "assayed_gene_count": 6,
+          "panel_coverage": 1.0,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 42,
+          "signature_genes": [
+            "CTLA4",
+            "HAVCR2",
+            "LAG3",
+            "PDCD1",
+            "TIGIT",
+            "TOX"
+          ]
+        },
+        "apoptosis_associated": {
+          "signature_size": 7,
+          "assayed_gene_count": 7,
+          "panel_coverage": 1.0,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 405,
+          "signature_genes": [
+            "BAK1",
+            "BAX",
+            "BBC3",
+            "CASP3",
+            "CASP8",
+            "FAS",
+            "PMAIP1"
+          ]
+        },
+        "inflammation": {
+          "signature_size": 6,
+          "assayed_gene_count": 3,
+          "panel_coverage": 0.5,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 19,
+          "signature_genes": [
+            "CCL2",
+            "CXCL8",
+            "IL1B",
+            "IL6",
+            "NFKBIA",
+            "TNF"
+          ]
+        },
+        "antigen_presentation": {
+          "signature_size": 6,
+          "assayed_gene_count": 0,
+          "panel_coverage": 0.0,
+          "available_score_cells": 0,
+          "missing_score_cells": 1000,
+          "cells_with_any_detected_signature_gene": 0,
+          "signature_genes": [
+            "B2M",
+            "CD74",
+            "HLA-A",
+            "HLA-DPA1",
+            "HLA-DPB1",
+            "HLA-DRA"
+          ]
+        }
+      },
+      "preflight": {
+        "schema_version": "2.0",
+        "cells": 1000,
+        "by_lineage": {
+          "unknown": 1000
+        },
+        "initial_questions": 0,
+        "initial_http_batches": 0,
+        "isolated_cells": 0,
+        "interaction_mode": "spatial",
+        "limitations": [
+          "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+          "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+          "Spatial edges use centroid distance; they do not establish physical contact.",
+          "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+        ]
+      },
+      "run_report": {
+        "schema_version": "2.0",
+        "completed": true,
+        "stop_reason": "completed",
+        "error": null,
+        "completed_steps": 3,
+        "requested_steps": 3,
+        "seed": 21,
+        "mode": "local",
+        "living": 1000,
+        "dead": 0,
+        "removed": 0,
+        "allocated": 1000,
+        "events": {},
+        "bundle_fingerprint": "4648f59a13587f8974e0c17f475b9fb304095fcfdb05520f7f45bd68134610f9",
+        "config_hash": "693712de05afcabb164c51516b2ea20b138e7449dc8604c7abd72427d981e43b",
+        "usage": {
+          "http_attempts": 0
+        },
+        "biological_validation": "not established",
+        "preflight": {
+          "schema_version": "2.0",
+          "cells": 1000,
+          "by_lineage": {
+            "unknown": 1000
+          },
+          "initial_questions": 0,
+          "initial_http_batches": 0,
+          "isolated_cells": 0,
+          "interaction_mode": "spatial",
+          "limitations": [
+            "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+            "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+            "Spatial edges use centroid distance; they do not establish physical contact.",
+            "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+          ]
+        }
+      },
+      "decisions_count": 3000,
+      "action_counts": {
+        "REST": 3000
+      },
+      "artifacts_relative_to_repo": "outputs/v2_real_data_smoke/20261030_105904/melanoma_5k",
+      "replay_bytes": 1243295,
+      "wall_seconds": 2.66,
+      "status": "passed_engineering_only"
+    },
+    {
+      "dataset_id": "brain_tg_5_7m",
+      "source_page": "https://www.10xgenomics.com/datasets/xenium-in-situ-analysis-of-alzheimers-disease-mouse-model-brain-coronal-sections-from-one-hemisphere-over-a-time-course-1-standard",
+      "selected_cells": 1000,
+      "measured_sample_cells": 58682,
+      "assayed_gene_expression_targets": 347,
+      "selected_region_center_um": [
+        844.3943786621094,
+        870.3839691162109
+      ],
+      "annotation_status": "Every cell explicitly unreviewed; lineage unknown; not a reviewed biological annotation.",
+      "gene_sets_source": "Exact first three assayed symbols, engineering overlap check only; no human-mouse orthology inference.",
+      "guidebook_fingerprint": "86012554f85b4344d5cae42692d654fe20cb13432fe9f85169fac53901886f44",
+      "coverage": {
+        "engineering_panel_overlap_only": {
+          "signature_size": 3,
+          "assayed_gene_count": 3,
+          "panel_coverage": 1.0,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 621,
+          "signature_genes": [
+            "2010300C02RIK",
+            "ABCA7",
+            "ACSBG1"
+          ]
+        },
+        "engineering_absent_panel_only": {
+          "signature_size": 3,
+          "assayed_gene_count": 0,
+          "panel_coverage": 0.0,
+          "available_score_cells": 0,
+          "missing_score_cells": 1000,
+          "cells_with_any_detected_signature_gene": 0,
+          "signature_genes": [
+            "__NOT_ASSAYED_1",
+            "__NOT_ASSAYED_2",
+            "__NOT_ASSAYED_3"
+          ]
+        }
+      },
+      "preflight": {
+        "schema_version": "2.0",
+        "cells": 1000,
+        "by_lineage": {
+          "unknown": 1000
+        },
+        "initial_questions": 0,
+        "initial_http_batches": 0,
+        "isolated_cells": 1,
+        "interaction_mode": "spatial",
+        "limitations": [
+          "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+          "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+          "Spatial edges use centroid distance; they do not establish physical contact.",
+          "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+        ]
+      },
+      "run_report": {
+        "schema_version": "2.0",
+        "completed": true,
+        "stop_reason": "completed",
+        "error": null,
+        "completed_steps": 3,
+        "requested_steps": 3,
+        "seed": 21,
+        "mode": "local",
+        "living": 1000,
+        "dead": 0,
+        "removed": 0,
+        "allocated": 1000,
+        "events": {},
+        "bundle_fingerprint": "86012554f85b4344d5cae42692d654fe20cb13432fe9f85169fac53901886f44",
+        "config_hash": "65f43c91182a2966d982e48872a3b1ab7d0d537816b1519704c808f2efc30348",
+        "usage": {
+          "http_attempts": 0
+        },
+        "biological_validation": "not established",
+        "preflight": {
+          "schema_version": "2.0",
+          "cells": 1000,
+          "by_lineage": {
+            "unknown": 1000
+          },
+          "initial_questions": 0,
+          "initial_http_batches": 0,
+          "isolated_cells": 1,
+          "interaction_mode": "spatial",
+          "limitations": [
+            "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+            "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+            "Spatial edges use centroid distance; they do not establish physical contact.",
+            "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+          ]
+        }
+      },
+      "decisions_count": 3000,
+      "action_counts": {
+        "REST": 3000
+      },
+      "artifacts_relative_to_repo": "outputs/v2_real_data_smoke/20261030_105904/brain_tg_5_7m",
+      "replay_bytes": 1335059,
+      "wall_seconds": 1.609,
+      "status": "passed_engineering_only"
+    },
+    {
+      "dataset_id": "brain_wt_5_7m",
+      "source_page": "https://www.10xgenomics.com/datasets/xenium-in-situ-analysis-of-alzheimers-disease-mouse-model-brain-coronal-sections-from-one-hemisphere-over-a-time-course-1-standard",
+      "selected_cells": 1000,
+      "measured_sample_cells": 58685,
+      "assayed_gene_expression_targets": 347,
+      "selected_region_center_um": [
+        836.6107360839843,
+        834.4094726562499
+      ],
+      "annotation_status": "Every cell explicitly unreviewed; lineage unknown; not a reviewed biological annotation.",
+      "gene_sets_source": "Exact first three assayed symbols, engineering overlap check only; no human-mouse orthology inference.",
+      "guidebook_fingerprint": "ce93a679a52f873bab6901aba8a520c9f7883d55d22106b3a7210affde2c5673",
+      "coverage": {
+        "engineering_panel_overlap_only": {
+          "signature_size": 3,
+          "assayed_gene_count": 3,
+          "panel_coverage": 1.0,
+          "available_score_cells": 1000,
+          "missing_score_cells": 0,
+          "cells_with_any_detected_signature_gene": 758,
+          "signature_genes": [
+            "2010300C02RIK",
+            "ABCA7",
+            "ACSBG1"
+          ]
+        },
+        "engineering_absent_panel_only": {
+          "signature_size": 3,
+          "assayed_gene_count": 0,
+          "panel_coverage": 0.0,
+          "available_score_cells": 0,
+          "missing_score_cells": 1000,
+          "cells_with_any_detected_signature_gene": 0,
+          "signature_genes": [
+            "__NOT_ASSAYED_1",
+            "__NOT_ASSAYED_2",
+            "__NOT_ASSAYED_3"
+          ]
+        }
+      },
+      "preflight": {
+        "schema_version": "2.0",
+        "cells": 1000,
+        "by_lineage": {
+          "unknown": 1000
+        },
+        "initial_questions": 0,
+        "initial_http_batches": 0,
+        "isolated_cells": 2,
+        "interaction_mode": "spatial",
+        "limitations": [
+          "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+          "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+          "Spatial edges use centroid distance; they do not establish physical contact.",
+          "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+        ]
+      },
+      "run_report": {
+        "schema_version": "2.0",
+        "completed": true,
+        "stop_reason": "completed",
+        "error": null,
+        "completed_steps": 3,
+        "requested_steps": 3,
+        "seed": 21,
+        "mode": "local",
+        "living": 1000,
+        "dead": 0,
+        "removed": 0,
+        "allocated": 1000,
+        "events": {},
+        "bundle_fingerprint": "ce93a679a52f873bab6901aba8a520c9f7883d55d22106b3a7210affde2c5673",
+        "config_hash": "70634c89f06597ccbf2d07dc03a27a1d0983d45af0db5e5b8de3d93a4a1ff70b",
+        "usage": {
+          "http_attempts": 0
+        },
+        "biological_validation": "not established",
+        "preflight": {
+          "schema_version": "2.0",
+          "cells": 1000,
+          "by_lineage": {
+            "unknown": 1000
+          },
+          "initial_questions": 0,
+          "initial_http_batches": 0,
+          "isolated_cells": 2,
+          "interaction_mode": "spatial",
+          "limitations": [
+            "Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
+            "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
+            "Spatial edges use centroid distance; they do not establish physical contact.",
+            "Enrichment/subsampling does not reconstruct absent populations or population frequencies."
+          ]
+        }
+      },
+      "decisions_count": 3000,
+      "action_counts": {
+        "REST": 3000
+      },
+      "artifacts_relative_to_repo": "outputs/v2_real_data_smoke/20261030_105904/brain_wt_5_7m",
+      "replay_bytes": 1341523,
+      "wall_seconds": 1.613,
+      "status": "passed_engineering_only"
+    }
+  ],
+  "limitations": [
+    "All labels are explicitly unreviewed and unknown lineage; the conservative guidebook allows REST only.",
+    "These tests validate real-file compatibility and the pipeline; they do not validate cell-type annotation, transitions, interactions, disease progression, or treatment response.",
+    "No Jev calls were made in these real-data tests because unknown-lineage cells have one permitted action.",
+    "Mouse signatures are software checks built from exact assayed symbols and do not establish biological module validity or orthology.",
+    "Regions are selected at the first vendor cell for reproducible engineering tests, not a pathology-reviewed region.",
+    "Baseline expression remains fixed and hours are uncalibrated step labels."
+  ]
+}

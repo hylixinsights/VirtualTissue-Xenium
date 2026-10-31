@@ -1,0 +1,508 @@
+{
+  "description": "Synthetic software demonstration; no experimental measurements.",
+  "assayed_genes": [
+    "B2M",
+    "BAK1",
+    "BAX",
+    "BBC3",
+    "CASP3",
+    "CASP8",
+    "CCL2",
+    "CCNB1",
+    "CD69",
+    "CD74",
+    "CDK1",
+    "CTLA4",
+    "CTSW",
+    "CXCL8",
+    "FAS",
+    "FOS",
+    "GNLY",
+    "GZMB",
+    "GZMH",
+    "HAVCR2",
+    "HLA-A",
+    "HLA-DPA1",
+    "HLA-DPB1",
+    "HLA-DRA",
+    "IFNG",
+    "IL1B",
+    "IL2RA",
+    "IL6",
+    "JUN",
+    "LAG3",
+    "MCM2",
+    "MCM5",
+    "MKI67",
+    "NFKBIA",
+    "NKG7",
+    "PCNA",
+    "PDCD1",
+    "PMAIP1",
+    "PRF1",
+    "TIGIT",
+    "TNF",
+    "TNFRSF9",
+    "TOP2A",
+    "TOX",
+    "UBE2C"
+  ],
+  "cells": [
+    {
+      "cell_id": "synthetic_00",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 0,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": true,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_01",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 12,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_02",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 24,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_03",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 36,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_04",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 48,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_05",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 60,
+      "y": 0,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_06",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 0,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_07",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 12,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_08",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 24,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": true,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_09",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 36,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_10",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 48,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_11",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 60,
+      "y": 12,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_12",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 0,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_13",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 12,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_14",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 24,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_15",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 36,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_16",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 48,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": true,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_17",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 60,
+      "y": 24,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_18",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 0,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_19",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 12,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_20",
+      "cell_type": "CD8 T cell",
+      "lineage": "T_CD8",
+      "expression": {
+        "NKG7": 5,
+        "PRF1": 3,
+        "GZMB": 2,
+        "CD69": 2,
+        "IFNG": 1,
+        "TOX": 1
+      },
+      "x": 24,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_21",
+      "cell_type": "melanoma cell",
+      "lineage": "malignant",
+      "expression": {
+        "MKI67": 4,
+        "TOP2A": 3,
+        "PCNA": 2,
+        "MCM2": 1,
+        "CASP3": 1
+      },
+      "x": 36,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_22",
+      "cell_type": "myeloid cell",
+      "lineage": "myeloid",
+      "expression": {
+        "IL1B": 3,
+        "TNF": 2,
+        "IL6": 1,
+        "HLA-DRA": 3,
+        "CD74": 4
+      },
+      "x": 48,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    },
+    {
+      "cell_id": "synthetic_23",
+      "cell_type": "fibroblast",
+      "lineage": "fibroblast",
+      "expression": {
+        "CCL2": 2,
+        "FOS": 2,
+        "JUN": 3,
+        "PCNA": 1
+      },
+      "x": 60,
+      "y": 36,
+      "sample_id": "synthetic_demo",
+      "initial_state": {
+        "activated": false,
+        "exhausted": false
+      }
+    }
+  ]
+}

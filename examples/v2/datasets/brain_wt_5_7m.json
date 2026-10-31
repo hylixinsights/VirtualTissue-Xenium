@@ -1,0 +1,39 @@
+{
+  "id": "brain_wt_5_7m",
+  "title": "Mouse brain wild type at 5.7 months",
+  "organism": "Mus musculus",
+  "tissue": "brain",
+  "disease": "wild type",
+  "assay": "xenium",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "10x Genomics; indicate any processing or annotation changes.",
+  "source_page": "https://www.10xgenomics.com/datasets/xenium-in-situ-analysis-of-alzheimers-disease-mouse-model-brain-coronal-sections-from-one-hemisphere-over-a-time-course-1-standard",
+  "verified_on": "2026-10-30",
+  "annotation_status": "Cell types and lineage require investigator review; vendor clustering is not annotation.",
+  "files": [
+    {
+      "path": "cell_feature_matrix.h5",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_wildtype_5_7_months/Xenium_V1_FFPE_wildtype_5_7_months_cell_feature_matrix.h5",
+      "bytes": 5362551,
+      "sha256": "3168fb4035ca9cc5637d24ab6e3e7a1b28ba78ed356e78a8b95cbd16756b44fe"
+    },
+    {
+      "path": "cells.csv.gz",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_wildtype_5_7_months/Xenium_V1_FFPE_wildtype_5_7_months_cells.csv.gz",
+      "bytes": 3045252,
+      "sha256": "3e6c04cf3658a0d66172870973b1569b1a5148c1d20a3e61764348bb413ef4ac"
+    },
+    {
+      "path": "metrics_summary.csv",
+      "url": "https://cf.10xgenomics.com/samples/xenium/1.4.0/Xenium_V1_FFPE_wildtype_5_7_months/Xenium_V1_FFPE_wildtype_5_7_months_metrics_summary.csv",
+      "bytes": 857,
+      "sha256": "28587e055111920ff7070f42aab518c322511c10f17d80300182034d6947fd89"
+    }
+  ],
+  "notes": [
+    "One male mouse at this genotype/age; independent animals, not repeatedly measured cells.",
+    "248-gene brain base panel plus 99 custom targets (one base target removed in final validation).",
+    "Age-matched pair is suitable for technical context tests; no donor replication at each genotype/age."
+  ]
+}

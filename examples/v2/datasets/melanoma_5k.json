@@ -1,0 +1,63 @@
+{
+  "id": "melanoma_5k",
+  "title": "Xenium Prime 5K human primary dermal melanoma",
+  "organism": "Homo sapiens",
+  "tissue": "skin",
+  "disease": "primary dermal melanoma",
+  "assay": "xenium",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "10x Genomics; indicate any processing or annotation changes.",
+  "source_page": "https://www.10xgenomics.com/datasets/xenium-prime-ffpe-human-skin",
+  "verified_on": "2026-10-30",
+  "annotation_status": "Cell types and lineage require investigator review; vendor clustering is not annotation.",
+  "files": [
+    {
+      "path": "cell_feature_matrix.h5",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_cell_feature_matrix.h5",
+      "bytes": 44041809,
+      "sha256": "443ad56e7253ee8339a8a7bddf96b53d397a7a35551eb38dae80df5701b10bba",
+      "optional": false
+    },
+    {
+      "path": "cells.parquet",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_cells.parquet",
+      "bytes": 2289204,
+      "sha256": "6b5852ed0fa27c74e77707f32a815f8c362bf934234da2d5f9667ac120ff2958",
+      "optional": false
+    },
+    {
+      "path": "metrics_summary.csv",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_metrics_summary.csv",
+      "bytes": 2189,
+      "sha256": "bcd3475bcc49a3385802e887ca9d9b79f7718a3d0d9c0f4a358c86880978e3f1",
+      "optional": false
+    },
+    {
+      "path": "gene_panel.json",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_gene_panel.json",
+      "bytes": 2933339,
+      "sha256": "a27ac41a051819d23e90ec8b112b64cebea5514d6e168dfb518bdf6ddb788c94",
+      "optional": false
+    },
+    {
+      "path": "analysis.tar.gz",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_analysis.tar.gz",
+      "bytes": 30851022,
+      "sha256": "ec7b73eddfda0dc95ba48f97de6e5d816babc2775678735458d089ba4f632254",
+      "optional": true
+    },
+    {
+      "path": "experiment.xenium",
+      "url": "https://cf.10xgenomics.com/samples/xenium/3.0.0/Xenium_Prime_Human_Skin_FFPE/Xenium_Prime_Human_Skin_FFPE_experiment.xenium",
+      "bytes": 2323,
+      "sha256": "0d8dbac202c9ebd297f091dfaf9d4e17a502e527775126af1464b39e982be848",
+      "optional": false
+    }
+  ],
+  "notes": [
+    "Single FFPE donor; 112551 cells and 5006 Gene Expression targets; not a treatment-response study.",
+    "Development panel: 10x flags ADGRG1, NMBR, OSMR, OSTF1 and RGS8 for non-specific binding; exclude or flag in analyses.",
+    "No image or full 7.56 GB archive is needed for this input workflow."
+  ]
+}

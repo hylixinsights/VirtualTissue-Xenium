@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-30",
+  "dataset": "24-cell synthetic engineering fixture",
+  "fixture_sha256": "1a9aaee9fd9da1989396e389c32c32bb6117844518f8aa18b1d125a3a9085709",
+  "bundle_fingerprint": "5c3dfc1b8ed878d6d00b8871b99793ae5b9931ca907dfa3173a6a32f51ed7a73",
+  "model": "jev-1.14.0",
+  "prompt_version": "vtx-context-guidebook-2.0",
+  "completed": true,
+  "completed_steps": 2,
+  "stop_reason": "completed",
+  "error": null,
+  "usage": {
+    "http_attempts": 4,
+    "cache_hits": 0,
+    "input_tokens": 67750,
+    "output_tokens": 2778,
+    "attempts_with_unknown_usage": 0
+  },
+  "resume_usage": {
+    "http_attempts": 4,
+    "cache_hits": 4,
+    "input_tokens": 67750,
+    "output_tokens": 2778,
+    "attempts_with_unknown_usage": 0
+  },
+  "resume_new_http_requests": 0,
+  "biological_validation": false,
+  "scope": "API protocol, concurrent batches, response validation, atomic round commit and cached replay only. Synthetic input; no efficacy claim."
+}
