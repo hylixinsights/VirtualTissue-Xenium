@@ -8,6 +8,15 @@ Version **2.0.0a1** is a working research preview. Each cell has an expression-i
 
 **Start with the [ordered workflow and task plan](docs/v2/WORKFLOW.md).** The [v0.1.3 code review](docs/v2/CODE_REVIEW_V0_1_3.md) explains the changes. The [validation plan](docs/v2/VALIDATION_PLAN.md) separates software checks from biological validation.
 
+**V2 is the default workflow on `main`.** New users can follow the [step-by-step guide for their own data](docs/v2/YOUR_DATA.md), including annotation requirements, a complete context example, preparation, simulation and results. No development branch selection is needed.
+
+| Your starting point | Start here |
+|---|---|
+| Your annotated Xenium, scRNA-seq or single-nucleus object | [Run your own data](docs/v2/YOUR_DATA.md) |
+| Raw Xenium output with reviewed annotations | [Xenium files, annotation templates and ROI selection](docs/v2/DATASETS.md#2-create-reviewed-annotations-and-select-a-region) |
+| Try a small example without an API key | [Synthetic quick start below](#first-run-no-dataset-or-api-key-needed) |
+| Prefer a notebook | [V2 workflow notebook](notebooks/V2_Context_Guidebook_Workflow.ipynb) · [Open in Colab](https://colab.research.google.com/github/hylixinsights/VirtualTissue-Xenium/blob/main/notebooks/V2_Context_Guidebook_Workflow.ipynb) |
+
 The guidebook currently uses **transparent heuristic preferences**, rather than probabilities learned from observed cell fates. Jev scores are also not calibrated cell-fate probabilities. Expression stays fixed at baseline; the simulator evolves discrete cell states, population and abstract local signals. Anti-PD1 exposure does not guarantee killing; a chronic diagnosis does not establish exhaustion. Those hypotheses need independent perturbation data.
 
 ## What v2 implements
@@ -31,10 +40,8 @@ The spatial kernel is a centroid graph. It does not model mechanics, molecular d
 Python 3.12 or 3.13:
 
 ```bash
-git clone https://github.com/hylixinsights/VirtualTissue-Xenium.git
+git clone --branch main https://github.com/hylixinsights/VirtualTissue-Xenium.git
 cd VirtualTissue-Xenium
-# Select the v2 branch until this preview is merged:
-git switch v2/context-guidebook
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[test]'
@@ -60,6 +67,8 @@ The treatment example declares an illustrative activation-weight modifier and le
 
 ## Use your annotated object
 
+Complete the installation above, then follow the [own-data guide](docs/v2/YOUR_DATA.md) to create a reviewed `annotated_region.h5ad` and a tissue-specific `context.json`. The guide includes a complete context template and the required lineage mapping. Do not reuse the synthetic example's tissue or treatment assumptions for a different experiment.
+
 ```bash
 pip install -e '.[xenium]'
 vtx2 prepare annotated_region.h5ad context.json outputs/v2/sample.json \
@@ -73,6 +82,8 @@ vtx2 run outputs/v2/sample.json outputs/v2/sample_local --steps 12
 For scRNA-seq or single-nucleus data without measured XY, set `assay` to `scrna` or `snrna` and `interaction_mode` to `well_mixed`. The replay labels its layout as schematic. Enriched libraries describe the sampled compartment; absent populations are not reconstructed. Mouse or other species require reviewed gene sets; no orthology is inferred.
 
 See the [context/guidebook contract and Python API](docs/v2/CONTEXT_AND_GUIDEBOOK.md), the [workflow](docs/v2/WORKFLOW.md), and `notebooks/V2_Context_Guidebook_Workflow.ipynb`.
+
+Existing testers can update a clean checkout with `git switch main`, `git pull --ff-only origin main`, and `pip install -e '.[xenium]'` in their virtual environment. Users with local changes should preserve those changes before switching branches.
 
 ## Public skin and brain examples
 

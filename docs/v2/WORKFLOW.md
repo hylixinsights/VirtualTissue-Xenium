@@ -6,6 +6,8 @@ Version 2.0.0a1 implements this software path. It does not yet learn calibrated 
 
 ## Read these first
 
+**For a practical first run with your own dataset, start with [Run your own data](YOUR_DATA.md).** It includes installation from `main`, annotated-object requirements, a full context template and the exact commands.
+
 1. [v0.1.3 review](CODE_REVIEW_V0_1_3.md): what makes sense, what prevents generalization and what v2 changes.
 2. [Context and guidebook contract](CONTEXT_AND_GUIDEBOOK.md): exact required input and the meaning of each score.
 3. [Public datasets](DATASETS.md): skin melanoma first, WT/Tg brain second, chronic-skin study for subsequent validation.

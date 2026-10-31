@@ -2,6 +2,8 @@
 
 **V2 starts with the [ordered workflow](v2/WORKFLOW.md), [context and guidebook contract](v2/CONTEXT_AND_GUIDEBOOK.md), [datasets](v2/DATASETS.md), and [v0.1.3 review](v2/CODE_REVIEW_V0_1_3.md).**
 
+New collaborators should use the [own-data walkthrough](v2/YOUR_DATA.md) and the [v2 notebook](../notebooks/V2_Context_Guidebook_Workflow.ipynb). V2 is the default on `main`.
+
 The guides below describe the preserved v0.1.3 lung-specific `vtx` workflow. Its original README is available at the [v0.1.3 tag](https://github.com/hylixinsights/VirtualTissue-Xenium/blob/v0.1.3/README.md). Install its pinned environment with `pip install -e '.[legacy,notebooks]'`.
 
 Start with the route that matches your goal:
