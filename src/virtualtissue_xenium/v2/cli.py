@@ -96,8 +96,10 @@ def compare(paths):
                     "kinetics_mode", "kinetics_sha256"):
             if ref["guidebook"]["provenance"].get(key) != result["guidebook"]["provenance"].get(key):
                 raise ValueError(f"Unmatched guidebook scoring assumption: {key}")
-        for key in ("time_step_hours", "kinetics", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease"):
+        for key in ("time_step_hours", "kinetics", "scoring", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease"):
             if key == "interaction_mode" and control.get("kind") == "well_mixed_equivalent":
+                continue
+            if key == "scoring" and control.get("kind") == "beta_zero":
                 continue
             if ref["guidebook"]["context"][key] != result["guidebook"]["context"][key]:
                 raise ValueError(f"Unmatched biological/context setting: {key}")

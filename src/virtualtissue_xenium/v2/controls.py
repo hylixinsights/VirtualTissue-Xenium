@@ -20,6 +20,7 @@ CONTROLS = {
     "coordinate_shuffle": "Permute measured (x, y) among cells of the same sample; labels and expression stay.",
     "no_modifier_treatment": "Keep the declared perturbations but remove every context_modifier (drug name alone).",
     "well_mixed_equivalent": "Same cells and context with interaction_mode = well_mixed (coordinates ignored).",
+    "beta_zero": "Same cells and context with scoring.beta = 0: label-only kinetics, the reference for expression effects.",
 }
 
 
@@ -75,6 +76,10 @@ def apply_control(bundle: dict, kind: str, *, seed: int = 0) -> dict:
         context["context_modifiers"] = []
     elif kind == "well_mixed_equivalent":
         context["interaction_mode"] = "well_mixed"
+    elif kind == "beta_zero":
+        if context["scoring"]["method"] != "depth_conditioned_auc":
+            raise ValueError("beta_zero needs scoring.method = depth_conditioned_auc in the source bundle.")
+        context["scoring"] = dict(context["scoring"], beta=0.0)
     provenance = bundle["guidebook"]["provenance"]
     gene_sets = provenance["gene_sets"]
     assayed = context.get("assayed_genes")

@@ -63,6 +63,51 @@ def _finite_json(value, field="context"):
     raise ValueError(f"{field} must contain only JSON values and string keys.")
 
 
+def _int(value, field, lo, hi):
+    if type(value) is not int or not lo <= value <= hi:
+        raise ValueError(f"{field} must be an integer from {lo} to {hi}.")
+    return value
+
+
+def _scoring(scoring):
+    """Validate the expression-evidence method; fill documented defaults."""
+    from .scoring import SCORING_DEFAULTS, SCORING_METHODS
+    if not isinstance(scoring, dict) or scoring.get("method") not in SCORING_METHODS:
+        raise ValueError(f"scoring.method must be one of {SCORING_METHODS}.")
+    if scoring["method"] == "rank_legacy":
+        if set(scoring) - {"method"}:
+            raise ValueError("scoring.method rank_legacy takes no other settings.")
+        return dict(scoring)
+    unknown = set(scoring) - set(SCORING_DEFAULTS)
+    if unknown:
+        raise ValueError(f"Unknown scoring settings: {sorted(unknown)}.")
+    s = dict(SCORING_DEFAULTS, **scoring)
+    s["auc_top_fraction"] = _number(s["auc_top_fraction"], "scoring.auc_top_fraction", positive=True)
+    if s["auc_top_fraction"] > 1:
+        raise ValueError("scoring.auc_top_fraction must be at most 1.")
+    s["auc_min_rank"] = _int(s["auc_min_rank"], "scoring.auc_min_rank", 1, 100000)
+    s["depth_bins"] = _int(s["depth_bins"], "scoring.depth_bins", 1, 50)
+    s["min_reference_cells"] = _int(s["min_reference_cells"], "scoring.min_reference_cells", 2, 100000)
+    s["min_overlap"] = _int(s["min_overlap"], "scoring.min_overlap", 1, 1000)
+    s["min_transcripts"] = _number(s["min_transcripts"], "scoring.min_transcripts")
+    beta = s["beta"]
+    if isinstance(beta, dict):
+        if set(beta) - set(ACTIONS) or "REST" in beta:
+            raise ValueError("scoring.beta keys must be non-REST actions.")
+        if any(type(v) not in (int, float) or not math.isfinite(v) for v in beta.values()):
+            raise ValueError("scoring.beta values must be finite numbers (negative allowed).")
+        # Actions not listed get beta = 0 (no expression effect).
+        s["beta"] = {a: float(v) for a, v in sorted(beta.items())}
+    elif type(beta) in (int, float) and math.isfinite(beta):
+        s["beta"] = float(beta)
+    else:
+        raise ValueError("scoring.beta must be a finite number or an action-to-number map.")
+    for value in ([s["beta"]] if isinstance(s["beta"], float) else s["beta"].values()):
+        if abs(value) > 3:
+            raise ValueError("scoring.beta magnitudes above 3 imply >400-fold hazard ratios; declare them only with evidence.")
+    return s
+
+
 def validate_context(context: dict) -> dict:
     """Return an independent normalized declaration, or fail before an API call.
 
@@ -72,6 +117,11 @@ def validate_context(context: dict) -> dict:
     hazards in events per hour; the kernel converts them with
     ``p = 1 - exp(-k * dt)`` and refuses a step whose summed probability
     exceeds ``max_step_probability``, default 0.25).
+
+    Optional ``scoring`` selects the expression-evidence method:
+    ``rank_legacy`` (2.0.0a1 default) or ``depth_conditioned_auc`` (see
+    scoring.py; settings auc_top_fraction, auc_min_rank, depth_bins,
+    min_reference_cells, min_overlap, beta, min_transcripts).
 
     Optional ``action_priors`` overrides assumed action weights by lineage.
     Optional ``context_modifiers`` are explicit, auditable multiplicative
@@ -145,6 +195,7 @@ def validate_context(context: dict) -> dict:
         if not genes or len({g.upper() for g in genes}) != len(genes):
             raise ValueError("assayed_genes must be nonempty and unique after case normalization.")
         c["assayed_genes"] = sorted(g.upper() for g in genes)
+    c["scoring"] = _scoring(c.get("scoring", {"method": "rank_legacy"}))
     priors = c.setdefault("action_priors", {})
     if not isinstance(priors, dict):
         raise ValueError("action_priors must map lineages to action weights.")

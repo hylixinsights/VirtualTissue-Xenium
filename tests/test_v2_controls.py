@@ -35,6 +35,10 @@ def bundle():
 
 def test_every_control_yields_a_valid_bundle_with_a_control_record(bundle):
     for kind in CONTROLS:
+        if kind == "beta_zero":
+            with pytest.raises(ValueError, match="depth_conditioned_auc"):
+                apply_control(bundle, kind)
+            continue
         out = apply_control(bundle, kind, seed=3)
         validate_prepared(out)
         record = out["guidebook"]["control"]

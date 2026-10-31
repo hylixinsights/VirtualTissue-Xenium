@@ -28,6 +28,7 @@ The guidebook currently uses **transparent heuristic hazards** (`src/virtualtiss
 | Context | Organism, tissue, disease, assay, enrichment/subsampling, missing populations, perturbation assumptions, recognition and timestep |
 | Guidebook | Panel-aware signature evidence, per-cell action weights, per-type summaries, explicit contextual modifiers and provenance |
 | Cell decisions | Reproducible sampling from guidebook preferences, optionally pooled with Jev preferences; local gates apply first |
+| Expression evidence | `depth_conditioned_auc`: within-type, depth-binned signature percentiles; hazards multiplied by `exp(β·z)` normalised to the reference mean; `β = 0` is the label-only control; low-count cells REST-only |
 | Kinetics | `hazard_per_hour`: packaged per-hour hazards with cited anchors (draft, uncalibrated) converted per step as competing risks, so `time_step_hours` changes the trajectory and too coarse a step is refused; `legacy_per_decision` reproduces v2.0.0a1 |
 | Interactions | Centroid-radius neighborhoods or explicitly assumed well-mixed neighborhoods; activation, exhaustion/recovery, abstract secretion, killing, clearance and division |
 | Parallel execution | Concurrent bounded Jev requests; all questions use the same pre-update snapshot; deterministic conflict handling |

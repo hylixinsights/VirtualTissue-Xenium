@@ -1,12 +1,15 @@
 """Expression evidence and explicitly assumed action preferences, without an LLM.
 
-Scores use mean ranks among positively detected assayed genes, with zero for an
-assayed but undetected gene. This is a small descriptive signature score, not
-AUCell, protein activity, transition frequency, or a calibrated fate probability.
+Two scoring methods (context.scoring.method):
+- ``rank_legacy`` (2.0.0a1): mean ranks among positively detected assayed genes,
+  zero for an assayed but undetected gene; weight *= 1 + score.
+- ``depth_conditioned_auc`` (v3 lane B, see scoring.py): within-type,
+  depth-binned recovery-AUC percentiles; hazard *= exp(beta z)/mean_ref.
+Neither is protein activity, a transition frequency or a calibrated fate probability.
 """
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from functools import lru_cache
 import hashlib
@@ -15,6 +18,7 @@ import math
 from pathlib import Path
 
 from .context import ACTIONS, LINEAGES, modifier_matches, validate_context
+from .scoring import beta_for, expression_multiplier, max_rank_for, score_population
 
 DEFAULT_GENE_SETS = {
     "cell_cycle": ["MKI67", "TOP2A", "PCNA", "MCM2", "MCM5", "CDK1", "CCNB1", "UBE2C"],
@@ -199,10 +203,16 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
     hazard_mode = c["kinetics"]["mode"] == "hazard_per_hour"
     dt = c["time_step_hours"]
     kinetics_table, hazards = load_kinetics() if hazard_mode else (None, None)
+    scoring = c["scoring"]
+    depth_mode = scoring["method"] == "depth_conditioned_auc"
+    qc_fail = {cell["cell_id"] for cell in checked
+               if depth_mode and sum(cell["expression"].values()) < scoring["min_transcripts"]}
+    if depth_mode:
+        population, references = score_population(checked, panel, signatures, dict(scoring, _qc_fail=qc_fail))
     records, grouped, worst_case_burden = {}, defaultdict(list), 0.0
     for cell in sorted(checked, key=lambda x: x["cell_id"]):
         lineage = cell["lineage"]
-        evidence = _rank_evidence(cell["expression"], panel, signatures)
+        evidence = population[cell["cell_id"]] if depth_mode else _rank_evidence(cell["expression"], panel, signatures)
         if hazard_mode:
             weights = dict(hazards[lineage])
             if not (lineage == "T_CD8" and c["recognition"]):
@@ -218,12 +228,30 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         if set(overrides) - set(weights) or (hazard_mode and "REST" in overrides):
             raise ValueError(f"Action override is incompatible with lineage {lineage}, recognition licensing, or hazard mode (REST is residual).")
         weights.update(overrides)
+        if cell["cell_id"] in qc_fail:
+            # Too few transcripts to say anything: the cell stays in the graph and only rests, visibly.
+            weights = {"REST": None if hazard_mode else 1.0}
         prior_weights = dict(weights)
         audit = []
+        if cell["cell_id"] in qc_fail:
+            audit.append({"source": "qc_gate", "applied": True, "min_transcripts": scoring["min_transcripts"],
+                          "assumption": "Below min_transcripts the cell is REST-only; not evidence of quiescence."})
         for action, weight in list(weights.items()):
             signature = ACTION_SIGNATURE.get(action)
-            score = evidence.get(signature, {}).get("score")
-            if score is not None and weight is not None:
+            if weight is None or signature not in evidence:
+                continue
+            if depth_mode:
+                beta = beta_for(scoring, action)
+                multiplier, normaliser = expression_multiplier(evidence[signature], references[signature], beta)
+                weights[action] = weight * multiplier
+                audit.append({"action": action, "source": "depth_conditioned_auc", "signature": signature,
+                              "z": evidence[signature]["z"], "status": evidence[signature]["status"],
+                              "reference": evidence[signature]["reference"], "beta": beta,
+                              "normaliser": normaliser, "multiplier": multiplier,
+                              "assumption": "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta"})
+                continue
+            score = evidence[signature].get("score")
+            if score is not None:
                 multiplier = 1 + score
                 weights[action] = weight * multiplier
                 audit.append({"action": action, "source": "expression_rank_heuristic", "signature": signature,
@@ -264,6 +292,7 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         if not math.isfinite(expression_total):
             raise ValueError("Expression total overflowed; supply finite counts within numeric range.")
         record = {"cell_type": cell["cell_type"], "lineage": lineage, "actions": actions,
+                  "qc": "below_min_transcripts" if cell["cell_id"] in qc_fail else "pass",
                   "evidence": evidence, "weight_adjustments": audit,
                   "detected_genes": sum(v > 0 for v in cell["expression"].values()),
                   "expression_total": expression_total,
@@ -301,7 +330,14 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             "input_sha256": _digest(checked), "gene_sets_sha256": _digest(signatures),
             "gene_sets": signatures, "assayed_genes": sorted(panel),
             "panel_source": "context.assayed_genes" if explicit_panel else "input_feature_union_incomplete_if_sparse",
-            "score_method": "mean_positive_expression_rank_with_undetected_assayed_genes_zero; minimum_overlap=3",
+            "score_method": ("depth_conditioned_recovery_auc_within_cell_type; z=probit(mid-rank percentile); m=exp(beta z)/mean_ref"
+                             if depth_mode else
+                             "mean_positive_expression_rank_with_undetected_assayed_genes_zero; minimum_overlap=3"),
+            "scoring": deepcopy(scoring),
+            "scoring_max_rank": max_rank_for(len(panel), scoring) if depth_mode else None,
+            "qc_fail_cells": len(qc_fail),
+            "scoring_coverage": ({name: dict(Counter(population[cid][name]["status"] for cid in population))
+                                  for name in signatures} if depth_mode else None),
             "symbol_normalization": "uppercase; no orthology inference",
             "probability_semantics": "Uncalibrated heuristic action preferences conditional on the offered menu; not learned fate probabilities or rates.",
             "time_semantics": ("Per-hour hazards; first-event competing-risk discretisation per step (at most one event per cell per step); "
