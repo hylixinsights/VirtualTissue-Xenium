@@ -82,8 +82,10 @@ def compare(paths):
                     "provider_name", "provider_prompt_version", "jev_prior_mode", "max_questions"):
             if ref["config"].get(key) != result["config"].get(key):
                 raise ValueError(f"Unmatched run setting: {key}")
-        if ref["guidebook"]["provenance"]["input_sha256"] != result["guidebook"]["provenance"]["input_sha256"]:
-            raise ValueError("Runs have different measured input cells/expression/geometry.")
+        control = result["guidebook"].get("control") or ref["guidebook"].get("control") or {}
+        inputs = {ref["guidebook"]["provenance"]["input_sha256"], result["guidebook"]["provenance"]["input_sha256"]}
+        if len(inputs) > 1 and control.get("source_input_sha256") not in inputs:
+            raise ValueError("Runs have different measured input cells/expression/geometry and no declared control links them.")
         if ref["guidebook"]["provenance"]["gene_sets_sha256"] != result["guidebook"]["provenance"]["gene_sets_sha256"]:
             raise ValueError("Runs have different gene sets.")
         for key in ("guidebook_version", "assayed_genes", "panel_source", "score_method", "symbol_normalization",
@@ -91,6 +93,8 @@ def compare(paths):
             if ref["guidebook"]["provenance"][key] != result["guidebook"]["provenance"][key]:
                 raise ValueError(f"Unmatched guidebook scoring assumption: {key}")
         for key in ("time_step_hours", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease"):
+            if key == "interaction_mode" and control.get("kind") == "well_mixed_equivalent":
+                continue
             if ref["guidebook"]["context"][key] != result["guidebook"]["context"][key]:
                 raise ValueError(f"Unmatched biological/context setting: {key}")
     shared = min(r["report"]["completed_steps"] for r in results)
@@ -103,10 +107,25 @@ def compare(paths):
             living=sum(c["status"] == "alive" for c in cells), dead=sum(c["status"] == "dead" for c in cells),
             activated=sum(c["status"] == "alive" and c["activated"] for c in cells),
             exhausted=sum(c["status"] == "alive" and c["exhausted"] for c in cells),
-            context=r["guidebook"]["context"],
+            context=r["guidebook"]["context"], control=r["guidebook"].get("control"),
+            jev_prior_divergence=r["report"].get("jev_prior_divergence", {}).get("by_lineage"),
             guidebook_fingerprint=digest(r["guidebook"])))
     return dict(shared_step=shared, runs=output,
                 interpretation="Matched stochastic assumptions experiment; no causal treatment efficacy claim. Repeat across seeds.")
+
+
+def cmd_control(args):
+    from .controls import CONTROLS, apply_control
+    if args.kind == "list":
+        return CONTROLS
+    if not args.output:
+        raise ValueError("control requires an OUTPUT path for the transformed bundle.")
+    bundle = apply_control(read_json(args.prepared), args.kind, seed=args.seed)
+    if Path(args.output).exists():
+        raise ValueError("Control output exists; choose a new bundle path.")
+    write_json(args.output, bundle)
+    return dict(prepared=args.output, fingerprint=bundle["fingerprint"], control=bundle["guidebook"]["control"],
+                preflight=preflight(bundle))
 
 
 def cmd_dataset(args):
@@ -159,6 +178,10 @@ def parser():
     s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown"); s.set_defaults(func=cmd_cost)
     s = sub.add_parser("compare", help="Compare matched arms at their latest common completed step.")
     s.add_argument("runs", nargs="+"); s.set_defaults(func=lambda a: compare(a.runs))
+    s = sub.add_parser("control", help="Write a null-model control bundle (shuffled expression, labels, coordinates, ...).")
+    s.add_argument("prepared"); s.add_argument("output", nargs="?")
+    s.add_argument("--kind", required=True, help="Control name, or 'list' to print the available controls.")
+    s.add_argument("--seed", type=int, default=0); s.set_defaults(func=cmd_control)
     s = sub.add_parser("dataset", help="Verified public-data manifests and bounded downloads.")
     s.add_argument("action", choices=("list", "download", "verify")); s.add_argument("dataset", nargs="?")
     s.add_argument("output", nargs="?"); s.add_argument("--max-mib", type=int, default=100)
