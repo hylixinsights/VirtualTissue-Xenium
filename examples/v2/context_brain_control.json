@@ -1,13 +1,16 @@
 {
   "schema_version": "2.0",
-  "tissue": "human brain cortex",
-  "organism": "human",
-  "disease": "no disease intervention declared; verify the donor metadata",
+  "tissue": "mouse brain cortex",
+  "organism": "mouse",
+  "disease": "wild-type control; the TgCRND8 arm declares the APP transgene as disease (verify the sample metadata)",
   "assay": "xenium",
   "sampling": {
     "design": "subsampled",
-    "description": "A selected region of one section; transcript panel and segmentation limit what is represented.",
-    "missing_populations": ["cells outside the selected region", "unsegmented cells"]
+    "description": "A selected cortical region of one coronal hemisphere section; the 248-gene base panel plus custom glial/plaque targets limits which signatures are assayed.",
+    "missing_populations": [
+      "cells outside the selected region",
+      "unsegmented cells"
+    ]
   },
   "perturbations": [],
   "recognition": false,

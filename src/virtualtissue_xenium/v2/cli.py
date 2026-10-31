@@ -23,6 +23,9 @@ def cmd_prepare(args):
         if len(cells) > args.max_cells:
             raise ValueError("Subset the input first or explicitly increase --max-cells.")
     gene_sets = read_json(args.gene_sets) if args.gene_sets else None
+    if isinstance(gene_sets, dict):
+        # Keys starting with "_" are file-level notes (provenance, review status), not gene sets.
+        gene_sets = {k: v for k, v in gene_sets.items() if not k.startswith("_")}
     bundle = prepare(cells, context, assayed_genes=genes, gene_sets=gene_sets)
     report = preflight(bundle)
     sidecar = Path(args.output).with_suffix(".guidebook.json")

@@ -1,0 +1,55 @@
+{
+  "_note": "Illustrative mouse symbols for the brain demo, mapped by hand from the human demo sets; review against the actual Xenium mouse brain panel before any biological claim. Not a curated resource.",
+  "cell_cycle": [
+    "Mki67",
+    "Top2a",
+    "Pcna",
+    "Mcm2",
+    "Mcm5",
+    "Cdk1",
+    "Ccnb1",
+    "Ube2c"
+  ],
+  "activation": [
+    "Cd69",
+    "Il2ra",
+    "Ifng",
+    "Tnfrsf9",
+    "Fos",
+    "Jun"
+  ],
+  "apoptosis_associated": [
+    "Bax",
+    "Bak1",
+    "Fas",
+    "Casp3",
+    "Casp8",
+    "Bbc3",
+    "Pmaip1"
+  ],
+  "inflammation": [
+    "Il1b",
+    "Tnf",
+    "Il6",
+    "Cxcl1",
+    "Ccl2",
+    "Nfkbia"
+  ],
+  "microglia_activation": [
+    "Trem2",
+    "Tyrobp",
+    "Cst7",
+    "Itgax",
+    "Clec7a",
+    "Apoe",
+    "Lpl"
+  ],
+  "astrocyte_reactivity": [
+    "Gfap",
+    "Serpina3n",
+    "C4b",
+    "Vim",
+    "Osmr",
+    "Cd44"
+  ]
+}

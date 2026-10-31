@@ -48,7 +48,7 @@ vtx2 run outputs/v2/real.json outputs/v2/real_local --steps 12 --seed 21
 
 # Only after inspection, provide your key through the environment.
 vtx2 run outputs/v2/real.json outputs/v2/real_jev --mode jev \
-  --steps 12 --seed 21 --max-http-attempts 100 --workers 2
+  --steps 12 --seed 21 --max-http-attempts 700 --workers 2   # see vtx2 cost
 ```
 
 If counts are in `X`, omit `--layer`. The gene panel comes from all `var_names`, including undetected genes; panel absence remains distinct from an observed zero. `--coordinate-scale` converts measured coordinates to micrometres. No coordinates are inferred for sc/snRNA-seq. For a nonhuman organism, pass `--gene-sets reviewed_species_signatures.json`.
@@ -119,6 +119,6 @@ Raw data, prepared objects, journals and full results stay in ignored `data/` an
 
 ## Recovery and limits
 
-A run writes a checkpoint only after a complete decision round. Resume reconstructs from t0 and reuses successful cached responses. Configuration or guidebook changes require a new run directory. Unknown outcomes are never retried automatically; preserve their journals. Exclusive run locks prevent accidental simultaneous writers. If a process was forcibly terminated, verify it has exited before manually removing its stale lock.
+A run writes `checkpoint.json` (the last fully committed state, for inspection) only after a complete decision round. Resume does not read it: it reconstructs from t0 and reuses successful cached responses. Configuration or guidebook changes require a new run directory. Unknown outcomes are never retried automatically; preserve their journals. Exclusive run locks prevent accidental simultaneous writers. If a process was forcibly terminated, verify it has exited before manually removing its stale lock.
 
 The preview keeps frames and decisions in memory for export, so start with hundreds to 1,000 cells and short horizons. A higher live-cell ceiling permits growth but does not add biological realism. Living-capacity limits, centroid truncation, synthetic daughter offsets, abstract signals and one-action-per-step rules are declared model assumptions. A stable-looking movie is not proof that the tissue dynamics are correct.
