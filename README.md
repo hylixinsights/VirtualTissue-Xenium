@@ -17,7 +17,7 @@ Version **2.0.0a1** is a working research preview. Each cell has an expression-i
 | Try a small example without an API key | [Synthetic quick start below](#first-run-no-dataset-or-api-key-needed) |
 | Prefer a notebook | [V2 workflow notebook](notebooks/V2_Context_Guidebook_Workflow.ipynb) · [Open in Colab](https://colab.research.google.com/github/hylixinsights/VirtualTissue-Xenium/blob/main/notebooks/V2_Context_Guidebook_Workflow.ipynb) |
 
-The guidebook currently uses **transparent heuristic preferences**, rather than probabilities learned from observed cell fates. Jev scores are also not calibrated cell-fate probabilities. Expression stays fixed at baseline; the simulator evolves discrete cell states, population and abstract local signals. Anti-PD1 exposure does not guarantee killing; a chronic diagnosis does not establish exhaustion. Those hypotheses need independent perturbation data.
+The guidebook currently uses **transparent heuristic hazards** (`src/virtualtissue_xenium/v2/kinetics_v3.json`, draft anchors to verify), rather than probabilities learned from observed cell fates. Jev scores are also not calibrated cell-fate probabilities. Expression stays fixed at baseline; the simulator evolves discrete cell states, population and abstract local signals. Anti-PD1 exposure does not guarantee killing; a chronic diagnosis does not establish exhaustion. Those hypotheses need independent perturbation data.
 
 ## What v2 implements
 
@@ -28,9 +28,10 @@ The guidebook currently uses **transparent heuristic preferences**, rather than 
 | Context | Organism, tissue, disease, assay, enrichment/subsampling, missing populations, perturbation assumptions, recognition and timestep |
 | Guidebook | Panel-aware signature evidence, per-cell action weights, per-type summaries, explicit contextual modifiers and provenance |
 | Cell decisions | Reproducible sampling from guidebook preferences, optionally pooled with Jev preferences; local gates apply first |
+| Kinetics | `hazard_per_hour`: packaged per-hour hazards with cited anchors (draft, uncalibrated) converted per step as competing risks, so `time_step_hours` changes the trajectory and too coarse a step is refused; `legacy_per_decision` reproduces v2.0.0a1 |
 | Interactions | Centroid-radius neighborhoods or explicitly assumed well-mixed neighborhoods; activation, exhaustion/recovery, abstract secretion, killing, clearance and division |
 | Parallel execution | Concurrent bounded Jev requests; all questions use the same pre-update snapshot; deterministic conflict handling |
-| Audit | Durable request intents/results, no automatic retry of unknown attempts, budgets, configuration-bound cache, checkpoints, run lock, decision logs and offline replay |
+| Audit | Durable request intents/results, no automatic retry of unknown attempts, budgets, configuration-bound cache, last-committed-state snapshot, run lock, decision logs and offline replay |
 | Comparisons | Same measurement input, scoring rules and simulation settings; latest common completed step; context differences exported |
 
 The spatial kernel is a centroid graph. It does not model mechanics, molecular diffusion, pharmacokinetics or emergent transcriptomes. Living-cell capacity is a computational limit; deaths free capacity. Daughter positions are synthetic offsets. This general kernel is separate from the preserved, lung-specific v0.1.3 physical engine.
@@ -49,17 +50,17 @@ pip install -e '.[test]'
 vtx2 prepare examples/v2/synthetic_cells.json \
   examples/v2/context_melanoma_control.json outputs/v2/control.json
 vtx2 inspect outputs/v2/control.json
-vtx2 run outputs/v2/control.json outputs/v2/control --steps 12 --seed 21
+vtx2 run outputs/v2/control.json outputs/v2/control --steps 48 --seed 21
 ```
 
-Open `outputs/v2/control/replay.html`. This 24-cell example is **synthetic software-test data**.
+Open `outputs/v2/control/replay.html`. This 24-cell example is **synthetic software-test data**. The example contexts use `kinetics.mode: hazard_per_hour` with 0.5 h steps, so 48 steps are one simulated day; `vtx2 inspect` prints the implied doubling time per lineage and the largest time step the declared hazards allow.
 
 Run an assumed treatment arm with the same seed:
 
 ```bash
 vtx2 prepare examples/v2/synthetic_cells.json \
   examples/v2/context_melanoma_anti_pd1.json outputs/v2/anti_pd1.json
-vtx2 run outputs/v2/anti_pd1.json outputs/v2/anti_pd1 --steps 12 --seed 21
+vtx2 run outputs/v2/anti_pd1.json outputs/v2/anti_pd1 --steps 48 --seed 21
 vtx2 compare outputs/v2/control outputs/v2/anti_pd1
 ```
 
@@ -110,20 +111,40 @@ The example center is a coordinate-selection example, not a biologically chosen 
 The API transmits biological context and summarized evidence. Select the cells and metadata you intend to send. Keep API keys in environment variables or notebook secrets.
 
 ```bash
-# Set TYPESAFE_API_KEY or JEV_API_KEY in your environment.
+# Estimate calls and input tokens first; no API use. A 1,000-cell bundle needs
+# about 50 HTTP calls per step, so 12 steps exceed the default budget of 100.
+vtx2 cost outputs/v2/sample.json --steps 12 --max-http-attempts 100
+
+# Set TYPESAFE_API_KEY or JEV_API_KEY in your environment, then pass a budget
+# that covers the horizon reported by vtx2 cost.
 vtx2 run outputs/v2/sample.json outputs/v2/sample_jev --mode jev \
-  --steps 12 --seed 21 --max-http-attempts 100 --workers 2
+  --steps 12 --seed 21 --max-http-attempts 700 --workers 2
 ```
+
+A run stops before the first round its budget cannot cover and records `provider_stopped_before_round_commit`; it never falls back to local decisions. `--jev-prior hidden` omits the guidebook prior from the prompt so that anchoring can be measured; the report records the Jensen–Shannon divergence between Jev and the prior per lineage.
 
 The model is pinned to `jev-1.14.0` by default. Use `--jev-weight 0.5` for the explicit normalized pooling rule `prior^(1-alpha) × Jev^alpha`; `1` uses Jev preferences, while local mode uses the guidebook alone. Pooling reinforces preferences and is not a Bayesian evidence update. All choices are sampled with stable per-cell/per-step seeds; Jev's returned argmax is retained for audit.
 
-Inspect the preflight before spending API credits. A request cap may stop before the requested horizon. Resume with the **identical command plus `--resume`**: successful responses are replayed from t0 without new calls; a failed or unresolved attempt is never resent automatically. Do not delete journals to bypass that safeguard. A stale `.running.lock` requires checking that no process remains before manual removal.
+Inspect the preflight and `vtx2 cost` before spending API credits. A request cap may stop before the requested horizon. Resume with the **identical command plus `--resume`**: successful responses are replayed from t0 without new calls; a failed or unresolved attempt is never resent automatically. Do not delete journals to bypass that safeguard. A stale `.running.lock` requires checking that no process remains before manual removal.
 
 ## Tests and evidence
 
 ```bash
+pip install -e '.[xenium,test]'   # test_v2_datasets needs h5py/pandas
 pytest tests/test_v2_*.py -q
 ```
+
+Null-model controls are one command away and `vtx2 compare` matches them to their source arm:
+
+```bash
+vtx2 control outputs/v2/control.json outputs/v2/control_shuffled.json \
+  --kind shuffle_expression_within_type --seed 1
+vtx2 run outputs/v2/control_shuffled.json outputs/v2/control_shuffled --steps 48 --seed 21
+vtx2 compare outputs/v2/control outputs/v2/control_shuffled
+vtx2 control outputs/v2/control.json --kind list
+```
+
+If a shuffled-expression arm stays inside the seed envelope of the real arm, per-cell expression carries no information in this model for that dataset; report that rather than the label "expression-informed". The 24-cell synthetic fixture has identical expression within each lineage, so it cannot show an expression effect by construction.
 
 Recorded evidence is in [docs/v2](docs/v2/WORKFLOW.md#validation-evidence): verified real downloads; 1,000-cell adapter/simulation checks for melanoma and each brain sample; a small live Jev protocol test; and offline regression tests. Unknown real-data annotations deliberately permit REST only. These checks establish software behavior and input compatibility, not biological prediction.
 

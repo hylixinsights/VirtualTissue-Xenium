@@ -1,10 +1,20 @@
 # Changelog
 
+## Unreleased (v3 phase 0, branch `v3/phase0-hygiene`)
+
+* Kernel: `KILL` and `CLEAR_CORPSE` act on the nearest neighbor in spatial mode and on a seeded draw in well-mixed mode; the previous cell-ID order was a hidden bias. Events and config record the `target_rule`. Existing run fingerprints change.
+* Provider: `--jev-prior hidden` omits the guidebook prior from the prompt under its own prompt version and journal identity (anchoring control). Decisions record the Jensen–Shannon divergence between Jev and the gated prior; reports aggregate it per lineage.
+* `vtx2 cost` estimates HTTP calls and input tokens before any paid request (calibrated on the recorded live test) and reports how many steps a `--max-http-attempts` budget covers. README examples now use a budget that completes.
+* `vtx2 control` writes null-model bundles: expression shuffled within type or globally, label permutation, coordinate shuffle, modifier removal, well-mixed equivalent. `vtx2 compare` matches a control arm to its source run and reports the control.
+* Docs: `checkpoint.json` is described as the last committed state for inspection; `--resume` reconstructs from t0 using the journal cache and does not read it. The brain example declares `organism: mouse` and ships an illustrative, unreviewed mouse gene-set file; gene-set files may carry `_`-prefixed note keys.
+* Kinetics (lane A): `context.kinetics.mode = hazard_per_hour` interprets action weights as per-hour hazards from the packaged `kinetics_v3.json` (draft anchors with confidence flags; verify before publication). Each step uses a first-event competing-risk discretisation (`P(any) = 1 - exp(-Σk·dt)`, shares `k/Σk`, REST = `exp(-Σk·dt)`); a gated action that leaves the menu returns its share to REST. Steps whose burden exceeds `max_step_probability` (default 0.25) are refused at preparation for always-available actions and stop a run with `kinetics_step_too_coarse` otherwise; preflight reports implied doubling times, the gated worst case and the largest admissible step. `legacy_per_decision` (default for existing contexts) reproduces 2.0.0a1 exactly. Examples now use hazard mode with 0.5 h steps. Time-step invariance is tested (`tests/test_v2_kinetics.py`): rates are under-counted by about burden/2, which the guard bounds.
+* Not yet done (see the v3 plan): depth-conditioned scoring and the β effect size, timed states and motility, data-driven ontology, platform adapters, real-data runs.
+
 ## 2.0.0a1 — 2026-10-30
 
 * Introduce the separate `vtx2` research workflow for annotated AnnData, JSON and Xenium input, explicit tissue/disease/perturbation/sampling context and panel-aware expression guidebooks.
 * Add lineage-restricted actions, per-cell seeded categorical sampling, concurrent bounded Jev requests, synchronous commit barriers, abstract local signals, alive-capacity accounting and auditable state transitions. Preserve the original physical engine and `vtx` interface.
-* Persist immutable API intents/results, configuration-bound cache, atomic checkpoints, run locks, per-cell probabilities, provenance, offline replay and matched shared-endpoint comparisons.
+* Persist immutable API intents/results, configuration-bound cache, last-committed-state snapshots (not consumed by resume), run locks, per-cell probabilities, provenance, offline replay and matched shared-endpoint comparisons.
 * Package verified skin melanoma and WT/Tg brain source manifests, bounded download/ROI/annotation adapters, executable examples, a notebook, code review and an ordered parallel/sequential development plan.
 * Keep the JSON core dependency-free; scientific input support is the `xenium` extra and the unchanged pinned legacy stack is the `legacy` extra.
 * Record real-data compatibility checks and a live Jev protocol test. Preferences, timescales and state transitions remain uncalibrated assumptions; biological predictive validation and learned transition models remain future work.

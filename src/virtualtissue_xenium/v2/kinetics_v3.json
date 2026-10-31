@@ -1,0 +1,93 @@
+{
+  "kinetics_version": "v3-kinetics-1",
+  "unit": "events per hour per cell, before expression and context multipliers",
+  "step_probability": "p = 1 - exp(-k * m * dt); REST = 1 - sum(p) over the gated menu",
+  "review_status": "DRAFT. Values are order-of-magnitude anchors or declared assumptions. Verify every anchor against the cited paper and replace citation strings with DOIs before any publication. A row with confidence 'assumed' has no literature support and must be covered by the sensitivity analysis.",
+  "confidence_levels": {
+    "order_of_magnitude": "A published measurement constrains the value to within roughly a factor of three.",
+    "assumed": "No measurement located; the value is a declared modelling assumption."
+  },
+  "anchors": {
+    "ctl_serial_killing": {"citation": "Halle S et al. In vivo killing capacity of cytotoxic T cells is limited and involves dynamic interactions and T cell cooperativity. Immunity 2016;44:233-245.", "summary": "Intravital estimates of 2-16 h per target per CTL in vivo.", "verify": true},
+    "ctl_killing_adoptive": {"citation": "Breart B et al. Two-photon imaging of intratumoral CD8+ T cell cytotoxic activity during adoptive T cell therapy in mice. J Clin Invest 2008;118:1390-1397.", "summary": "About 6 h per kill for tumour-infiltrating CTLs.", "verify": true},
+    "cd8_expansion": {"citation": "Murali-Krishna K et al. Counting antigen-specific CD8 T cells: a reevaluation of bystander activation during viral infection. Immunity 1998;8:177-187.", "summary": "Clonal expansion consistent with division every 6-8 h at peak.", "verify": true},
+    "cd8_cycle_time": {"citation": "Yoon H, Kim TS, Braciale TJ. The cell cycle time of CD8+ T cells responding in vivo is controlled by the type of antigenic stimulus. PLoS One 2010;5:e15423.", "summary": "In vivo CD8 cycle times of roughly 8-12 h depending on stimulus.", "verify": true},
+    "melanoma_ki67": {"citation": "Gimotty PA et al. Biologic and prognostic significance of dermal Ki67 expression, mitoses, and tumorigenicity in thin invasive cutaneous melanoma. J Clin Oncol 2005;23:8048-8056.", "summary": "Ki-67 labelling indices of roughly 10-40% in invasive primary melanoma; with a 2-3 day cycle this implies population division hazards of about 0.002-0.008 per hour.", "verify": true},
+    "exhaustion_timescale": {"citation": "Wherry EJ et al. Viral persistence alters CD8 T-cell immunodominance and tissue distribution and results in distinct stages of functional impairment. J Virol 2003;77:4911-4927.", "summary": "Functional exhaustion develops over one to several weeks of chronic stimulation.", "verify": true},
+    "epidermal_turnover": {"citation": "Halprin KM. Epidermal 'turnover time' - a re-examination. Br J Dermatol 1972;86:14-19.", "summary": "Basal keratinocyte cycle times of roughly 200-300 h.", "verify": true},
+    "endothelial_turnover": {"citation": "Hobson B, Denekamp J. Endothelial proliferation in tumours and normal tissues: continuous labelling studies. Br J Cancer 1984;49:405-413.", "summary": "Normal-tissue endothelial turnover of weeks to months; tumour endothelium days.", "verify": true}
+  },
+  "hazards": {
+    "unknown": {},
+    "T_CD8": {
+      "PROLIFERATE": {"hazard_per_hour": 0.004, "confidence": "assumed", "note": "Resting value. Activated-state hazard (0.08/h, cd8_expansion, cd8_cycle_time) is applied by the kernel multiplier for activated cells once timed states exist (lane C); until then this is the uniform value."},
+      "ACTIVATE": {"hazard_per_hour": 0.05, "confidence": "assumed", "note": "Hours to a day with antigen; multiplied by 1 + local signal in the kernel."},
+      "EXHAUST": {"hazard_per_hour": 0.005, "confidence": "order_of_magnitude", "anchor": "exhaustion_timescale"},
+      "RECOVER": {"hazard_per_hour": 0.01, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.05, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"},
+      "KILL": {"hazard_per_hour": 0.2, "confidence": "order_of_magnitude", "anchor": "ctl_serial_killing", "note": "Also ctl_killing_adoptive. Applied only with declared recognition and the local gates."}
+    },
+    "T_CD4": {
+      "PROLIFERATE": {"hazard_per_hour": 0.004, "confidence": "assumed"},
+      "ACTIVATE": {"hazard_per_hour": 0.05, "confidence": "assumed"},
+      "EXHAUST": {"hazard_per_hour": 0.005, "confidence": "order_of_magnitude", "anchor": "exhaustion_timescale"},
+      "RECOVER": {"hazard_per_hour": 0.01, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.05, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"}
+    },
+    "B": {
+      "PROLIFERATE": {"hazard_per_hour": 0.003, "confidence": "assumed"},
+      "ACTIVATE": {"hazard_per_hour": 0.03, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.02, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"}
+    },
+    "myeloid": {
+      "PROLIFERATE": {"hazard_per_hour": 0.002, "confidence": "assumed"},
+      "ACTIVATE": {"hazard_per_hour": 0.05, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.08, "confidence": "assumed"},
+      "CLEAR_CORPSE": {"hazard_per_hour": 0.3, "confidence": "assumed", "note": "Engulfment within a few hours of contact; applied only with a neighbouring corpse."},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"}
+    },
+    "microglia": {
+      "PROLIFERATE": {"hazard_per_hour": 0.001, "confidence": "assumed"},
+      "ACTIVATE": {"hazard_per_hour": 0.05, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.08, "confidence": "assumed"},
+      "CLEAR_CORPSE": {"hazard_per_hour": 0.3, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.001, "confidence": "assumed"}
+    },
+    "fibroblast": {
+      "PROLIFERATE": {"hazard_per_hour": 0.002, "confidence": "assumed", "note": "Quiescent in vivo; wound or tumour stroma higher."},
+      "SECRETE": {"hazard_per_hour": 0.04, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.001, "confidence": "assumed"}
+    },
+    "endothelial": {
+      "PROLIFERATE": {"hazard_per_hour": 0.001, "confidence": "order_of_magnitude", "anchor": "endothelial_turnover"},
+      "SECRETE": {"hazard_per_hour": 0.02, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.0005, "confidence": "assumed"}
+    },
+    "epithelial": {
+      "PROLIFERATE": {"hazard_per_hour": 0.003, "confidence": "order_of_magnitude", "anchor": "epidermal_turnover"},
+      "SECRETE": {"hazard_per_hour": 0.02, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"}
+    },
+    "malignant": {
+      "PROLIFERATE": {"hazard_per_hour": 0.006, "confidence": "order_of_magnitude", "anchor": "melanoma_ki67", "note": "Population doubling about 5 days at this value; calibrate per sample from the measured Ki-67 or cell-cycle fraction."},
+      "SECRETE": {"hazard_per_hour": 0.04, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.002, "confidence": "assumed"}
+    },
+    "neuron": {
+      "ACTIVATE": {"hazard_per_hour": 0.02, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.0002, "confidence": "assumed"}
+    },
+    "astrocyte": {
+      "PROLIFERATE": {"hazard_per_hour": 0.001, "confidence": "assumed"},
+      "ACTIVATE": {"hazard_per_hour": 0.03, "confidence": "assumed"},
+      "SECRETE": {"hazard_per_hour": 0.02, "confidence": "assumed"},
+      "APOPTOSIS": {"hazard_per_hour": 0.0005, "confidence": "assumed"}
+    },
+    "oligodendrocyte": {
+      "APOPTOSIS": {"hazard_per_hour": 0.0005, "confidence": "assumed"}
+    }
+  }
+}

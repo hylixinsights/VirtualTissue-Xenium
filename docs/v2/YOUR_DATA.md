@@ -133,6 +133,7 @@ Open `outputs/my_tissue/local/replay.html` in a browser. Check `report.json` for
 Set your own credential in the terminal environment, then run a small bounded Jev experiment:
 
 ```bash
+vtx2 cost outputs/my_tissue/prepared.json --steps 3 --max-http-attempts 100   # no API use
 export TYPESAFE_API_KEY="replace-with-your-own-key"
 vtx2 run outputs/my_tissue/prepared.json outputs/my_tissue/jev \
   --mode jev --steps 3 --seed 21 --max-population 2000 \
@@ -143,7 +144,7 @@ unset TYPESAFE_API_KEY
 
 Use your normal credential manager/environment setup if available; keep real credentials out of notebooks, source files and shared command transcripts. `JEV_API_KEY` is also supported. The API receives context and cell-level summarized evidence; use data you are authorized to send to that service.
 
-The request limit covers HTTP attempts, not cells or completed simulated hours. Inspection estimates the first round; later rounds depend on living cells and their menus. If the remaining budget cannot cover a full round, the run stops before committing that round and records the reason. It does not silently switch to local decisions. Read the report even if a replay was produced. Reuse a directory only with `--resume` and identical settings; successful cached responses are reused, while failed or unresolved attempts are not automatically resent. Preserve journals when diagnosing an interrupted run.
+The request limit covers HTTP attempts, not cells or completed simulated hours. `vtx2 cost` estimates calls and input tokens from the first round and says how many steps a budget covers; later rounds depend on living cells and their menus. If the remaining budget cannot cover a full round, the run stops before committing that round and records the reason. It does not silently switch to local decisions. Read the report even if a replay was produced. Reuse a directory only with `--resume` and identical settings; successful cached responses are reused, while failed or unresolved attempts are not automatically resent. Preserve journals when diagnosing an interrupted run.
 
 ## 7. Inspect decisions and compare matched contexts
 
@@ -155,7 +156,7 @@ Each run directory contains:
 | `config.json` | Exact settings, input fingerprint, model and explicit kernel assumptions. |
 | `guidebook.json` | The actual guidebook used by the run. |
 | `decisions.jsonl` | Allowed/excluded actions, observations, guidebook priors, Jev preferences and sampled action. |
-| `frames.json`, `checkpoint.json` | Saved simulated states and last fully committed round. |
+| `frames.json`, `checkpoint.json` | Saved simulated states; `checkpoint.json` is the last fully committed state for inspection and is not read by `--resume`. |
 | `replay.html` | Offline visualization for inspecting the saved run. |
 | `jev_journal/` (Jev mode) | Durable request intents/results and usage for audit/recovery. |
 
