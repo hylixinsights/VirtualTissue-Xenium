@@ -33,19 +33,32 @@ def cmd_prepare(args):
     return dict(prepared=args.output, fingerprint=bundle["fingerprint"], preflight=report)
 
 
+def cmd_cost(args):
+    """Estimate Jev HTTP calls and input tokens from step-0 payloads; no API use."""
+    from .provider import estimate_cost
+    from .simulation import decision_rows, initialize
+    bundle = read_json(args.prepared)
+    preflight(bundle, model=args.model, max_questions=args.max_questions, prior_mode=args.jev_prior)
+    rows, _ = decision_rows(initialize(bundle), bundle["guidebook"], bundle["context"], seed=args.seed, step=0)
+    active = [r for r in rows if len(r["actions"]) > 1]
+    return estimate_cost(active, bundle["context"], model=args.model, steps=args.steps, max_questions=args.max_questions,
+                         prior_mode=args.jev_prior, max_http_attempts=args.max_http_attempts)
+
+
 def cmd_run(args):
     from .provider import JevProvider
     bundle = read_json(args.prepared)
-    facts = preflight(bundle, model=args.model, max_questions=args.max_questions, seed=args.seed)
+    facts = preflight(bundle, model=args.model, max_questions=args.max_questions, seed=args.seed, prior_mode=args.jev_prior)
     if args.mode == "jev":
         key = os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY")
         if not key:
             raise ValueError("Set TYPESAFE_API_KEY or JEV_API_KEY before Jev mode.")
         identity = dict(bundle_fingerprint=bundle["fingerprint"], steps=args.steps, seed=args.seed,
                         mode=args.mode, jev_weight=args.jev_weight, max_population=args.max_population,
-                        model=args.model, max_questions=args.max_questions)
+                        model=args.model, max_questions=args.max_questions, jev_prior=args.jev_prior)
         provider = JevProvider(key, Path(args.output)/"jev_journal", identity, model=args.model,
-            max_attempts=args.max_http_attempts, workers=args.workers, max_questions=args.max_questions)
+            max_attempts=args.max_http_attempts, workers=args.workers, max_questions=args.max_questions,
+            prior_mode=args.jev_prior)
     else:
         provider = None
     report = run(bundle, args.output, steps=args.steps, seed=args.seed, mode=args.mode,
@@ -66,8 +79,8 @@ def compare(paths):
     ref = results[0]
     for result in results[1:]:
         for key in ("seed", "mode", "jev_weight", "model", "kernel", "max_population", "assumptions",
-                    "provider_name", "provider_prompt_version", "max_questions"):
-            if ref["config"][key] != result["config"][key]:
+                    "provider_name", "provider_prompt_version", "jev_prior_mode", "max_questions"):
+            if ref["config"].get(key) != result["config"].get(key):
                 raise ValueError(f"Unmatched run setting: {key}")
         if ref["guidebook"]["provenance"]["input_sha256"] != result["guidebook"]["provenance"]["input_sha256"]:
             raise ValueError("Runs have different measured input cells/expression/geometry.")
@@ -136,7 +149,14 @@ def parser():
     s.add_argument("--max-population", type=int, default=2000); s.add_argument("--jev-weight", type=float, default=.5)
     s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--max-http-attempts", type=int, default=100)
     s.add_argument("--workers", type=int, default=2); s.add_argument("--max-questions", type=int, default=20)
+    s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown",
+                   help="hidden omits the guidebook prior from the prompt (anchoring control); journals never mix modes.")
     s.add_argument("--resume", action="store_true"); s.set_defaults(func=cmd_run)
+    s = sub.add_parser("cost", help="Estimate Jev HTTP calls and input tokens for a run; no API use.")
+    s.add_argument("prepared"); s.add_argument("--steps", type=int, default=12); s.add_argument("--seed", type=int, default=21)
+    s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--max-questions", type=int, default=20)
+    s.add_argument("--max-http-attempts", type=int, default=100)
+    s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown"); s.set_defaults(func=cmd_cost)
     s = sub.add_parser("compare", help="Compare matched arms at their latest common completed step.")
     s.add_argument("runs", nargs="+"); s.set_defaults(func=lambda a: compare(a.runs))
     s = sub.add_parser("dataset", help="Verified public-data manifests and bounded downloads.")

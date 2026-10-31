@@ -200,3 +200,33 @@ def test_kill_target_is_nearest_in_spatial_mode_and_seeded_in_well_mixed():
         assert cd8["target_rule"] == "seeded_uniform_draw"
         firsts.add(cd8["targets"][0])
     assert firsts == {"z_near", "a_far"}
+
+
+def test_jev_prior_divergence_is_reported_per_lineage(tmp_path):
+    from virtualtissue_xenium.v2.provider import JevProvider
+    from virtualtissue_xenium.v2.simulation import js_divergence
+    assert js_divergence({"A": .5, "B": .5}, {"A": .5, "B": .5}) == 0
+    assert abs(js_divergence({"A": 1.0, "B": 0.0}, {"A": 0.0, "B": 1.0}) - 1.0) < 1e-12
+    bundle = prepare(cells(), context(), assayed_genes=["ACTB"])
+
+    def transport(body):
+        answers = {}
+        for qid, q in body["questions"].items():
+            menu = sorted(q["criteria"])
+            # Deliberately disagree with any prior: put everything on the first non-REST action.
+            pick = next(a for a in menu if a != "REST") if len(menu) > 1 else "REST"
+            answers[qid] = dict(type="choice", choice=pick, confidence=.9,
+                                probabilities={a: (1.0 if a == pick else 0.0) for a in menu})
+        return dict(model=body["model"], answers=answers, usage=dict(input_tokens=1, output_tokens=1))
+
+    provider = JevProvider("FAKE_KEY", tmp_path / "run" / "jev_journal", {"run": 1}, max_attempts=50,
+                           transport=transport, prior_mode="hidden")
+    report = run(bundle, tmp_path / "run", steps=2, seed=3, mode="jev", provider=provider, jev_weight=1.0)
+    assert report["jev_prior_mode"] == "hidden"
+    by_lineage = report["jev_prior_divergence"]["by_lineage"]
+    assert set(by_lineage) <= {"malignant", "T_CD8", "myeloid", "neuron"} and by_lineage
+    assert all(0 < v["mean"] <= 1 for v in by_lineage.values())
+    config = json.loads((tmp_path / "run" / "config.json").read_text())
+    assert config["jev_prior_mode"] == "hidden" and config["provider_prompt_version"].endswith("hidden-prior")
+    first = json.loads((tmp_path / "run" / "decisions.jsonl").read_text().splitlines()[0])
+    assert "jev_prior_js_bits" in first

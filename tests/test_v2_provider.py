@@ -149,3 +149,35 @@ def test_invalid_provider_answer_fails_closed(fault):
         answer["confidence"] = True
     with pytest.raises(ProviderError):
         validate_response(raw, body)
+
+
+def test_hidden_prior_mode_omits_prior_and_keeps_its_own_journal(tmp_path):
+    shown = payload(rows(1), context(), MODEL, "shown")
+    hidden = payload(rows(1), context(), MODEL, "hidden")
+    assert "guidebook_prior" in shown["questions"]["q0"]["instructions"]
+    assert "guidebook_prior" not in hidden["questions"]["q0"]["instructions"]
+    assert hidden["state"]["prompt_version"] != shown["state"]["prompt_version"]
+    assert "pooled" not in hidden["state"]["semantics"]
+    with pytest.raises(ValueError):
+        payload(rows(1), context(), MODEL, "anchored")
+    sent = []
+    p = JevProvider("FAKE_KEY", tmp_path / "a", {"run": 1}, model=MODEL, max_attempts=4,
+                    transport=lambda body: sent.append(body) or response(body), prior_mode="hidden")
+    p.choose(rows(2), context())
+    assert all("guidebook_prior" not in q["instructions"] for q in sent[0]["questions"].values())
+    # The same journal directory cannot be reused by the other prompt mode.
+    with pytest.raises(ProviderError):
+        JevProvider("FAKE_KEY", tmp_path / "a", {"run": 1}, model=MODEL, max_attempts=4,
+                    transport=response, prior_mode="shown")
+
+
+def test_cost_estimate_reports_budget_coverage_before_any_call():
+    from virtualtissue_xenium.v2.provider import estimate_cost
+    many = rows(50)
+    estimate = estimate_cost(many, context(), model=MODEL, steps=12, max_questions=20, max_http_attempts=10)
+    assert estimate["http_calls_per_round"] == 3 and estimate["http_calls_total"] == 36
+    assert estimate["steps_covered_by_budget"] == 3 and estimate["budget_sufficient"] is False
+    assert estimate["input_tokens_total_estimate"] > 0
+    assert estimate_cost(many, context(), steps=12, max_http_attempts=36)["budget_sufficient"] is True
+    hidden = estimate_cost(many, context(), steps=12, prior_mode="hidden")
+    assert hidden["bytes_per_round"] < estimate["bytes_per_round"]

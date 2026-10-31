@@ -158,6 +158,15 @@ def distribution(prior, answer=None, jev_weight=.5):
     return {a: w/total for a, w in weights.items()}
 
 
+def js_divergence(p, q):
+    """Jensen-Shannon divergence in bits between two distributions on the same menu."""
+    keys = sorted(set(p) | set(q))
+    m = {a: (p.get(a, 0.0) + q.get(a, 0.0)) / 2 for a in keys}
+    def kl(x):
+        return sum(x.get(a, 0.0) * math.log2(x.get(a, 0.0) / m[a]) for a in keys if x.get(a, 0.0) > 0 and m[a] > 0)
+    return (kl(p) + kl(q)) / 2
+
+
 def draw(probabilities, rng):
     u, cumulative = rng.random(), 0.0
     for action, p in sorted(probabilities.items()):
@@ -238,12 +247,12 @@ def commit(cells, proposals, *, max_population, seed, step):
     return next_cells, events
 
 
-def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21):
+def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21, prior_mode="shown"):
     validate_prepared(bundle)
     cells = initialize(bundle)
     rows, graph = decision_rows(cells, bundle["guidebook"], bundle["context"], seed=seed, step=0)
     active_rows = [r for r in rows if len(r["actions"]) > 1]
-    groups = batches(active_rows, bundle["context"], model, max_questions)
+    groups = batches(active_rows, bundle["context"], model, max_questions, prior_mode=prior_mode)
     return dict(schema_version="2.0", cells=len(cells), by_lineage=dict(Counter(c["lineage"] for c in cells.values())),
         initial_questions=len(active_rows), initial_http_batches=len(groups),
         isolated_cells=sum(not ns for ns in graph.values()), interaction_mode=bundle["context"].get("interaction_mode"),
@@ -286,6 +295,7 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
         mode=mode, jev_weight=jev_weight, max_population=max_population,
         model=provider.model if provider else None,
         provider_name=getattr(provider, "name", None), provider_prompt_version=getattr(provider, "prompt_version", None),
+        jev_prior_mode=getattr(provider, "prior_mode", None),
         max_questions=getattr(provider, "max_questions", None),
         probability_semantics="guidebook prior (local) or normalized prior^(1-alpha)*Jev^alpha; seeded categorical sample",
         kernel="vtx-discrete-context-2.0", assumptions=dict(signal_retention_per_step=.5, signal_increment=1.0,
@@ -310,7 +320,7 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
     write_json(directory / "guidebook.json", bundle["guidebook"])
     cells = initialize(bundle)
     frames = [dict(step=0, time_hours=0, cells=deepcopy(cells), events=[])]
-    decisions, stop, error = [], "completed", None
+    decisions, stop, error, divergences = [], "completed", None, {}
     for step in range(steps):
         rows, graph = decision_rows(cells, bundle["guidebook"], bundle["context"], seed=seed, step=step)
         if not rows:
@@ -330,10 +340,14 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
             answer = answers.get(cid)
             probabilities = distribution(row["prior"], answer, jev_weight)
             action = draw(probabilities, seeded_rng(seed, "decision", step, cid))
+            divergence = js_divergence(row["prior"], answer["probabilities"]) if answer else None
+            if divergence is not None:
+                divergences.setdefault(row["observation"]["lineage"], []).append(divergence)
             proposals.append(dict(cell_id=cid, action=action, targets=row["targets"], corpses=row["corpses"],
                                   target_rule=row["target_rule"]))
             decisions.append(dict(step=step, time_hours=step*bundle["context"]["time_step_hours"], cell_id=cid,
                 action=action, prior=row["prior"], jev=answer, applied_probabilities=probabilities,
+                jev_prior_js_bits=divergence,
                 observation=row["observation"], excluded=row["excluded"],
                 provenance="local_guidebook" if mode == "local" else ("jev_pooled_preferences" if answer else "single_permitted_action")))
         cells, events = commit(cells, proposals, max_population=max_population, seed=seed, step=step)
@@ -347,8 +361,13 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
         events=dict(Counter(e["kind"] for f in frames for e in f["events"])),
         bundle_fingerprint=bundle["fingerprint"], config_hash=identity,
         usage=provider.usage() if provider else dict(http_attempts=0),
+        jev_prior_mode=getattr(provider, "prior_mode", None),
+        jev_prior_divergence=dict(unit="Jensen-Shannon divergence, bits, Jev vs gated guidebook prior",
+            by_lineage={lineage: dict(n=len(v), mean=sum(v)/len(v), max=max(v)) for lineage, v in sorted(divergences.items())},
+            interpretation="Near zero with prior shown and larger with prior hidden indicates anchoring; compare against replicate variance."),
         biological_validation="not established", preflight=preflight(bundle, seed=seed,
-            model=getattr(provider, "model", "jev-1.14.0"), max_questions=getattr(provider, "max_questions", 20)))
+            model=getattr(provider, "model", "jev-1.14.0"), max_questions=getattr(provider, "max_questions", 20),
+            prior_mode=getattr(provider, "prior_mode", "shown")))
     write_json(directory / "frames.json", frames)
     with (directory / "decisions.jsonl").open("w", encoding="utf8") as f:
         for d in decisions:
