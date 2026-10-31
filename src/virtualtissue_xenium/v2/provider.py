@@ -47,7 +47,7 @@ def payload(rows, context, model, prior_mode="shown"):
     expand the action menu."""
     version = prompt_version(prior_mode)
     prompt_context = {k: context[k] for k in ("tissue", "organism", "disease", "assay", "sampling",
-        "perturbations", "recognition", "time_step_hours", "interaction_mode", "neighbor_radius_um", "max_neighbors") if k in context}
+        "perturbations", "recognition", "time_step_hours", "kinetics", "interaction_mode", "neighbor_radius_um", "max_neighbors") if k in context}
     pooling = ("Your preferences will be pooled with the provided prior as a reinforcing heuristic, not independent evidence. "
                if prior_mode == "shown" else
                "No prior is shown; your preferences are recorded as given and compared with an independent heuristic prior. ")

@@ -17,7 +17,7 @@ Version **2.0.0a1** is a working research preview. Each cell has an expression-i
 | Try a small example without an API key | [Synthetic quick start below](#first-run-no-dataset-or-api-key-needed) |
 | Prefer a notebook | [V2 workflow notebook](notebooks/V2_Context_Guidebook_Workflow.ipynb) · [Open in Colab](https://colab.research.google.com/github/hylixinsights/VirtualTissue-Xenium/blob/main/notebooks/V2_Context_Guidebook_Workflow.ipynb) |
 
-The guidebook currently uses **transparent heuristic preferences**, rather than probabilities learned from observed cell fates. Jev scores are also not calibrated cell-fate probabilities. Expression stays fixed at baseline; the simulator evolves discrete cell states, population and abstract local signals. Anti-PD1 exposure does not guarantee killing; a chronic diagnosis does not establish exhaustion. Those hypotheses need independent perturbation data.
+The guidebook currently uses **transparent heuristic hazards** (`src/virtualtissue_xenium/v2/kinetics_v3.json`, draft anchors to verify), rather than probabilities learned from observed cell fates. Jev scores are also not calibrated cell-fate probabilities. Expression stays fixed at baseline; the simulator evolves discrete cell states, population and abstract local signals. Anti-PD1 exposure does not guarantee killing; a chronic diagnosis does not establish exhaustion. Those hypotheses need independent perturbation data.
 
 ## What v2 implements
 
@@ -28,6 +28,7 @@ The guidebook currently uses **transparent heuristic preferences**, rather than 
 | Context | Organism, tissue, disease, assay, enrichment/subsampling, missing populations, perturbation assumptions, recognition and timestep |
 | Guidebook | Panel-aware signature evidence, per-cell action weights, per-type summaries, explicit contextual modifiers and provenance |
 | Cell decisions | Reproducible sampling from guidebook preferences, optionally pooled with Jev preferences; local gates apply first |
+| Kinetics | `hazard_per_hour`: packaged per-hour hazards with cited anchors (draft, uncalibrated) converted per step as competing risks, so `time_step_hours` changes the trajectory and too coarse a step is refused; `legacy_per_decision` reproduces v2.0.0a1 |
 | Interactions | Centroid-radius neighborhoods or explicitly assumed well-mixed neighborhoods; activation, exhaustion/recovery, abstract secretion, killing, clearance and division |
 | Parallel execution | Concurrent bounded Jev requests; all questions use the same pre-update snapshot; deterministic conflict handling |
 | Audit | Durable request intents/results, no automatic retry of unknown attempts, budgets, configuration-bound cache, last-committed-state snapshot, run lock, decision logs and offline replay |
@@ -49,17 +50,17 @@ pip install -e '.[test]'
 vtx2 prepare examples/v2/synthetic_cells.json \
   examples/v2/context_melanoma_control.json outputs/v2/control.json
 vtx2 inspect outputs/v2/control.json
-vtx2 run outputs/v2/control.json outputs/v2/control --steps 12 --seed 21
+vtx2 run outputs/v2/control.json outputs/v2/control --steps 48 --seed 21
 ```
 
-Open `outputs/v2/control/replay.html`. This 24-cell example is **synthetic software-test data**.
+Open `outputs/v2/control/replay.html`. This 24-cell example is **synthetic software-test data**. The example contexts use `kinetics.mode: hazard_per_hour` with 0.5 h steps, so 48 steps are one simulated day; `vtx2 inspect` prints the implied doubling time per lineage and the largest time step the declared hazards allow.
 
 Run an assumed treatment arm with the same seed:
 
 ```bash
 vtx2 prepare examples/v2/synthetic_cells.json \
   examples/v2/context_melanoma_anti_pd1.json outputs/v2/anti_pd1.json
-vtx2 run outputs/v2/anti_pd1.json outputs/v2/anti_pd1 --steps 12 --seed 21
+vtx2 run outputs/v2/anti_pd1.json outputs/v2/anti_pd1 --steps 48 --seed 21
 vtx2 compare outputs/v2/control outputs/v2/anti_pd1
 ```
 
@@ -138,7 +139,7 @@ Null-model controls are one command away and `vtx2 compare` matches them to thei
 ```bash
 vtx2 control outputs/v2/control.json outputs/v2/control_shuffled.json \
   --kind shuffle_expression_within_type --seed 1
-vtx2 run outputs/v2/control_shuffled.json outputs/v2/control_shuffled --steps 12 --seed 21
+vtx2 run outputs/v2/control_shuffled.json outputs/v2/control_shuffled --steps 48 --seed 21
 vtx2 compare outputs/v2/control outputs/v2/control_shuffled
 vtx2 control outputs/v2/control.json --kind list
 ```

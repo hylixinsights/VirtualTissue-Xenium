@@ -8,6 +8,8 @@ from __future__ import annotations
 from copy import deepcopy
 import math
 
+KINETICS_MODES = ("legacy_per_decision", "hazard_per_hour")
+
 LINEAGES = (
     "T_CD8", "T_CD4", "B", "myeloid", "fibroblast", "endothelial",
     "epithelial", "malignant", "neuron", "astrocyte", "oligodendrocyte",
@@ -64,6 +66,13 @@ def _finite_json(value, field="context"):
 def validate_context(context: dict) -> dict:
     """Return an independent normalized declaration, or fail before an API call.
 
+    Optional ``kinetics`` selects how action weights are interpreted:
+    ``legacy_per_decision`` (v2 default: weights are preferences per decision,
+    independent of ``time_step_hours``) or ``hazard_per_hour`` (weights are
+    hazards in events per hour; the kernel converts them with
+    ``p = 1 - exp(-k * dt)`` and refuses a step whose summed probability
+    exceeds ``max_step_probability``, default 0.25).
+
     Optional ``action_priors`` overrides assumed action weights by lineage.
     Optional ``context_modifiers`` are explicit, auditable multiplicative
     assumptions, with optional exact-match ``when`` clauses. They are never
@@ -112,6 +121,18 @@ def validate_context(context: dict) -> dict:
     if type(c.get("recognition")) is not bool:
         raise ValueError("recognition must explicitly be true or false; it is an assumption.")
     c["time_step_hours"] = _number(c.get("time_step_hours"), "time_step_hours", positive=True)
+    kinetics = c.setdefault("kinetics", {"mode": "legacy_per_decision"})
+    if not isinstance(kinetics, dict) or kinetics.get("mode") not in KINETICS_MODES:
+        raise ValueError(f"kinetics.mode must be one of {KINETICS_MODES}.")
+    if set(kinetics) - {"mode", "max_step_probability"}:
+        raise ValueError("kinetics accepts only mode and max_step_probability.")
+    if kinetics["mode"] == "hazard_per_hour":
+        kinetics["max_step_probability"] = _number(kinetics.get("max_step_probability", 0.25),
+                                                   "kinetics.max_step_probability", positive=True)
+        if kinetics["max_step_probability"] > 1:
+            raise ValueError("kinetics.max_step_probability must be at most 1.")
+    elif "max_step_probability" in kinetics:
+        raise ValueError("kinetics.max_step_probability applies only to hazard_per_hour.")
     c.setdefault("interaction_mode", "spatial" if c["assay"] == "xenium" else "well_mixed")
     if c["interaction_mode"] not in ("spatial", "well_mixed"):
         raise ValueError("interaction_mode must be spatial or well_mixed.")

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import random
 
+from .guidebook import KineticsStepError, competing_risk_probabilities
 from .inputs import digest, validate_prepared, write_json
 from .provider import BudgetExhausted, ProviderError, batches
 
@@ -82,6 +83,8 @@ def initialize(bundle):
 def decision_rows(cells, guidebook, context, *, seed, step):
     graph = interaction_graph(cells, context, seed=seed, step=step)
     spatial = context.get("interaction_mode", "spatial" if context["assay"] == "xenium" else "well_mixed") == "spatial"
+    kinetics = context.get("kinetics", {"mode": "legacy_per_decision"})
+    hazard_mode, dt = kinetics["mode"] == "hazard_per_hour", context["time_step_hours"]
     rows = []
     for cid in sorted(cells):
         cell = cells[cid]
@@ -121,15 +124,24 @@ def decision_rows(cells, guidebook, context, *, seed, step):
                 excluded[action] = reason
             else:
                 actions[action] = spec["description"]
-                prior[action] = spec["weight"]
                 # A declared toy communication rule; no cytokine concentration or
                 # inferred receptor specificity is implied by this abstract signal.
-                if action == "ACTIVATE":
-                    prior[action] *= 1 + incoming_signal
+                multiplier = 1 + incoming_signal if action == "ACTIVATE" else 1.0
+                if hazard_mode and action != "REST":
+                    prior[action] = spec["hazard_per_hour"] * multiplier  # hazard, converted below
+                else:
+                    prior[action] = spec["weight"] * multiplier
         if not actions or "REST" not in actions:
             raise ValueError("Every living cell must have a positive REST prior.")
-        total = sum(prior.values())
-        prior = {a: v/total for a, v in prior.items()}
+        if hazard_mode:
+            # An unavailable action's hazard is zero; its share returns to REST rather
+            # than being redistributed among the remaining actions.
+            hazards = {a: k for a, k in prior.items() if a != "REST"}
+            prior, _ = competing_risk_probabilities(hazards, dt, kinetics["max_step_probability"],
+                                                    where=f"Cell {cid!r} at step {step}")
+        else:
+            total = sum(prior.values())
+            prior = {a: v/total for a, v in prior.items()}
         observation = dict(cell_id=cid, cell_type=cell["cell_type"], lineage=cell["lineage"],
             step=step, time_hours=step*context["time_step_hours"],
             state={k: cell[k] for k in ("activated", "exhausted", "signal", "generation")},
@@ -247,6 +259,56 @@ def commit(cells, proposals, *, max_population, seed, step):
     return next_cells, events
 
 
+def kinetics_summary(bundle, rows):
+    """Implied event rates at t0 so the user can judge the time scale before running.
+
+    In hazard mode the per-lineage mean hazard and the implied population
+    doubling time (ln 2 / mean PROLIFERATE hazard, ignoring death) are reported
+    in hours. In legacy mode only per-step probabilities exist, and the
+    doubling time is per step, not per hour.
+    """
+    context = bundle["context"]
+    mode, dt = context["kinetics"]["mode"], context["time_step_hours"]
+    guidebook = bundle["guidebook"]["cells"]
+    per_lineage = {}
+    for row in rows:
+        lineage = row["observation"]["lineage"]
+        entry = guidebook[row["observation"]["cell_id"]]
+        acc = per_lineage.setdefault(lineage, dict(n=0, hazard_sum={}, probability_sum={}))
+        acc["n"] += 1
+        for action, spec in entry["actions"].items():
+            if action == "REST":
+                continue
+            acc["probability_sum"][action] = acc["probability_sum"].get(action, 0.0) + spec["probability"]
+            if mode == "hazard_per_hour":
+                acc["hazard_sum"][action] = acc["hazard_sum"].get(action, 0.0) + spec["hazard_per_hour"]
+    out = {}
+    for lineage, acc in sorted(per_lineage.items()):
+        n = acc["n"]
+        item = dict(cells=n, mean_step_probability={a: v / n for a, v in sorted(acc["probability_sum"].items())})
+        if mode == "hazard_per_hour":
+            item["mean_hazard_per_hour"] = {a: v / n for a, v in sorted(acc["hazard_sum"].items())}
+            k = item["mean_hazard_per_hour"].get("PROLIFERATE", 0.0)
+            item["implied_doubling_hours_ignoring_death"] = (math.log(2) / k) if k > 0 else None
+        else:
+            p = item["mean_step_probability"].get("PROLIFERATE", 0.0)
+            item["implied_doubling_steps_ignoring_death"] = (math.log(2) / math.log1p(p)) if p > 0 else None
+        out[lineage] = item
+    max_event_probability = max((1 - r["prior"]["REST"] for r in rows), default=0.0)
+    max_burden = -math.log(1 - max_event_probability) if max_event_probability < 1 else float("inf")
+    provenance = bundle["guidebook"]["provenance"]
+    return dict(mode=mode, time_step_hours=dt, by_lineage=out, max_cell_event_probability_t0=max_event_probability,
+                max_cell_step_burden_t0=max_burden,
+                max_step_probability=context["kinetics"].get("max_step_probability"),
+                gated_worst_case_step_burden=provenance.get("kinetics_worst_case_step_burden"),
+                recommended_max_time_step_hours=provenance.get("kinetics_recommended_max_time_step_hours"),
+                expected_rate_undercount_fraction=(max_burden / 2 if mode == "hazard_per_hour" else None),
+                discretisation="at most one event per cell per step; rates are under-counted by about burden/2",
+                kinetics_review_status=provenance.get("kinetics_review_status"),
+                note=("Hazards are per hour; time_step_hours changes the trajectory." if mode == "hazard_per_hour" else
+                      "Legacy mode: weights are per decision, time_step_hours is a label only."))
+
+
 def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21, prior_mode="shown"):
     validate_prepared(bundle)
     cells = initialize(bundle)
@@ -255,6 +317,7 @@ def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21, prior_mo
     groups = batches(active_rows, bundle["context"], model, max_questions, prior_mode=prior_mode)
     return dict(schema_version="2.0", cells=len(cells), by_lineage=dict(Counter(c["lineage"] for c in cells.values())),
         initial_questions=len(active_rows), initial_http_batches=len(groups),
+        kinetics=kinetics_summary(bundle, rows),
         isolated_cells=sum(not ns for ns in graph.values()), interaction_mode=bundle["context"].get("interaction_mode"),
         limitations=["Preferences are uncalibrated; simulation hours are declared step labels, not fitted biological time.",
                     "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
@@ -298,6 +361,7 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
         jev_prior_mode=getattr(provider, "prior_mode", None),
         max_questions=getattr(provider, "max_questions", None),
         probability_semantics="guidebook prior (local) or normalized prior^(1-alpha)*Jev^alpha; seeded categorical sample",
+        kinetics=bundle["context"]["kinetics"],
         kernel="vtx-discrete-context-2.0", assumptions=dict(signal_retention_per_step=.5, signal_increment=1.0,
             signal_activation_multiplier="1 + mean neighbor signal from previous snapshot",
             kill="one licensed KILL commits one target death per step; target = nearest live malignant neighbor (spatial) or seeded draw (well_mixed)",
@@ -322,17 +386,20 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
     frames = [dict(step=0, time_hours=0, cells=deepcopy(cells), events=[])]
     decisions, stop, error, divergences = [], "completed", None, {}
     for step in range(steps):
-        rows, graph = decision_rows(cells, bundle["guidebook"], bundle["context"], seed=seed, step=step)
-        if not rows:
-            stop = "no_living_cells"
-            break
-        active_rows = [r for r in rows if len(r["actions"]) > 1]
         try:
+            rows, graph = decision_rows(cells, bundle["guidebook"], bundle["context"], seed=seed, step=step)
+            if not rows:
+                stop = "no_living_cells"
+                break
+            active_rows = [r for r in rows if len(r["actions"]) > 1]
             answers = provider.choose(active_rows, bundle["context"]) if mode == "jev" else {}
             if mode == "jev" and set(answers) != {r["cell_id"] for r in active_rows}:
                 raise ProviderError("Provider omitted or added cell answers; no state committed.")
         except (ProviderError, BudgetExhausted) as e:
             stop, error = "provider_stopped_before_round_commit", str(e)
+            break
+        except KineticsStepError as e:
+            stop, error = "kinetics_step_too_coarse", str(e)
             break
         proposals = []
         for row in rows:

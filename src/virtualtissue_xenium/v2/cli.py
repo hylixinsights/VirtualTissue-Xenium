@@ -92,10 +92,11 @@ def compare(paths):
         if ref["guidebook"]["provenance"]["gene_sets_sha256"] != result["guidebook"]["provenance"]["gene_sets_sha256"]:
             raise ValueError("Runs have different gene sets.")
         for key in ("guidebook_version", "assayed_genes", "panel_source", "score_method", "symbol_normalization",
-                    "default_action_weights", "recognition_licensed_kill_weight", "time_semantics"):
-            if ref["guidebook"]["provenance"][key] != result["guidebook"]["provenance"][key]:
+                    "default_action_weights", "recognition_licensed_kill_weight", "time_semantics",
+                    "kinetics_mode", "kinetics_sha256"):
+            if ref["guidebook"]["provenance"].get(key) != result["guidebook"]["provenance"].get(key):
                 raise ValueError(f"Unmatched guidebook scoring assumption: {key}")
-        for key in ("time_step_hours", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease"):
+        for key in ("time_step_hours", "kinetics", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease"):
             if key == "interaction_mode" and control.get("kind") == "well_mixed_equivalent":
                 continue
             if ref["guidebook"]["context"][key] != result["guidebook"]["context"][key]:

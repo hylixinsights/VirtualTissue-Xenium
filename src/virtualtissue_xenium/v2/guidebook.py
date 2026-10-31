@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
+from functools import lru_cache
 import hashlib
 import json
 import math
+from pathlib import Path
 
 from .context import ACTIONS, LINEAGES, modifier_matches, validate_context
 
@@ -50,6 +52,49 @@ BASE_WEIGHTS = {
     "astrocyte": {"REST": 1.0, "PROLIFERATE": .005, "ACTIVATE": .06, "SECRETE": .04, "APOPTOSIS": .005},
     "oligodendrocyte": {"REST": 1.0, "APOPTOSIS": .005},
 }
+KINETICS_PATH = Path(__file__).with_name("kinetics_v3.json")
+
+
+@lru_cache(maxsize=1)
+def load_kinetics():
+    """Packaged per-hour hazards with their anchors; see kinetics_v3.json review_status."""
+    table = json.loads(KINETICS_PATH.read_text(encoding="utf-8"))
+    hazards = {lineage: {action: float(row["hazard_per_hour"]) for action, row in rows.items()}
+               for lineage, rows in table["hazards"].items()}
+    for lineage, rows in hazards.items():
+        # The hazard table licenses exactly the legacy action sets; validate_prepared relies on this.
+        expected = set(BASE_WEIGHTS[lineage]) - {"REST"} | ({"KILL"} if lineage == "T_CD8" else set())
+        if set(rows) != expected or any(not math.isfinite(k) or k < 0 for k in rows.values()):
+            raise ValueError(f"kinetics_v3.json rows for {lineage} do not match the licensed action set.")
+    return table, hazards
+
+
+GATED_ACTIONS = ("KILL", "CLEAR_CORPSE")
+
+
+class KineticsStepError(ValueError):
+    """The declared time step is too coarse for the summed hazards of a cell."""
+
+
+def competing_risk_probabilities(hazards, dt, max_burden, *, where):
+    """First-event discretisation of competing Poisson processes.
+
+    ``burden`` = sum(k) * dt. P(any event in dt) = 1 - exp(-burden); each action
+    takes its share k_a / sum(k); REST = exp(-burden). At most one event per
+    cell per step, so rates are under-counted by about burden / 2; the guard
+    keeps that below max_burden / 2.
+    """
+    total = sum(hazards.values())
+    burden = total * dt
+    if burden > max_burden:
+        raise KineticsStepError(f"{where}: summed hazard x time step = {burden:.3f} exceeds kinetics.max_step_probability "
+                                f"{max_burden}; use time_step_hours <= {max_burden / total:.3f} or lower the hazards.")
+    p_any = 1 - math.exp(-burden)
+    probabilities = {a: p_any * k / total for a, k in hazards.items()} if total > 0 else {a: 0.0 for a in hazards}
+    probabilities["REST"] = math.exp(-burden)
+    return probabilities, burden
+
+
 ACTION_SIGNATURE = {
     "PROLIFERATE": "cell_cycle", "ACTIVATE": "activation", "EXHAUST": "exhaustion_associated",
     "APOPTOSIS": "apoptosis_associated", "SECRETE": "inflammation", "KILL": "cytotoxic",
@@ -151,44 +196,70 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         raise ValueError("Declare assayed_genes when the expression matrix has no features.")
     if explicit_panel and observed - panel:
         raise ValueError("Expression contains genes outside context.assayed_genes.")
-    records, grouped = {}, defaultdict(list)
+    hazard_mode = c["kinetics"]["mode"] == "hazard_per_hour"
+    dt = c["time_step_hours"]
+    kinetics_table, hazards = load_kinetics() if hazard_mode else (None, None)
+    records, grouped, worst_case_burden = {}, defaultdict(list), 0.0
     for cell in sorted(checked, key=lambda x: x["cell_id"]):
         lineage = cell["lineage"]
         evidence = _rank_evidence(cell["expression"], panel, signatures)
-        weights = deepcopy(BASE_WEIGHTS[lineage])
-        if lineage == "T_CD8" and c["recognition"]:
-            weights["KILL"] = .1
+        if hazard_mode:
+            weights = dict(hazards[lineage])
+            if not (lineage == "T_CD8" and c["recognition"]):
+                weights.pop("KILL", None)
+            weights["REST"] = None  # residual; computed after conversion
+        else:
+            weights = deepcopy(BASE_WEIGHTS[lineage])
+            if lineage == "T_CD8" and c["recognition"]:
+                weights["KILL"] = .1
         # Overrides cannot create a lineage-incompatible action. This prevents
         # a typo or context modifier from making mature neurons divide.
         overrides = c["action_priors"].get(lineage, {})
-        if set(overrides) - set(weights):
-            raise ValueError(f"Action override is incompatible with lineage {lineage} or recognition licensing.")
+        if set(overrides) - set(weights) or (hazard_mode and "REST" in overrides):
+            raise ValueError(f"Action override is incompatible with lineage {lineage}, recognition licensing, or hazard mode (REST is residual).")
         weights.update(overrides)
         prior_weights = dict(weights)
         audit = []
         for action, weight in list(weights.items()):
             signature = ACTION_SIGNATURE.get(action)
             score = evidence.get(signature, {}).get("score")
-            if score is not None:
+            if score is not None and weight is not None:
                 multiplier = 1 + score
                 weights[action] = weight * multiplier
                 audit.append({"action": action, "source": "expression_rank_heuristic", "signature": signature,
                               "multiplier": multiplier, "assumption": "weight *= 1 + score; uncalibrated"})
         for index, rule in enumerate(c["context_modifiers"]):
-            applies = lineage in rule["lineages"] and modifier_matches(rule, c)
-            if applies and rule["action"] in weights:
+            applies = lineage in rule["lineages"] and modifier_matches(rule, c) and weights.get(rule["action"]) is not None
+            if applies:
                 weights[rule["action"]] *= rule["multiplier"]
-            audit.append({"source": "declared_context_modifier", "rule_index": index,
-                          "applied": applies and rule["action"] in weights,
+            audit.append({"source": "declared_context_modifier", "rule_index": index, "applied": applies,
                           "action": rule["action"], "multiplier": rule["multiplier"], "reason": rule["reason"]})
-        if any(not math.isfinite(w) for w in weights.values()):
+        if any(w is not None and not math.isfinite(w) for w in weights.values()):
             raise ValueError("Action weights overflowed; reduce prior or modifier magnitudes.")
-        total = sum(weights.values())
-        if not math.isfinite(total) or total <= 0 or weights["REST"] <= 0:
-            raise ValueError("Finite action weights and a positive REST fallback are required.")
-        actions = {a: {"weight": w, "prior_weight": prior_weights[a], "probability": w / total, "description": DESCRIPTIONS[a],
-                       "provenance": "uncalibrated_assumed_preference_per_decision"}
-                   for a, w in sorted(weights.items()) if w > 0}
+        if hazard_mode:
+            limit = c["kinetics"]["max_step_probability"]
+            hazard_rows = {a: k for a, k in weights.items() if a != "REST"}
+            # Gated actions (KILL, CLEAR_CORPSE) only enter the menu with a local target, so
+            # the build-time guard covers the always-available actions; the kernel guards the
+            # actual gated menu every step and preflight reports the gated worst case.
+            ungated = {a: k for a, k in hazard_rows.items() if a not in GATED_ACTIONS}
+            competing_risk_probabilities(ungated, dt, limit, where=f"Cell {cell['cell_id']!r} (ungated actions)")
+            probabilities, burden = competing_risk_probabilities(hazard_rows, dt, float("inf"), where="")
+            worst_case_burden = max(worst_case_burden, burden)
+            actions = {a: {"weight": p, "probability": p, "step_probability": p,
+                           "hazard_per_hour": weights[a] if a != "REST" else None,
+                           "prior_hazard_per_hour": prior_weights[a] if a != "REST" else None,
+                           "prior_weight": prior_weights[a] if a != "REST" else None,
+                           "description": DESCRIPTIONS[a],
+                           "provenance": "competing_risk_first_event: p_a = (1-exp(-sum(k)*dt)) * k_a/sum(k); REST = exp(-sum(k)*dt); uncalibrated anchors"}
+                       for a, p in sorted(probabilities.items()) if p > 0}
+        else:
+            total = sum(weights.values())
+            if not math.isfinite(total) or total <= 0 or weights["REST"] <= 0:
+                raise ValueError("Finite action weights and a positive REST fallback are required.")
+            actions = {a: {"weight": w, "prior_weight": prior_weights[a], "probability": w / total, "description": DESCRIPTIONS[a],
+                           "provenance": "uncalibrated_assumed_preference_per_decision"}
+                       for a, w in sorted(weights.items()) if w > 0}
         expression_total = sum(cell["expression"].values())
         if not math.isfinite(expression_total):
             raise ValueError("Expression total overflowed; supply finite counts within numeric range.")
@@ -219,13 +290,24 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             "guidebook_version": "v2-guidebook-1", "context_sha256": _digest(c),
             "default_action_weights": deepcopy(BASE_WEIGHTS),
             "recognition_licensed_kill_weight": .1,
+            "kinetics_mode": c["kinetics"]["mode"],
+            "kinetics_version": kinetics_table["kinetics_version"] if hazard_mode else None,
+            "kinetics_sha256": _digest(kinetics_table) if hazard_mode else None,
+            "default_hazards_per_hour": deepcopy(hazards) if hazard_mode else None,
+            "kinetics_review_status": kinetics_table["review_status"] if hazard_mode else None,
+            "kinetics_worst_case_step_burden": worst_case_burden if hazard_mode else None,
+            "kinetics_recommended_max_time_step_hours": (
+                c["kinetics"]["max_step_probability"] * dt / worst_case_burden if hazard_mode and worst_case_burden > 0 else None),
             "input_sha256": _digest(checked), "gene_sets_sha256": _digest(signatures),
             "gene_sets": signatures, "assayed_genes": sorted(panel),
             "panel_source": "context.assayed_genes" if explicit_panel else "input_feature_union_incomplete_if_sparse",
             "score_method": "mean_positive_expression_rank_with_undetected_assayed_genes_zero; minimum_overlap=3",
             "symbol_normalization": "uppercase; no orthology inference",
             "probability_semantics": "Uncalibrated heuristic action preferences conditional on the offered menu; not learned fate probabilities or rates.",
-            "time_semantics": "One preference distribution per decision; changing the decision interval changes the model and requires calibration.",
+            "time_semantics": ("Per-hour hazards; first-event competing-risk discretisation per step (at most one event per cell per step); "
+                               "rates are under-counted by about sum(k)*dt/2, bounded by kinetics.max_step_probability."
+                               if hazard_mode else
+                               "One preference distribution per decision; changing the decision interval changes the model and requires calibration."),
             "limitations": [
                 "Expression is fixed baseline evidence; dynamic states are simulated, not remeasured.",
                 "Exhaustion-associated and apoptosis-associated transcripts do not establish functional exhaustion or impending death.",

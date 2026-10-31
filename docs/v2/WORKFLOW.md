@@ -38,7 +38,7 @@ From the repository root, after installation:
 # First understand the complete software path using synthetic data.
 vtx2 prepare examples/v2/synthetic_cells.json examples/v2/context_melanoma_control.json outputs/v2/control.json
 vtx2 inspect outputs/v2/control.json
-vtx2 run outputs/v2/control.json outputs/v2/control --steps 12 --seed 21
+vtx2 run outputs/v2/control.json outputs/v2/control --steps 48 --seed 21   # 0.5 h steps, one day
 
 # Then prepare a bounded, annotated real object. Adapt annotation names/layer.
 vtx2 prepare annotated_region.h5ad context.json outputs/v2/real.json \
