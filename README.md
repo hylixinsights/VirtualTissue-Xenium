@@ -6,7 +6,7 @@ VirtualTissue-Xenium is part of Helder Nakaya's [Virtual Tissue initiative](http
 
 Version **2.0.0a1** is a working research preview. Each cell has an expression-informed guidebook, lineage-compatible actions and simulated states. Jev evaluates permitted actions; a seeded sampler chooses actions; the kernel commits a complete round from a shared snapshot. Disease, treatment, mutation, tissue and sampling context are explicit inputs.
 
-**Start with the [ordered workflow and task plan](docs/v2/WORKFLOW.md).** The [v0.1.3 code review](docs/v2/CODE_REVIEW_V0_1_3.md) explains the changes. The [validation plan](docs/v2/VALIDATION_PLAN.md) separates software checks from biological validation.
+**v3 work in progress:** see [docs/v3/HANDOFF.md](docs/v3/HANDOFF.md) for status, next steps and open decisions. **Start with the [ordered workflow and task plan](docs/v2/WORKFLOW.md).** The [v0.1.3 code review](docs/v2/CODE_REVIEW_V0_1_3.md) explains the changes. The [validation plan](docs/v2/VALIDATION_PLAN.md) separates software checks from biological validation.
 
 **V2 is the default workflow on `main`.** New users can follow the [step-by-step guide for their own data](docs/v2/YOUR_DATA.md), including annotation requirements, a complete context example, preparation, simulation and results. No development branch selection is needed.
 
