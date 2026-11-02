@@ -40,7 +40,7 @@ Status as of 2026-10-31. Read this file first in any new session; it is the sing
 | ID | Task | Status | Commit / note |
 | --- | --- | --- | --- |
 | A-1 | Hazard → per-step probability (competing risks) | Done | `7da734d` |
-| A-2 | Literature-anchored hazard table | **Draft — needs your review** | `kinetics_v3.json`: verify each `anchors.*.citation`, add DOIs; `assumed` rows stay in sensitivity |
+| A-2 | Scientific audit of kinetic anchors | **Audit recorded; not validated** | `kinetics_v3.json`: DOIs verified for cited records; every numerical hazard remains `assumed` or a contextual, non-calibrating anchor; see §4a and file limitations |
 | A-3 | Δt invariance test | Done (pytest) | `tests/test_v2_kinetics.py`; CI figure not done |
 | A-4 | Implied doubling time / admissible Δt in inspect | Done | `vtx2 inspect` → `kinetics` |
 | B-1 | β effect size, `exp(β z)` normalised to reference mean | Done | `ff60476` |
@@ -77,7 +77,7 @@ Status as of 2026-10-31. Read this file first in any new session; it is the sing
 Sequential spine (each step needs the previous one):
 
 1. **Review and merge PR #4** after running the full suite on your laptop (section 5).
-2. **Review `kinetics_v3.json`** (A-2): open every `anchors` paper, confirm the number, add a DOI, adjust `confidence`.
+2. **Obtain scientific-owner approval for the kinetics audit** (A-2): confirm model scope and retain/change each assumed value; all numeric hazards remain uncalibrated. Then design context-specific calibration and sensitivity analysis.
 3. **`vtx2 ensemble`**: N seeds × arms → per-readout medians and 95% bootstrap envelopes; readouts from a frozen `analysis/readouts.yaml`. Every figure depends on it.
 4. **Invariance gate** before any Jev spend: A-3 passes (done) and F-8 (`no_modifier_treatment`) is identical to control in local mode.
 5. **Real-data local runs** (G-3), then Jev arms (shown + hidden prior), then figures (plan §13).
@@ -96,7 +96,7 @@ Collision rule: two parallel sessions must not edit the same file. C owns `simul
 ## 4. Decisions waiting on you
 
 1. I-3: rename the legacy engine directory, or keep it and disambiguate in the paper?
-2. A-2: accept, change or replace each hazard; which rows stay `assumed`.
+2. A-2: approve or revise the audited assumptions and their intended tissue/disease scope. The citations are contextual evidence only; no numerical hazard is presented as validated. In particular, decide whether to implement timed activation/exhaustion before assigning state-specific proliferation.
 3. Default β: keep 1.0 globally, or per action (e.g. only PROLIFERATE and ACTIVATE)?
 4. Defaults for real data: `min_reference_cells` 30, `depth_bins` 10, `min_transcripts` (suggest 20 for Xenium 5K).
 5. Venue/framing decided after the controls (plan §13 P-4).
@@ -138,3 +138,17 @@ Notes:
 Paste this into a new Claude conversation (with this repository attached or linked):
 
 > I am continuing the VirtualTissue v3 plan. Repository: https://github.com/hylixinsights/VirtualTissue-Xenium, branch `v3/phase0-hygiene`, draft PR #4. Read `docs/v3/HANDOFF.md` first; it lists what is done (by task ID), what is next, the parallel lanes and the open decisions. The full plan is at https://claude.ai/artifact/JWxubyYoAwN7eajoBdC37g. Do not change the CLI shape, bundle format, replay layout or the hashed legacy engine. Work on: **[lane / task ID]**. Run `pytest tests/test_v2_*.py -q` before committing, update `CHANGELOG.md` and the status table in `docs/v3/HANDOFF.md`, and push to the same branch.
+
+
+## 4a. Scientific kinetics audit (2026-11-02)
+
+The audit in `src/virtualtissue_xenium/v2/kinetics_v3.json` verified DOI metadata for all eight cited records and documents what each experimental design does and does not measure. The reference set is not uniformly primary: Halprin (1972) is a critical review of epidermal transit time, not a primary cell-cycle measurement. All rates remain uncalibrated model assumptions; contextual anchors are explicitly labeled as such.
+
+Key interpretation decisions recorded:
+
+- `T_CD8/KILL = 0.2 h^-1` implies a 5-hour mean waiting time only under the model's constant exponential hazard. Halle et al. (mouse antiviral intravital CTL encounters) and Bréart et al. (adoptive CTLs in a defined mouse tumour) are contextual, not estimates of a universal kill hazard for a graph neighbor. Cognate recognition/contact, encounter and target death are distinct processes.
+- CD8 expansion counts and stimulus-specific cell-cycle measurements do not calibrate the model's generic PROLIFERATE hazard. The proposed activated `0.08 h^-1` remains an unimplemented assumption: timed activation states are not yet implemented, and a measured cycle duration is not a memoryless exponential waiting-time parameter.
+- Ki-67 labeling fraction does not alone identify a division hazard; the prior melanoma conversion added an assumed cycle duration. Epidermal transit time is not basal division time. Endothelial kinetics differ greatly between normal and tumour tissue; a single generic lineage rate is not transferable.
+- Exhaustion evidence is chronic-antigen-dependent and staged in the cited CD8 mouse model; it does not justify a constant generic `0.005 h^-1`, particularly without timed states. Other lineage/action values have no direct supporting measurements in this file and remain assumptions.
+
+Approval gates before calling kinetics validated: (1) select organism, tissue, disease, cell-state and treatment scope for every rate; (2) decide whether hazards represent event initiation, completion, or observed population net growth, and whether contact/recognition are explicit; (3) implement timed activation/exhaustion or remove conditional rates until implemented; (4) provide direct context-matched calibration data and uncertainty intervals, including division vs net growth/death; (5) approve sensitivity ranges and decision thresholds. Passing unit/software tests does not pass these biological gates.
