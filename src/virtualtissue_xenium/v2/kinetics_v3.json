@@ -12,9 +12,9 @@
       "citation": "Halle S et al. In Vivo Killing Capacity of Cytotoxic T Cells Is Limited and Involves Dynamic Interactions and T Cell Cooperativity. Immunity. 2016;44(2):233–245.",
       "doi": "10.1016/j.immuni.2016.01.010",
       "doi_url": "https://doi.org/10.1016/j.immuni.2016.01.010",
-      "summary": "Primary intravital study of antiviral CTL interactions in mouse tissue; reports limited killing capacity and cooperation across repeated encounters. Related in-vivo studies span target-killing times of hours, but these include encounter, recognition and target-death dynamics.",
+      "summary": "Primary intravital study in mouse viral-infection models reports estimated per-capita killing rates of about 2–16 infected cells per CTL per day (PCKR; targets killed per CTL per day). In a distinct analysis, observed target-cell disruption occurred about 20–120 min after first CTL contact in the specified reporter-virus system.",
       "relevance": "Context only for cytotoxicity timescale and dependence on repeated cognate encounters.",
-      "limitation": "Does not estimate a universal 0.2 h^-1 per-CTL hazard for killing any adjacent malignant cell. Tissue, target, antigen, CTL state, encounter rate and the definition of kill differ. A graph neighbor is not proof of contact or antigen recognition."
+      "limitation": "The 2–16/day PCKR is not a 2–16 h interval per target and is not interchangeable with a constant hazard for an always-eligible neighbor. The 20–120 min is conditional on first observed cognate contact in a specific mouse viral-infection model, not the waiting time to encounter or kill in a tumour. Neither estimates a universal 0.2 h^-1 per-CTL hazard. Tissue, target, antigen, CTL state, encounter rate and the definition of kill differ. A graph neighbor is not proof of contact or antigen recognition."
     },
     "ctl_killing_adoptive": {
       "citation": "Bréart B, Lemaître F, Celli S, Bousso P. Two-photon imaging of intratumoral CD8+ T cell cytotoxic activity during adoptive T cell therapy in mice. J Clin Invest. 2008;118(4):1390–1397.",
@@ -111,7 +111,7 @@
         "hazard_per_hour": 0.2,
         "confidence": "contextual_anchor",
         "anchor": "ctl_serial_killing",
-        "note": "Still an assumed per-eligible-cell hazard. 0.2/h implies a 5 h mean waiting time only under a constant exponential hazard, not an observed universal kill interval. Halle and Bréart are context-specific; the model's recognition gate and spatial neighbor are not equivalent to experimentally verified cognate contact."
+        "note": "Still an assumed per-eligible-cell hazard. 0.2/h implies a 5 h mean waiting time only under a constant exponential hazard; if continuously eligible and considered alone, it corresponds mathematically to 4.8 events/day, not an observed universal kill rate. Halle et al.'s 2–16/day PCKR and 20–120 min post-contact target disruption are distinct context-specific measures; neither estimates this generic hazard. Bréart is also context-specific. The model's recognition gate and spatial neighbor are not equivalent to experimentally verified cognate contact."
       }
     },
     "T_CD4": {
