@@ -54,13 +54,13 @@ jobs:
         with:
           node-version: '22'
       - name: Test the fresh-clone entry point
-        run: zsh START_TEST.command --no-open
+        run: zsh START_TEST.command --no-open --output-root "$RUNNER_TEMP/vtx-acceptance"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mac-acceptance
           path: |
-            ../VirtualTissue-Xenium-test-results/RESULT.*
-            ../VirtualTissue-Xenium-test-results/results/*/validation.json
-            ../VirtualTissue-Xenium-test-results/results/*/tests.xml
-            ../VirtualTissue-Xenium-test-results/results/*/logs/
+            ${{ runner.temp }}/vtx-acceptance/RESULT.*
+            ${{ runner.temp }}/vtx-acceptance/results/*/validation.json
+            ${{ runner.temp }}/vtx-acceptance/results/*/tests.xml
+            ${{ runner.temp }}/vtx-acceptance/results/*/logs/
