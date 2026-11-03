@@ -5,6 +5,8 @@ __pycache__/
 build/
 dist/
 .venv/
+.venv-mac/
+.venv-test/
 venv/
 .pytest_cache/
 .ipynb_checkpoints/
@@ -19,6 +21,8 @@ venv/
 # Raw Xenium output, prepared bundles, simulation results and journals can be
 # large, can contain unpublished data, and are reproducible from the notebooks.
 data/
+!src/virtualtissue_xenium/v3/data/
+!src/virtualtissue_xenium/v3/data/**
 raw/
 outputs/
 results/

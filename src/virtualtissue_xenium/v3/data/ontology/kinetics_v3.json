@@ -1,0 +1,2248 @@
+{
+  "kinetics_version": "v3-kinetics-3",
+  "unit": "Baseline menu-action proposal hazard per model-unit hour, before expression/context multipliers, state/target gates and runtime modifiers; not a measured count of committed events.",
+  "step_probability": "K=sum(k_a*m_a); p_a=(1-exp(-K*dt))*k_a*m_a/K; REST=exp(-K*dt); gates applied before conversion",
+  "review_status": "DRAFT — SCIENTIFIC AUDIT RECORDED; NOT VALIDATED. All numerical rates and beta defaults remain assumed; source identity verification is not parameter calibration.",
+  "confidence_levels": {
+    "order_of_magnitude": "Reserved for quantitatively justified bounds with matching event/exposure definitions; no current default row qualifies.",
+    "assumed": "Declared numerical modelling assumption; no direct estimate matching the runtime event and supplied dataset is established, even when related literature exists.",
+    "measured": "Direct estimate for the same dataset and experimental conditions; no default rows currently qualify."
+  },
+  "anchors": {
+    "ctl_serial_killing": {
+      "citation": "Halle S et al. In vivo killing capacity of cytotoxic T cells is limited and involves dynamic interactions and T cell cooperativity. Immunity 2016;44:233-245.",
+      "summary": "Imaging/model estimates span 2-16 infected targets per CTL per day. This is not a conditional menu-action hazard or an NK measurement.",
+      "verify": true,
+      "doi": "10.1016/j.immuni.2016.01.010",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4846978/",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "PMC full text; Summary and Discussion.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Mouse herpesvirus/poxvirus infection; CD8 CTLs",
+      "measured_endpoint": "Virus-infected targets killed per CTL per day, with heterogeneous and cooperative killing.",
+      "checked_source_urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC4846978/"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "ctl_killing_adoptive": {
+      "citation": "Breart B et al. Two-photon imaging of intratumoral CD8+ T cell cytotoxic activity during adoptive T cell therapy in mice. J Clin Invest 2008;118:1390-1397.",
+      "summary": "Approximately one target per six hours of cumulative interaction, not a directly measured unconditional waiting time. No NK calibration.",
+      "verify": true,
+      "doi": "10.1172/JCI34388",
+      "url": "https://www.jci.org/articles/view/34388",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "Publisher full text; Figure 5 and Methods.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Mouse EG7 tumour; activated OT-I CD8 adoptive transfer",
+      "measured_endpoint": "Tumour apoptosis events divided by cumulative CTL-target interaction time.",
+      "checked_source_urls": [
+        "https://www.jci.org/articles/view/34388"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "cd8_expansion": {
+      "citation": "Murali-Krishna K et al. Counting antigen-specific CD8 T cells: a reevaluation of bystander activation during viral infection. Immunity 1998;8:177-187.",
+      "summary": "Expansion counts do not separately identify individual division, death and migration; the earlier 6-8 h rate description is unsupported here.",
+      "verify": true,
+      "doi": "10.1016/S1074-7613(00)80470-7",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/9491999/",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "PubMed primary-article abstract; publisher full text not accessed.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Mouse acute LCMV infection; antigen-specific CD8 cells",
+      "measured_endpoint": "Tetramer/cytokine-defined population expansion and contraction.",
+      "checked_source_urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/9491999/"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "cd8_cycle_time": {
+      "citation": "Yoon H, Kim TS, Braciale TJ. The cell cycle time of CD8+ T cells responding in vivo is controlled by the type of antigenic stimulus. PLoS One 2010;5:e15423.",
+      "summary": "Initial proliferative cycles can approach 2 h after a much longer activation-to-proliferation delay; stimulus and division history matter. Not an NK rate.",
+      "verify": true,
+      "doi": "10.1371/journal.pone.0015423",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2975678/",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "Publisher full text; Results/Figure 1 and Discussion.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Murine antigen-specific CD8 cells; influenza/vaccinia or vaccination",
+      "measured_endpoint": "CFSE-derived early division timing after proliferation begins.",
+      "checked_source_urls": [
+        "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0015423"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "melanoma_ki67": {
+      "citation": "Gimotty PA et al. Biologic and prognostic significance of dermal Ki67 expression, mitoses, and tumorigenicity in thin invasive cutaneous melanoma. J Clin Oncol 2005;23:8048-8056.",
+      "summary": "A marker/prognosis association does not estimate a per-cell hourly division hazard; no Ki67-to-rate conversion is justified by this anchor alone.",
+      "verify": true,
+      "doi": "10.1200/JCO.2005.02.0735",
+      "url": "https://ascopubs.org/doi/10.1200/JCO.2005.02.0735",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "PubMed indexed primary abstract and publisher bibliographic record; publisher full text unavailable.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Human thin primary cutaneous melanomas",
+      "measured_endpoint": "Ki67/mitotic markers and their association with growth phase/prognosis.",
+      "checked_source_urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/16258103/",
+        "https://ascopubs.org/doi/10.1200/JCO.2005.02.0735"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "exhaustion_timescale": {
+      "citation": "Wherry EJ et al. Viral persistence alters CD8 T-cell immunodominance and tissue distribution and results in distinct stages of functional impairment. J Virol 2003;77:4911-4927.",
+      "summary": "Different functions deteriorate at different times; this does not estimate a single binary EXHAUST waiting-time hazard, recovery cutoff, or CD4/Treg/NK rate.",
+      "verify": true,
+      "doi": "10.1128/JVI.77.8.4911-4927.2003",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC152117/",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "Publisher indexed full-text Results; functional impairment and cytotoxicity sections.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Mouse chronic versus acute LCMV; epitope-specific CD8 cells",
+      "measured_endpoint": "Progressive loss of cytokine and cytolytic functions, including population deletion.",
+      "checked_source_urls": [
+        "https://journals.asm.org/doi/abs/10.1128/jvi.77.8.4911-4927.2003"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "epidermal_turnover": {
+      "citation": "Halprin KM. Epidermal 'turnover time' - a re-examination. Br J Dermatol 1972;86:14-19.",
+      "summary": "The review discusses surface transit/renewal, not a basal-cell division hazard or melanocyte kinetics. The earlier 200-300 h cycle claim remains unsupported.",
+      "verify": true,
+      "doi": "10.1111/j.1365-2133.1972.tb01886.x",
+      "url": "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1365-2133.1972.tb01886.x",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "Publisher abstract and bibliographic record; full text not accessed.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "review",
+      "experimental_system": "Literature on normal and psoriatic epidermal renewal",
+      "measured_endpoint": "Time from cell formation to arrival at the epidermal surface.",
+      "checked_source_urls": [
+        "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1365-2133.1972.tb01886.x"
+      ],
+      "parameter_estimated_from_cited_data": false
+    },
+    "endothelial_turnover": {
+      "citation": "Hobson B, Denekamp J. Endothelial proliferation in tumours and normal tissues: continuous labelling studies. Br J Cancer 1984;49:405-413.",
+      "summary": "Tumour potential doubling spans 2.4-13 days; normal turnover estimates span 47-23000 days. Neither endpoint directly calibrates the default human endothelial hazard.",
+      "verify": true,
+      "doi": "10.1038/bjc.1984.66",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1976759/",
+      "verification": "Source identity and stated endpoint checked 2026-11-02; numerical mapping to this runtime is not validated.",
+      "accessed_material": "PubMed primary abstract and PMC indexed Results; no new fitted rate extraction.",
+      "bibliography_verified": true,
+      "bibliography_checked_on": "2026-11-02",
+      "numerical_rate_verification": "not established for the default model parameter; quantitative calibration remains pending",
+      "study_type": "primary_research",
+      "experimental_system": "Five experimental mouse tumours, placenta and normal tissues",
+      "measured_endpoint": "Continuous thymidine labelling: potential doubling and normal turnover estimates.",
+      "checked_source_urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/6201181/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC1976759/"
+      ],
+      "parameter_estimated_from_cited_data": false
+    }
+  },
+  "hazards": {
+    "unknown": {},
+    "T_CD8": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.004,
+        "confidence": "assumed",
+        "note": "Baseline 0.004/h is allowed only while the CD8 activation gate is open, with expression/context and density modifiers. Timed activation already exists. No default 0.08/h activated-state rate or 20-fold multiplier is implemented.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "cd8_expansion",
+            "cd8_cycle_time"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "exhaustion_does_not_globally_block_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "EXHAUST": {
+        "hazard_per_hour": 0.005,
+        "confidence": "assumed",
+        "anchor": "exhaustion_timescale",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "EXHAUST",
+        "evidence_mapping": {
+          "anchors": [
+            "exhaustion_timescale"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Assumed binary transition restricted to activated, nonexhausted units. The CD8 functional-impairment anchor does not estimate this hazard."
+      },
+      "RECOVER": {
+        "hazard_per_hour": 0.01,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "RECOVER",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "KILL": {
+        "hazard_per_hour": 0.2,
+        "confidence": "assumed",
+        "anchor": "ctl_serial_killing",
+        "note": "Conditional proposal with activated/nonexhausted state, declared recognition and an available target. CTL throughput/contact measurements are not this event definition.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "KILL",
+        "evidence_mapping": {
+          "anchors": [
+            "ctl_serial_killing",
+            "ctl_killing_adoptive"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "T_CD4": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.004,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "exhaustion_does_not_globally_block_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "EXHAUST": {
+        "hazard_per_hour": 0.005,
+        "confidence": "assumed",
+        "anchor": "exhaustion_timescale",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "EXHAUST",
+        "evidence_mapping": {
+          "anchors": [
+            "exhaustion_timescale"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "CD8_evidence_transferred_to_T_CD4",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Assumed binary transition restricted to activated, nonexhausted units. The CD8 functional-impairment anchor does not estimate this hazard or validate transfer to T_CD4."
+      },
+      "RECOVER": {
+        "hazard_per_hour": 0.01,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "RECOVER",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "B": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.003,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.03,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "myeloid": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.08,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "CLEAR_CORPSE": {
+        "hazard_per_hour": 0.3,
+        "confidence": "assumed",
+        "note": "Assumed conditional corpse-removal proposal. No cited engulfment-duration measurement supports this numerical value; competition and target conflicts prevent reading 1/k as an observed clearance time.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "CLEAR_CORPSE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "target_gated_removal_not_measured_engulfment_time"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "microglia": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.08,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "CLEAR_CORPSE": {
+        "hazard_per_hour": 0.3,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "CLEAR_CORPSE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "target_gated_removal_not_measured_engulfment_time"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Assumed conditional corpse-removal proposal. No cited engulfment-duration measurement supports this numerical value; competition and target conflicts prevent reading 1/k as an observed clearance time."
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "fibroblast": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "note": "Provisional division hazard; no lineage-specific quantitative source is mapped. Tissue/state dependence must be explored as an assumption, not treated as measured quiescence.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.04,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "endothelial": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "anchor": "endothelial_turnover",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "endothelial_turnover"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.0005,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "epithelial": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.003,
+        "confidence": "assumed",
+        "anchor": "epidermal_turnover",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "epidermal_turnover"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "review_not_primary_rate_measurement",
+          "epidermal_surface_transit_not_epithelial_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Epidermal renewal review supplies background only; surface transit does not estimate this lineage division hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "malignant": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.006,
+        "confidence": "assumed",
+        "anchor": "melanoma_ki67",
+        "note": "Assumed 0.006/h baseline. ln(2)/k is only an idealised pure-birth algebraic reference; deaths, gates, modifiers and finite steps alter growth. Neither Ki67 nor cell-cycle marker fraction alone identifies this rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "melanoma_ki67"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "marker_association_not_hourly_hazard",
+          "thin_cutaneous_melanoma_not_all_malignant_lineages"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.04,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "neuron": {
+      "ACTIVATE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.0002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "astrocyte": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.03,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.0005,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "oligodendrocyte": {
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.0005,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "NK": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.004,
+        "confidence": "assumed",
+        "note": "Assumed 0.004/h baseline; the current NK proliferation rule does not require activation. Related CD8 papers are not NK measurements. No default 0.08/h activated-state multiplier is implemented.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "cd8_expansion",
+            "cd8_cycle_time"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "CD8_evidence_transferred_to_NK",
+          "exhaustion_does_not_globally_block_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "EXHAUST": {
+        "hazard_per_hour": 0.005,
+        "confidence": "assumed",
+        "anchor": "exhaustion_timescale",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "EXHAUST",
+        "evidence_mapping": {
+          "anchors": [
+            "exhaustion_timescale"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "CD8_evidence_transferred_to_NK",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Assumed binary transition restricted to activated, nonexhausted units. The CD8 functional-impairment anchor does not estimate this hazard or validate transfer to NK."
+      },
+      "RECOVER": {
+        "hazard_per_hour": 0.01,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "RECOVER",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "KILL": {
+        "hazard_per_hour": 0.2,
+        "confidence": "assumed",
+        "anchor": "ctl_serial_killing",
+        "note": "Conditional proposal with activated/nonexhausted state, declared recognition and an available target. CTL throughput/contact measurements are not this event definition; use for NK is an additional lineage extrapolation.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "KILL",
+        "evidence_mapping": {
+          "anchors": [
+            "ctl_serial_killing",
+            "ctl_killing_adoptive"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "CD8_evidence_transferred_to_NK"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "T_reg": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.004,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "exhaustion_does_not_globally_block_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "EXHAUST": {
+        "hazard_per_hour": 0.005,
+        "confidence": "assumed",
+        "anchor": "exhaustion_timescale",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "EXHAUST",
+        "evidence_mapping": {
+          "anchors": [
+            "exhaustion_timescale"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "mouse_experiment_not_universal_human_or_mouse_tissue_rate",
+          "CD8_evidence_transferred_to_T_reg",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Assumed binary transition restricted to activated, nonexhausted units. The CD8 functional-impairment anchor does not estimate this hazard or validate transfer to T_reg."
+      },
+      "RECOVER": {
+        "hazard_per_hour": 0.01,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "RECOVER",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "plasma": {
+      "ACTIVATE": {
+        "hazard_per_hour": 0.03,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "mast": {
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.08,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "pericyte": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "note": "Provisional division hazard; no lineage-specific quantitative source is mapped. Tissue/state dependence must be explored as an assumption, not treated as measured quiescence.",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.04,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.001,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "melanocyte": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.003,
+        "confidence": "assumed",
+        "anchor": "epidermal_turnover",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "epidermal_turnover"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "review_not_primary_rate_measurement",
+          "epidermal_surface_transit_not_melanocyte_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Epidermal renewal review supplies background only; surface transit does not estimate this lineage division hazard. Melanocytes were not a measured cell-cycle population in this cited endpoint."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "keratinocyte": {
+      "PROLIFERATE": {
+        "hazard_per_hour": 0.003,
+        "confidence": "assumed",
+        "anchor": "epidermal_turnover",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "PROLIFERATE",
+        "evidence_mapping": {
+          "anchors": [
+            "epidermal_turnover"
+          ],
+          "support": "related_context_only",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "published_endpoint_differs_from_menu_hazard",
+          "review_not_primary_rate_measurement",
+          "epidermal_surface_transit_not_keratinocyte_division"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Epidermal renewal review supplies background only; surface transit does not estimate this lineage division hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.02,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "neutrophil": {
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.08,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "CLEAR_CORPSE": {
+        "hazard_per_hour": 0.3,
+        "confidence": "assumed",
+        "note": "Assumed conditional corpse-removal proposal. No cited engulfment-duration measurement supports this numerical value; competition and target conflicts prevent reading 1/k as an observed clearance time.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "CLEAR_CORPSE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "target_gated_removal_not_measured_engulfment_time"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    },
+    "dendritic": {
+      "ACTIVATE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "ACTIVATE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_binary_state_not_assay_endpoint"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02",
+        "note": "Abstract state-setting/restimulation event; runtime multiplier is (1+incoming signal)/(1+incoming suppressive signal). Activation lifetime is a separate declared clock, not inferred from antigen or this hazard."
+      },
+      "SECRETE": {
+        "hazard_per_hour": 0.08,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "SECRETE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "abstract_signal_not_molecular_flux"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "CLEAR_CORPSE": {
+        "hazard_per_hour": 0.3,
+        "confidence": "assumed",
+        "note": "Assumed conditional corpse-removal proposal. No cited engulfment-duration measurement supports this numerical value; competition and target conflicts prevent reading 1/k as an observed clearance time.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "CLEAR_CORPSE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "target_gated_removal_not_measured_engulfment_time"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "APOPTOSIS": {
+        "hazard_per_hour": 0.002,
+        "confidence": "assumed",
+        "source": "uncalibrated_model_default",
+        "beta": 1.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "APOPTOSIS",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      },
+      "MOVE": {
+        "hazard_per_hour": 0.05,
+        "confidence": "assumed",
+        "note": "Movement-event hazard; speed and persistence are independently declared in dynamics. Not a measured motility rate.",
+        "source": "uncalibrated_model_default",
+        "beta": 0.0,
+        "beta_confidence": "assumed",
+        "event_semantics": "MOVE",
+        "evidence_mapping": {
+          "anchors": [],
+          "support": "no_direct_rate_evidence_mapped",
+          "parameter_estimated_from_cited_data": false
+        },
+        "extrapolations": [
+          "target_dataset_parameter_not_estimated",
+          "no_event_rate_measurement_mapped",
+          "episode_initiation_not_speed"
+        ],
+        "reviewer": "automated source/runtime audit; not biological validation",
+        "date": "2026-11-02"
+      }
+    }
+  },
+  "beta_by_action": {
+    "PROLIFERATE": 1.0,
+    "ACTIVATE": 1.0,
+    "EXHAUST": 1.0,
+    "APOPTOSIS": 1.0,
+    "SECRETE": 1.0,
+    "KILL": 1.0
+  },
+  "anchor_verification_policy": "bibliography_verified concerns identity only. verify=true retains unresolved quantitative transfer or calibration. Seven anchors are primary research and epidermal_turnover is a review; no cited endpoint is a fitted default hazard.",
+  "audit": {
+    "date": "2026-11-02",
+    "scope": "Source-to-event and runtime semantics; metadata correction only",
+    "numerical_parameters_unchanged_from": "v3-kinetics-2",
+    "numeric_parameters_sha256": "31d02e512cc7ab52dab2277ba27666268140a852fd0465e0d9dc6b8edaf28a5c",
+    "numeric_projection": "{hazards:{lineage:{action:{hazard_per_hour,beta}}},beta_by_action}; canonical sorted JSON",
+    "parameter_validation": "not established",
+    "annotation_requirement": "Existing object labels accepted; no new H&E or manual review required."
+  },
+  "runtime_contract": {
+    "model_unit": {
+      "cell_agent_segmented_cell": "one supplied segmented-cell agent; identity/segmentation not independently certified",
+      "cell_agent_nucleus": "one supplied nucleus used as a cell proxy; not evidence that nucleus transitions equal whole-cell kinetics",
+      "lattice_binned_spot": "one occupied fixed bin; rates are not multiplied by occupancy or converted into per-cell hazards"
+    },
+    "conversion": "Local effective hazards are converted by first-event competing risks after available-action gates. At most one menu action is sampled per unit per step; ongoing motion and implicit clocks may also act.",
+    "modifier_order": [
+      "packaged baseline or explicit context.action_priors override",
+      "QC and lineage/recognition permissions",
+      "signature-derived beta multiplier and declared context modifiers",
+      "runtime state/target gates, ACTIVATE signal ratio and PROLIFERATE density factor",
+      "competing-risk menu probabilities",
+      "optional Jev pooling and seeded action draw",
+      "synchronous commit, conflicts/capacity and implicit clocks"
+    ],
+    "proposal_vs_commit": "Target conflicts, same-round death and capacity limits can prevent a sampled proposal from producing its nominal outcome. Mean baseline hazard is not a measured population event rate.",
+    "jev": "Jev pooling changes the final action distribution. Hidden prior uses alpha=1; this table does not calibrate its time scale.",
+    "separate_clocks": {
+      "activation": "ACTIVATE samples/renews an exponential lifetime using dynamics.activation_half_life_hours; DEACTIVATE is implicit at a commit boundary.",
+      "exhaustion": "EXHAUST sets exhausted_since. RECOVER is disabled after dynamics.terminal_exhaustion_hours; this does not disable every other action.",
+      "corpse": "APOPTOSIS/KILL create a cell-agent corpse. CLEAR_CORPSE or dynamics.corpse_lifetime_hours removes it; lattice bins have no cell corpses.",
+      "movement": "MOVE starts or renews an episode; speed_um_per_hour and persistence_hours independently determine displacement and mean episode duration.",
+      "signals": "Each SECRETE adds one abstract signal unit; signal_half_life_hours sets decay. Neither is a measured molecular concentration."
+    },
+    "parameter_scope": "Default rows are reused across organisms/tissues unless explicitly overridden. Existing tissue profiles do not establish sample-specific rate calibration."
+  },
+  "event_semantics": {
+    "PROLIFERATE": {
+      "event": "Attempt one daughter agent, keeping the parent alive and inheriting baseline evidence/state clocks.",
+      "eligible_state": "Requires declared proliferation permission. T_CD8 additionally requires activation; no universal activation gate for NK, T_CD4 or T_reg. Exhaustion alone does not block division.",
+      "runtime_modifier": "In the cell-agent kernel multiply by max(0,1-local_live_neighbors/n_max); population cap can block commit.",
+      "lattice": "Add division_increment to one compatible neighboring fixed bin with capacity; not a new cell/bin.",
+      "not_a_measurement_of": [
+        "cell-cycle duration",
+        "net population growth",
+        "Ki67-positive fraction"
+      ]
+    },
+    "ACTIVATE": {
+      "event": "Set or renew an abstract activated state and its exponential lifetime.",
+      "eligible_state": "Permitted living units, including already activated units in v3; not direct antigen detection.",
+      "runtime_modifier": "Multiply by (1+mean_live_neighbor_signal)/(1+mean_live_neighbor_suppressive_signal).",
+      "lattice": "Set/renew the abstract occupied-bin state.",
+      "not_a_measurement_of": [
+        "antigen-specific recognition",
+        "neuronal electrical firing",
+        "protein activation",
+        "time from infection to first division"
+      ]
+    },
+    "EXHAUST": {
+      "event": "Set the binary exhausted flag and record its start time.",
+      "eligible_state": "Activated and not already exhausted; only lineages with permission.",
+      "runtime_modifier": "No numerical default is derived from the cited multistage functional assays.",
+      "lattice": "Set the abstract occupied-bin exhausted flag.",
+      "not_a_measurement_of": [
+        "terminal differentiation",
+        "a universal exhaustion onset time",
+        "loss of every cellular function"
+      ]
+    },
+    "RECOVER": {
+      "event": "Clear the exhausted flag and its clock.",
+      "eligible_state": "Exhausted units before the declared terminal duration; does not reset activation independently.",
+      "runtime_modifier": "The duration cutoff is a separate assumed dynamics setting.",
+      "lattice": "Clear the occupied-bin exhausted flag.",
+      "not_a_measurement_of": [
+        "anti-PD1 efficacy",
+        "experimentally established reversibility"
+      ]
+    },
+    "SECRETE": {
+      "event": "Add one abstract unit to the actor signal; T_reg uses suppressive_signal, other permitted lineages use signal.",
+      "eligible_state": "Permitted living/occupied units; no activation or nonexhaustion gate is imposed for this action.",
+      "runtime_modifier": "Decay and response to neighboring signals are independent runtime rules.",
+      "lattice": "Add one signal unit per selected occupied-bin action, without occupancy scaling.",
+      "audit_output": "Current commit logs do not emit a dedicated secretion event; selected actions remain in decisions.jsonl.",
+      "not_a_measurement_of": [
+        "molecules per hour",
+        "cytokine concentration",
+        "antibody secretion by plasma cells",
+        "suppressive potency"
+      ]
+    },
+    "APOPTOSIS": {
+      "event": "Mark this agent dead at commit; a corpse remains until removal.",
+      "eligible_state": "Any living unit with the permission; transcript signature is a heuristic modifier.",
+      "runtime_modifier": "Death conflicts are resolved so a target is not counted dead twice.",
+      "lattice": "Empty the actor bin, losing its occupancy; not a single-cell death count.",
+      "not_a_measurement_of": [
+        "apoptosis probability inferred from transcripts",
+        "tissue turnover time"
+      ]
+    },
+    "KILL": {
+      "event": "Attempt death of one currently available licensed target.",
+      "eligible_state": "can_kill permission, declared recognition, activated and nonexhausted actor, and a local living can_be_killed_target neighbor; current kill lineages are T_CD8 and NK.",
+      "runtime_modifier": "Target availability/order and synchronous conflicts matter; spatial proximity is not measured CTL-target contact time.",
+      "lattice": "Empty one eligible target bin regardless of fractional occupancy; not one killed cell.",
+      "not_a_measurement_of": [
+        "unconditional killing throughput",
+        "cumulative contact duration",
+        "NK killing rate from CTL papers"
+      ]
+    },
+    "CLEAR_CORPSE": {
+      "event": "Remove one available neighboring dead cell-agent corpse.",
+      "eligible_state": "can_clear permission and a local corpse.",
+      "runtime_modifier": "Competing actions and target conflicts can reduce committed clearance.",
+      "lattice": "Unavailable; bins do not leave cell corpses.",
+      "not_a_measurement_of": [
+        "measured phagocytosis duration",
+        "corpse degradation lifetime"
+      ]
+    },
+    "MOVE": {
+      "event": "Start or renew a stochastic moving episode.",
+      "eligible_state": "Motile lineage, spatial mode and enabled movement.",
+      "runtime_modifier": "Speed integrates over active episode hours; motion can continue on later steps without another MOVE selection.",
+      "lattice": "Unavailable; bins remain fixed.",
+      "audit_output": "move events count displacement segments, not necessarily episode starts.",
+      "not_a_measurement_of": [
+        "speed in micrometres per hour",
+        "displacement per event",
+        "persistence time"
+      ]
+    }
+  }
+}

@@ -1,0 +1,450 @@
+{
+  "ontology_version": "3.0",
+  "data_version": "v3-data-1",
+  "review_status": "Initial explicit ontology; human review pending.",
+  "lineages": {
+    "unknown": {
+      "name": "unknown",
+      "parent": null,
+      "allowed_actions": [
+        "REST"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "T_CD8": {
+      "name": "T_CD8",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "EXHAUST",
+        "KILL",
+        "MOVE",
+        "PROLIFERATE",
+        "RECOVER",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": true,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": true
+    },
+    "T_CD4": {
+      "name": "T_CD4",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "EXHAUST",
+        "MOVE",
+        "PROLIFERATE",
+        "RECOVER",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "B": {
+      "name": "B",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "MOVE",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "myeloid": {
+      "name": "myeloid",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "CLEAR_CORPSE",
+        "MOVE",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": true,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "microglia": {
+      "name": "microglia",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "CLEAR_CORPSE",
+        "MOVE",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": true,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "fibroblast": {
+      "name": "fibroblast",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "endothelial": {
+      "name": "endothelial",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "epithelial": {
+      "name": "epithelial",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "malignant": {
+      "name": "malignant",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": true,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "neuron": {
+      "name": "neuron",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "REST"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "astrocyte": {
+      "name": "astrocyte",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "oligodendrocyte": {
+      "name": "oligodendrocyte",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "REST"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "General lineage model; expression does not establish cell identity.",
+      "proliferation_requires_activation": false
+    },
+    "NK": {
+      "name": "NK",
+      "parent": null,
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "EXHAUST",
+        "KILL",
+        "MOVE",
+        "PROLIFERATE",
+        "RECOVER",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": true,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. NK killing also requires declared recognition.",
+      "proliferation_requires_activation": false
+    },
+    "T_reg": {
+      "name": "T_reg",
+      "parent": "T_CD4",
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "EXHAUST",
+        "MOVE",
+        "PROLIFERATE",
+        "RECOVER",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "suppressive",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "plasma": {
+      "name": "plasma",
+      "parent": "B",
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "mast": {
+      "name": "mast",
+      "parent": "myeloid",
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "pericyte": {
+      "name": "pericyte",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "melanocyte": {
+      "name": "melanocyte",
+      "parent": null,
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "keratinocyte": {
+      "name": "keratinocyte",
+      "parent": "epithelial",
+      "allowed_actions": [
+        "APOPTOSIS",
+        "PROLIFERATE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": false,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": false,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "neutrophil": {
+      "name": "neutrophil",
+      "parent": "myeloid",
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "CLEAR_CORPSE",
+        "MOVE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": true,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    },
+    "dendritic": {
+      "name": "dendritic",
+      "parent": "myeloid",
+      "allowed_actions": [
+        "ACTIVATE",
+        "APOPTOSIS",
+        "CLEAR_CORPSE",
+        "MOVE",
+        "REST",
+        "SECRETE"
+      ],
+      "motile": true,
+      "mean_radius_um": 5.0,
+      "can_be_killed_target": false,
+      "can_kill": false,
+      "can_clear": true,
+      "secretion_kind": "inflammatory",
+      "review_status": "assumed_action_permissions_require_tissue_review",
+      "notes": "Initial explicit modelling assumptions; requires tissue-specific review. ",
+      "proliferation_requires_activation": false
+    }
+  }
+}

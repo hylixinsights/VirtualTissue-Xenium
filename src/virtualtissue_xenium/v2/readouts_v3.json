@@ -1,0 +1,114 @@
+{
+  "schema_version": "3.0",
+  "readout_version": "1",
+  "status": "analysis definition frozen before real-data experiments; not biological validation",
+  "replication_unit": "simulation seed; no cell-level p-values and no claim of biological replication",
+  "time": "committed snapshot hours; round decisions attach to the following snapshot; comparisons use exact common times",
+  "missing": "undefined denominator, unavailable provider scores and nonspatial metrics remain null, never zero",
+  "aggregation": {
+    "central": "median across seeds",
+    "median_ci95": "percentile bootstrap of the median, resampling seeds with replacement",
+    "seed_envelope": "empirical quantiles 0.025 and 0.975 with linear interpolation; not a confidence interval",
+    "paired_contrast": "arm minus baseline within matching seed and common time, followed by median and seed bootstrap",
+    "failure_policy": "any incomplete seed excludes the entire arm from aggregate results; all run records remain available"
+  },
+  "readouts": [
+    {
+      "name": "living_cells",
+      "unit": "cells",
+      "group": "lineage and ALL",
+      "definition": "cells whose committed status is alive"
+    },
+    {
+      "name": "activated_fraction",
+      "unit": "fraction",
+      "group": "lineage and ALL",
+      "denominator": "living cells in that lineage",
+      "definition": "living cells with activated true divided by living cells"
+    },
+    {
+      "name": "exhausted_fraction",
+      "unit": "fraction",
+      "group": "lineage and ALL",
+      "denominator": "living cells in that lineage",
+      "definition": "living cells with exhausted true divided by living cells"
+    },
+    {
+      "name": "cumulative_kills",
+      "unit": "committed events",
+      "group": "actor lineage and ALL",
+      "definition": "cumulative committed kill events from time zero; blocked proposals excluded"
+    },
+    {
+      "name": "cumulative_apoptoses",
+      "unit": "committed events",
+      "group": "actor lineage and ALL",
+      "definition": "cumulative committed apoptosis events from time zero; blocked proposals excluded"
+    },
+    {
+      "name": "cumulative_clearances",
+      "unit": "committed events",
+      "group": "actor lineage and ALL",
+      "definition": "cumulative committed clear_corpse events from time zero; blocked proposals excluded"
+    },
+    {
+      "name": "cumulative_divisions",
+      "unit": "committed events",
+      "group": "actor lineage and ALL",
+      "definition": "cumulative committed division events from time zero; blocked proposals excluded"
+    },
+    {
+      "name": "cumulative_killed_targets",
+      "unit": "committed target deaths",
+      "group": "target lineage and ALL",
+      "definition": "cumulative kill events attributed to the target lineage"
+    },
+    {
+      "name": "malignant_activated_cd8_contact_fraction",
+      "unit": "fraction",
+      "group": "ALL",
+      "denominator": "all living malignant cells",
+      "definition": "fraction with >=1 living activated CD8 within declared centroid radius and same sample; exhaustion does not exclude activated CD8; uses geometry, independent of capped action graph"
+    },
+    {
+      "name": "mean_cd8_to_malignant_distance_um",
+      "unit": "micrometres",
+      "group": "ALL",
+      "denominator": "living CD8 cells with >=1 living malignant target in the same sample",
+      "definition": "mean nearest malignant centroid distance across eligible CD8 cells; nonspatial runs remain null"
+    },
+    {
+      "name": "jev_prior_js_bits",
+      "unit": "bits",
+      "group": "lineage and ALL",
+      "denominator": "provider-scored decisions in the just-completed round",
+      "definition": "mean Jensen-Shannon divergence of Jev versus gated guidebook prior; local or single-action decisions do not contribute"
+    },
+    {
+      "name": "occupied_bins",
+      "unit": "bins",
+      "group": "lineage and ALL; lattice only",
+      "definition": "bins with status alive and positive occupancy"
+    },
+    {
+      "name": "total_occupancy",
+      "unit": "abstract occupancy units; a full bin has the declared lattice.capacity",
+      "group": "lineage and ALL; lattice only",
+      "definition": "sum of raw occupancy across occupied bins; not a count of cells and not normalized by capacity"
+    },
+    {
+      "name": "cumulative_occupancy_gained",
+      "unit": "abstract occupancy units; a full bin has the declared lattice.capacity",
+      "group": "receiving lineage and ALL; lattice only",
+      "definition": "sum of added_occupancy in committed occupancy_gain events"
+    },
+    {
+      "name": "cumulative_occupancy_lost",
+      "unit": "abstract occupancy units; a full bin has the declared lattice.capacity",
+      "group": "affected lineage and ALL; lattice only",
+      "definition": "sum of removed_occupancy in committed occupancy_loss events"
+    }
+  ],
+  "interpretation": "software readouts only; expression/LLM/spatial claims require the predeclared null controls and independent reference data",
+  "kernel_units": "Cell-agent and lattice ensembles are separate. Lattice emits occupancy/bin readouts, never living_cells, cell event counts, cell state fractions or cell centroid-distance readouts."
+}

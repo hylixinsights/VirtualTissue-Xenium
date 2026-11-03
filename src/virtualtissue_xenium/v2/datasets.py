@@ -190,7 +190,7 @@ def write_annotation_template(data_dir, out, *, max_cells=1000, center=None, rad
     return path
 
 
-def load_xenium_cells(data_dir, annotations_path, max_cells=1000, center=None, radius_um=None):
+def load_xenium_cells(data_dir, annotations_path, max_cells=1000, center=None, radius_um=None, lineage_map=None):
     """Return (validated cell records, assayed Gene Expression symbols).
 
     annotations_path is a CSV with cell_id, cell_type, lineage. It may cover the
@@ -204,6 +204,8 @@ def load_xenium_cells(data_dir, annotations_path, max_cells=1000, center=None, r
     from .inputs import validate_cells
     obs, all_ids = _selected_obs(data_dir, max_cells=max_cells, center=center, radius_um=radius_um)
     annotations = pd.read_csv(annotations_path, dtype=str, keep_default_na=False)
+    if lineage_map is not None and "cell_type" in annotations:
+        annotations["lineage"] = annotations["cell_type"].map(lineage_map).fillna("")
     required = {"cell_id", "cell_type", "lineage"}
     if not required <= set(annotations):
         raise ValueError("Annotation CSV requires cell_id, cell_type and lineage.")

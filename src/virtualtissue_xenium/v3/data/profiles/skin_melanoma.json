@@ -1,0 +1,27 @@
+{
+  "version": "v3-profile-1",
+  "name": "skin_melanoma",
+  "organism": "human",
+  "expected_lineages": [
+    "malignant",
+    "melanocyte",
+    "T_CD8",
+    "T_CD4",
+    "T_reg",
+    "NK",
+    "myeloid",
+    "fibroblast",
+    "endothelial",
+    "keratinocyte",
+    "epithelial",
+    "B",
+    "plasma",
+    "mast",
+    "pericyte",
+    "neutrophil",
+    "dendritic",
+    "unknown"
+  ],
+  "hazard_overrides": {},
+  "review_status": "No numerical tissue calibration supplied; unexpected lineages produce a preparation warning."
+}

@@ -39,6 +39,7 @@ DESCRIPTIONS = {
     "SECRETE": "Emit an abstract local simulated inflammatory signal.",
     "CLEAR_CORPSE": "Attempt removal of a neighboring simulated corpse.",
     "KILL": "Attempt killing of a recognized live malignant graph neighbor; local gates apply, and proximity does not establish contact.",
+    "MOVE": "Attempt a seeded displacement using the declared speed and persistence; no molecular chemotaxis is inferred.",
 }
 # These weights describe illustrative preferences per decision, not rates.
 BASE_WEIGHTS = {
@@ -109,7 +110,7 @@ def _digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
-def _validate_cells(cells):
+def _validate_cells(cells, *, lineages=LINEAGES, exact_symbols=False):
     if not isinstance(cells, list) or not cells:
         raise ValueError("cells must be a nonempty list of annotated cells.")
     checked, ids, type_lineages = [], set(), {}
@@ -122,7 +123,7 @@ def _validate_cells(cells):
         if cell["cell_id"] in ids:
             raise ValueError("cell_id values must be unique.")
         ids.add(cell["cell_id"])
-        if cell["lineage"] not in LINEAGES:
+        if cell["lineage"] not in lineages:
             raise ValueError(f"Unsupported lineage {cell['lineage']!r}; provide an explicit supported mapping.")
         previous = type_lineages.setdefault(cell["cell_type"], cell["lineage"])
         if previous != cell["lineage"]:
@@ -134,7 +135,7 @@ def _validate_cells(cells):
         for gene, value in expression.items():
             if not isinstance(gene, str) or not gene.strip():
                 raise ValueError("Expression gene names must be nonempty strings.")
-            symbol = gene.strip().upper()
+            symbol = gene.strip() if exact_symbols else gene.strip().upper()
             if symbol in normalized:
                 raise ValueError("Expression genes must be unique after case normalization.")
             if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
@@ -179,11 +180,23 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
     support remains null and cannot be interpreted as biological inactivity.
     """
     c = validate_context(context)
-    checked = _validate_cells(cells)
+    v3 = c["schema_version"] == "3.0"
+    ontology, profile, signature_source = None, None, None
+    if v3:
+        from ..v3.ontology import kinetics_for, load_platform, load_signatures
+        kinetics_table, hazards, ontology, profile = kinetics_for(c)
+        lineages = ontology["lineages"]
+        platform_profile = load_platform(c["platform"])
+    else:
+        lineages = LINEAGES
+    checked = _validate_cells(cells, lineages=lineages, exact_symbols=v3)
     if gene_sets is None:
-        if c["organism"].casefold() not in ("human", "homo sapiens"):
+        if v3:
+            gene_sets, signature_source = load_signatures(c["organism"])
+        elif c["organism"].casefold() not in ("human", "homo sapiens"):
             raise ValueError("Default signatures use human symbols. Supply reviewed gene_sets for another organism.")
-        gene_sets = DEFAULT_GENE_SETS
+        else:
+            gene_sets = DEFAULT_GENE_SETS
     if not isinstance(gene_sets, dict) or not gene_sets:
         raise ValueError("gene_sets must be a nonempty name-to-gene-list map.")
     signatures = {}
@@ -192,7 +205,7 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             raise ValueError("Each gene set needs a nonempty name and gene list.")
         if any(not isinstance(g, str) or not g.strip() for g in genes):
             raise ValueError("Gene-set symbols must be nonempty strings.")
-        signatures[name] = sorted({gene.strip().upper() for gene in genes})
+        signatures[name] = sorted({gene.strip() if v3 else gene.strip().upper() for gene in genes})
     observed = {g for cell in checked for g in cell["expression"]}
     explicit_panel = "assayed_genes" in c
     panel = set(c.get("assayed_genes", observed))
@@ -202,9 +215,10 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         raise ValueError("Expression contains genes outside context.assayed_genes.")
     hazard_mode = c["kinetics"]["mode"] == "hazard_per_hour"
     dt = c["time_step_hours"]
-    kinetics_table, hazards = load_kinetics() if hazard_mode else (None, None)
+    if not v3:
+        kinetics_table, hazards = load_kinetics() if hazard_mode else (None, None)
     scoring = c["scoring"]
-    depth_mode = scoring["method"] == "depth_conditioned_auc"
+    depth_mode = scoring["method"] in ("depth_conditioned_auc", "tiered_panel_auc")
     qc_fail = {cell["cell_id"] for cell in checked
                if depth_mode and sum(cell["expression"].values()) < scoring["min_transcripts"]}
     if depth_mode:
@@ -215,8 +229,11 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         evidence = population[cell["cell_id"]] if depth_mode else _rank_evidence(cell["expression"], panel, signatures)
         if hazard_mode:
             weights = dict(hazards[lineage])
-            if not (lineage == "T_CD8" and c["recognition"]):
+            can_kill = lineages[lineage]["can_kill"] if v3 else lineage == "T_CD8"
+            if not (can_kill and c["recognition"]):
                 weights.pop("KILL", None)
+            if v3 and (not c["dynamics"]["movement_enabled"] or c["interaction_mode"] != "spatial"):
+                weights.pop("MOVE", None)
             weights["REST"] = None  # residual; computed after conversion
         else:
             weights = deepcopy(BASE_WEIGHTS[lineage])
@@ -244,11 +261,13 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
                 beta = beta_for(scoring, action)
                 multiplier, normaliser = expression_multiplier(evidence[signature], references[signature], beta)
                 weights[action] = weight * multiplier
-                audit.append({"action": action, "source": "depth_conditioned_auc", "signature": signature,
+                audit.append({"action": action, "source": scoring["method"], "signature": signature,
                               "z": evidence[signature]["z"], "status": evidence[signature]["status"],
                               "reference": evidence[signature]["reference"], "beta": beta,
                               "normaliser": normaliser, "multiplier": multiplier,
-                              "assumption": "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta"})
+                              "assumption": ("Bounded within-cell panel-rank heuristic; no population mean preservation or biological calibration"
+                                  if evidence[signature].get("status") == "available_panel_heuristic" else
+                                  "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta")})
                 continue
             score = evidence[signature].get("score")
             if score is not None:
@@ -313,8 +332,8 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
                 for values in [[item["evidence"][signature]["score"] for item in group
                                 if item["evidence"][signature]["score"] is not None]]},
         }
-    return {
-        "schema_version": "2.0", "context": c, "cells": records, "by_cell_type": by_type,
+    result = {
+        "schema_version": c["schema_version"], "context": c, "cells": records, "by_cell_type": by_type,
         "provenance": {
             "guidebook_version": "v2-guidebook-1", "context_sha256": _digest(c),
             "default_action_weights": deepcopy(BASE_WEIGHTS),
@@ -353,3 +372,31 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             ],
         },
     }
+    if v3:
+        provenance = result["provenance"]
+        provenance.update(
+            guidebook_version="v3-guidebook-1", default_action_weights=None,
+            recognition_licensed_kill_weight=None,
+            symbol_normalization="exact case-preserved symbols; no runtime orthology inference",
+            ontology_version=c["ontology_version"], ontology_sha256=_digest(ontology),
+            ontology_hashes=ontology["hashes"], lineage_rules=deepcopy(lineages),
+            signature_source=signature_source or {"source": "explicit_user_gene_sets", "review_status": "investigator_declared"},
+            platform_profile=platform_profile, tissue_profile=profile,
+            beta_table=kinetics_table.get("beta_by_action", {}),
+            coverage_warnings={name: "fewer_than_half_signature_genes_assayed"
+                               for name, genes in signatures.items() if len(set(genes) & panel) / len(genes) < .5},
+            unexpected_lineages=sorted({cell["lineage"] for cell in checked} - set(profile["expected_lineages"])) if profile else [],
+        )
+        if depth_mode:
+            provenance["scoring_reference_coverage"] = {
+                name: dict(Counter(population[cid][name].get("reference") or population[cid][name]["status"]
+                                   for cid in population)) for name in signatures}
+        if scoring["method"] == "tiered_panel_auc":
+            provenance["score_method"] = "tiered_panel_auc_v1: sample/type/depth, then sample/type, then bounded within-cell random-gene rank reference"
+            provenance["limitations"].append("The panel-only fallback is a weak heuristic, not a calibrated cell-type percentile; its multiplier does not preserve a population mean.")
+        for record in records.values():
+            record["lineage_rules"] = deepcopy(lineages[record["lineage"]])
+            record["local_gates_required"][-1] = "PROLIFERATE is subject to declared local crowding and living population capacity."
+            if "PROLIFERATE" in record["actions"]:
+                record["actions"]["PROLIFERATE"]["description"] = "Attempt one daughter cell with declared radius, local crowding and soft repulsion."
+    return result

@@ -1,0 +1,3909 @@
+{
+  "version": "v3-mgi-pairs-1",
+  "source_url": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt",
+  "retrieved_on": "2026-10-31",
+  "source_sha256": "8e9e21095a8044b489b6cec26ff6012a3f8787876db455f42d45bf5dc30b9828",
+  "policy": "Aggregate candidate pairs across all homology classes; retain only reciprocal one-human-to-one-mouse symbol mappings in the complete source. Ambiguous and absent mappings are excluded. No case conversion or runtime orthology.",
+  "review_status": "Computationally checked against MGI; independent biological review pending.",
+  "pairs": [
+    {
+      "human_symbol": "ACKR3",
+      "mouse_symbol": "Ackr3",
+      "human_entrez_id": "57007",
+      "mouse_entrez_id": "12778",
+      "mouse_mgi_id": "MGI:109562",
+      "mgi_homology_class": "52444974"
+    },
+    {
+      "human_symbol": "ACVR1",
+      "mouse_symbol": "Acvr1",
+      "human_entrez_id": "90",
+      "mouse_entrez_id": "11477",
+      "mouse_mgi_id": "MGI:87911",
+      "mgi_homology_class": "52442865"
+    },
+    {
+      "human_symbol": "ADAR",
+      "mouse_symbol": "Adar",
+      "human_entrez_id": "103",
+      "mouse_entrez_id": "56417",
+      "mouse_mgi_id": "MGI:1889575",
+      "mgi_homology_class": "52445555"
+    },
+    {
+      "human_symbol": "ADM",
+      "mouse_symbol": "Adm",
+      "human_entrez_id": "133",
+      "mouse_entrez_id": "11535",
+      "mouse_mgi_id": "MGI:108058",
+      "mgi_homology_class": "52458322"
+    },
+    {
+      "human_symbol": "ADORA2B",
+      "mouse_symbol": "Adora2b",
+      "human_entrez_id": "136",
+      "mouse_entrez_id": "11541",
+      "mouse_mgi_id": "MGI:99403",
+      "mgi_homology_class": "52452707"
+    },
+    {
+      "human_symbol": "AKAP12",
+      "mouse_symbol": "Akap12",
+      "human_entrez_id": "9590",
+      "mouse_entrez_id": "83397",
+      "mouse_mgi_id": "MGI:1932576",
+      "mgi_homology_class": "52442970"
+    },
+    {
+      "human_symbol": "ALDOA",
+      "mouse_symbol": "Aldoa",
+      "human_entrez_id": "226",
+      "mouse_entrez_id": "11674",
+      "mouse_mgi_id": "MGI:87994",
+      "mgi_homology_class": "52442993"
+    },
+    {
+      "human_symbol": "ALDOB",
+      "mouse_symbol": "Aldob",
+      "human_entrez_id": "229",
+      "mouse_entrez_id": "230163",
+      "mouse_mgi_id": "MGI:87995",
+      "mgi_homology_class": "52446461"
+    },
+    {
+      "human_symbol": "ALDOC",
+      "mouse_symbol": "Aldoc",
+      "human_entrez_id": "230",
+      "mouse_entrez_id": "11676",
+      "mouse_mgi_id": "MGI:101863",
+      "mgi_homology_class": "52442994"
+    },
+    {
+      "human_symbol": "AMPD3",
+      "mouse_symbol": "Ampd3",
+      "human_entrez_id": "272",
+      "mouse_entrez_id": "11717",
+      "mouse_mgi_id": "MGI:1096344",
+      "mgi_homology_class": "52443037"
+    },
+    {
+      "human_symbol": "ANGPTL4",
+      "mouse_symbol": "Angptl4",
+      "human_entrez_id": "51129",
+      "mouse_entrez_id": "57875",
+      "mouse_mgi_id": "MGI:1888999",
+      "mgi_homology_class": "52447649"
+    },
+    {
+      "human_symbol": "ANKZF1",
+      "mouse_symbol": "Ankzf1",
+      "human_entrez_id": "55139",
+      "mouse_entrez_id": "52231",
+      "mouse_mgi_id": "MGI:1098746",
+      "mgi_homology_class": "52449449"
+    },
+    {
+      "human_symbol": "APC",
+      "mouse_symbol": "Apc",
+      "human_entrez_id": "324",
+      "mouse_entrez_id": "11789",
+      "mouse_mgi_id": "MGI:88039",
+      "mgi_homology_class": "52444316"
+    },
+    {
+      "human_symbol": "APOL6",
+      "mouse_symbol": "Apol6",
+      "human_entrez_id": "80830",
+      "mouse_entrez_id": "71939",
+      "mouse_mgi_id": "MGI:1919189",
+      "mgi_homology_class": "52453624"
+    },
+    {
+      "human_symbol": "ARID4B",
+      "mouse_symbol": "Arid4b",
+      "human_entrez_id": "51742",
+      "mouse_entrez_id": "94246",
+      "mouse_mgi_id": "MGI:2137512",
+      "mgi_homology_class": "52453984"
+    },
+    {
+      "human_symbol": "ARID5B",
+      "mouse_symbol": "Arid5b",
+      "human_entrez_id": "84159",
+      "mouse_entrez_id": "71371",
+      "mouse_mgi_id": "MGI:2175912",
+      "mgi_homology_class": "52453081"
+    },
+    {
+      "human_symbol": "ARL4A",
+      "mouse_symbol": "Arl4a",
+      "human_entrez_id": "10124",
+      "mouse_entrez_id": "11861",
+      "mouse_mgi_id": "MGI:99437",
+      "mgi_homology_class": "52443168"
+    },
+    {
+      "human_symbol": "ATF3",
+      "mouse_symbol": "Atf3",
+      "human_entrez_id": "467",
+      "mouse_entrez_id": "11910",
+      "mouse_mgi_id": "MGI:109384",
+      "mgi_homology_class": "52456358"
+    },
+    {
+      "human_symbol": "ATP7A",
+      "mouse_symbol": "Atp7a",
+      "human_entrez_id": "538",
+      "mouse_entrez_id": "11977",
+      "mouse_mgi_id": "MGI:99400",
+      "mgi_homology_class": "52443627"
+    },
+    {
+      "human_symbol": "AUTS2",
+      "mouse_symbol": "Auts2",
+      "human_entrez_id": "26053",
+      "mouse_entrez_id": "319974",
+      "mouse_mgi_id": "MGI:1919847",
+      "mgi_homology_class": "52443285"
+    },
+    {
+      "human_symbol": "B2M",
+      "mouse_symbol": "B2m",
+      "human_entrez_id": "567",
+      "mouse_entrez_id": "12010",
+      "mouse_mgi_id": "MGI:88127",
+      "mgi_homology_class": "52443503"
+    },
+    {
+      "human_symbol": "B3GALT6",
+      "mouse_symbol": "B3galt6",
+      "human_entrez_id": "126792",
+      "mouse_entrez_id": "117592",
+      "mouse_mgi_id": "MGI:2152819",
+      "mgi_homology_class": "52458188"
+    },
+    {
+      "human_symbol": "B4GALNT2",
+      "mouse_symbol": "B4galnt2",
+      "human_entrez_id": "124872",
+      "mouse_entrez_id": "14422",
+      "mouse_mgi_id": "MGI:1342058",
+      "mgi_homology_class": "52443308"
+    },
+    {
+      "human_symbol": "BAK1",
+      "mouse_symbol": "Bak1",
+      "human_entrez_id": "578",
+      "mouse_entrez_id": "12018",
+      "mouse_mgi_id": "MGI:1097161",
+      "mgi_homology_class": "52458827"
+    },
+    {
+      "human_symbol": "BANK1",
+      "mouse_symbol": "Bank1",
+      "human_entrez_id": "55024",
+      "mouse_entrez_id": "242248",
+      "mouse_mgi_id": "MGI:2442120",
+      "mgi_homology_class": "52458829"
+    },
+    {
+      "human_symbol": "BATF2",
+      "mouse_symbol": "Batf2",
+      "human_entrez_id": "116071",
+      "mouse_entrez_id": "74481",
+      "mouse_mgi_id": "MGI:1921731",
+      "mgi_homology_class": "52458830"
+    },
+    {
+      "human_symbol": "BAX",
+      "mouse_symbol": "Bax",
+      "human_entrez_id": "581",
+      "mouse_entrez_id": "12028",
+      "mouse_mgi_id": "MGI:99702",
+      "mgi_homology_class": "52443346"
+    },
+    {
+      "human_symbol": "BBC3",
+      "mouse_symbol": "Bbc3",
+      "human_entrez_id": "27113",
+      "mouse_entrez_id": "170770",
+      "mouse_mgi_id": "MGI:2181667",
+      "mgi_homology_class": "52450895"
+    },
+    {
+      "human_symbol": "BCAN",
+      "mouse_symbol": "Bcan",
+      "human_entrez_id": "63827",
+      "mouse_entrez_id": "12032",
+      "mouse_mgi_id": "MGI:1096385",
+      "mgi_homology_class": "52447574"
+    },
+    {
+      "human_symbol": "BCAR3",
+      "mouse_symbol": "Bcar3",
+      "human_entrez_id": "8412",
+      "mouse_entrez_id": "29815",
+      "mouse_mgi_id": "MGI:1352501",
+      "mgi_homology_class": "52457947"
+    },
+    {
+      "human_symbol": "BCL2",
+      "mouse_symbol": "Bcl2",
+      "human_entrez_id": "596",
+      "mouse_entrez_id": "12043",
+      "mouse_mgi_id": "MGI:88138",
+      "mgi_homology_class": "52443367"
+    },
+    {
+      "human_symbol": "BGN",
+      "mouse_symbol": "Bgn",
+      "human_entrez_id": "633",
+      "mouse_entrez_id": "12111",
+      "mouse_mgi_id": "MGI:88158",
+      "mgi_homology_class": "52443395"
+    },
+    {
+      "human_symbol": "BHLHE40",
+      "mouse_symbol": "Bhlhe40",
+      "human_entrez_id": "8553",
+      "mouse_entrez_id": "20893",
+      "mouse_mgi_id": "MGI:1097714",
+      "mgi_homology_class": "52443396"
+    },
+    {
+      "human_symbol": "BMP2",
+      "mouse_symbol": "Bmp2",
+      "human_entrez_id": "650",
+      "mouse_entrez_id": "12156",
+      "mouse_mgi_id": "MGI:88177",
+      "mgi_homology_class": "52443434"
+    },
+    {
+      "human_symbol": "BMPR1A",
+      "mouse_symbol": "Bmpr1a",
+      "human_entrez_id": "657",
+      "mouse_entrez_id": "12166",
+      "mouse_mgi_id": "MGI:1338938",
+      "mgi_homology_class": "52442999"
+    },
+    {
+      "human_symbol": "BMPR2",
+      "mouse_symbol": "Bmpr2",
+      "human_entrez_id": "659",
+      "mouse_entrez_id": "12168",
+      "mouse_mgi_id": "MGI:1095407",
+      "mgi_homology_class": "52457816"
+    },
+    {
+      "human_symbol": "BNIP3L",
+      "mouse_symbol": "Bnip3l",
+      "human_entrez_id": "665",
+      "mouse_entrez_id": "12177",
+      "mouse_mgi_id": "MGI:1332659",
+      "mgi_homology_class": "52443444"
+    },
+    {
+      "human_symbol": "BPGM",
+      "mouse_symbol": "Bpgm",
+      "human_entrez_id": "669",
+      "mouse_entrez_id": "12183",
+      "mouse_mgi_id": "MGI:1098242",
+      "mgi_homology_class": "52457085"
+    },
+    {
+      "human_symbol": "BRS3",
+      "mouse_symbol": "Brs3",
+      "human_entrez_id": "680",
+      "mouse_entrez_id": "12209",
+      "mouse_mgi_id": "MGI:1100501",
+      "mgi_homology_class": "52458879"
+    },
+    {
+      "human_symbol": "BST2",
+      "mouse_symbol": "Bst2",
+      "human_entrez_id": "684",
+      "mouse_entrez_id": "69550",
+      "mouse_mgi_id": "MGI:1916800",
+      "mgi_homology_class": "52458882"
+    },
+    {
+      "human_symbol": "BTG1",
+      "mouse_symbol": "Btg1",
+      "human_entrez_id": "694",
+      "mouse_entrez_id": "12226",
+      "mouse_mgi_id": "MGI:88215",
+      "mgi_homology_class": "52443492"
+    },
+    {
+      "human_symbol": "CA12",
+      "mouse_symbol": "Ca12",
+      "human_entrez_id": "771",
+      "mouse_entrez_id": "76459",
+      "mouse_mgi_id": "MGI:1923709",
+      "mgi_homology_class": "52453540"
+    },
+    {
+      "human_symbol": "CASP1",
+      "mouse_symbol": "Casp1",
+      "human_entrez_id": "834",
+      "mouse_entrez_id": "12362",
+      "mouse_mgi_id": "MGI:96544",
+      "mgi_homology_class": "52443716"
+    },
+    {
+      "human_symbol": "CASP3",
+      "mouse_symbol": "Casp3",
+      "human_entrez_id": "836",
+      "mouse_entrez_id": "12367",
+      "mouse_mgi_id": "MGI:107739",
+      "mgi_homology_class": "52443718"
+    },
+    {
+      "human_symbol": "CASP6",
+      "mouse_symbol": "Casp6",
+      "human_entrez_id": "839",
+      "mouse_entrez_id": "12368",
+      "mouse_mgi_id": "MGI:1312921",
+      "mgi_homology_class": "52443719"
+    },
+    {
+      "human_symbol": "CASP7",
+      "mouse_symbol": "Casp7",
+      "human_entrez_id": "840",
+      "mouse_entrez_id": "12369",
+      "mouse_mgi_id": "MGI:109383",
+      "mgi_homology_class": "52443720"
+    },
+    {
+      "human_symbol": "CASP8",
+      "mouse_symbol": "Casp8",
+      "human_entrez_id": "841",
+      "mouse_entrez_id": "12370",
+      "mouse_mgi_id": "MGI:1261423",
+      "mgi_homology_class": "52443721"
+    },
+    {
+      "human_symbol": "CAV1",
+      "mouse_symbol": "Cav1",
+      "human_entrez_id": "857",
+      "mouse_entrez_id": "12389",
+      "mouse_mgi_id": "MGI:102709",
+      "mgi_homology_class": "52454628"
+    },
+    {
+      "human_symbol": "CAVIN1",
+      "mouse_symbol": "Cavin1",
+      "human_entrez_id": "284119",
+      "mouse_entrez_id": "19285",
+      "mouse_mgi_id": "MGI:1277968",
+      "mgi_homology_class": "52447347"
+    },
+    {
+      "human_symbol": "CAVIN3",
+      "mouse_symbol": "Cavin3",
+      "human_entrez_id": "112464",
+      "mouse_entrez_id": "109042",
+      "mouse_mgi_id": "MGI:1923422",
+      "mgi_homology_class": "52451269"
+    },
+    {
+      "human_symbol": "CCL5",
+      "mouse_symbol": "Ccl5",
+      "human_entrez_id": "6352",
+      "mouse_entrez_id": "20304",
+      "mouse_mgi_id": "MGI:98262",
+      "mgi_homology_class": "52444419"
+    },
+    {
+      "human_symbol": "CCN1",
+      "mouse_symbol": "Ccn1",
+      "human_entrez_id": "3491",
+      "mouse_entrez_id": "16007",
+      "mouse_mgi_id": "MGI:88613",
+      "mgi_homology_class": "52445025"
+    },
+    {
+      "human_symbol": "CCN2",
+      "mouse_symbol": "Ccn2",
+      "human_entrez_id": "1490",
+      "mouse_entrez_id": "14219",
+      "mouse_mgi_id": "MGI:95537",
+      "mgi_homology_class": "52444924"
+    },
+    {
+      "human_symbol": "CCN5",
+      "mouse_symbol": "Ccn5",
+      "human_entrez_id": "8839",
+      "mouse_entrez_id": "22403",
+      "mouse_mgi_id": "MGI:1328326",
+      "mgi_homology_class": "52444435"
+    },
+    {
+      "human_symbol": "CCNB1",
+      "mouse_symbol": "Ccnb1",
+      "human_entrez_id": "891",
+      "mouse_entrez_id": "268697",
+      "mouse_mgi_id": "MGI:88302",
+      "mgi_homology_class": "52443914"
+    },
+    {
+      "human_symbol": "CCNG2",
+      "mouse_symbol": "Ccng2",
+      "human_entrez_id": "901",
+      "mouse_entrez_id": "12452",
+      "mouse_mgi_id": "MGI:1095734",
+      "mgi_homology_class": "52444045"
+    },
+    {
+      "human_symbol": "CD274",
+      "mouse_symbol": "Cd274",
+      "human_entrez_id": "29126",
+      "mouse_entrez_id": "60533",
+      "mouse_mgi_id": "MGI:1926446",
+      "mgi_homology_class": "52457994"
+    },
+    {
+      "human_symbol": "CD38",
+      "mouse_symbol": "Cd38",
+      "human_entrez_id": "952",
+      "mouse_entrez_id": "12494",
+      "mouse_mgi_id": "MGI:107474",
+      "mgi_homology_class": "52459146"
+    },
+    {
+      "human_symbol": "CD40",
+      "mouse_symbol": "Cd40",
+      "human_entrez_id": "958",
+      "mouse_entrez_id": "21939",
+      "mouse_mgi_id": "MGI:88336",
+      "mgi_homology_class": "52452086"
+    },
+    {
+      "human_symbol": "CD69",
+      "mouse_symbol": "Cd69",
+      "human_entrez_id": "969",
+      "mouse_entrez_id": "12515",
+      "mouse_mgi_id": "MGI:88343",
+      "mgi_homology_class": "52458245"
+    },
+    {
+      "human_symbol": "CD74",
+      "mouse_symbol": "Cd74",
+      "human_entrez_id": "972",
+      "mouse_entrez_id": "16149",
+      "mouse_mgi_id": "MGI:96534",
+      "mgi_homology_class": "52444483"
+    },
+    {
+      "human_symbol": "CD86",
+      "mouse_symbol": "Cd86",
+      "human_entrez_id": "942",
+      "mouse_entrez_id": "12524",
+      "mouse_mgi_id": "MGI:101773",
+      "mgi_homology_class": "52459160"
+    },
+    {
+      "human_symbol": "CDH1",
+      "mouse_symbol": "Cdh1",
+      "human_entrez_id": "999",
+      "mouse_entrez_id": "12550",
+      "mouse_mgi_id": "MGI:88354",
+      "mgi_homology_class": "52445720"
+    },
+    {
+      "human_symbol": "CDK1",
+      "mouse_symbol": "Cdk1",
+      "human_entrez_id": "983",
+      "mouse_entrez_id": "12534",
+      "mouse_mgi_id": "MGI:88351",
+      "mgi_homology_class": "52444491"
+    },
+    {
+      "human_symbol": "CDK9",
+      "mouse_symbol": "Cdk9",
+      "human_entrez_id": "1025",
+      "mouse_entrez_id": "107951",
+      "mouse_mgi_id": "MGI:1328368",
+      "mgi_homology_class": "52454437"
+    },
+    {
+      "human_symbol": "CDKN1A",
+      "mouse_symbol": "Cdkn1a",
+      "human_entrez_id": "1026",
+      "mouse_entrez_id": "12575",
+      "mouse_mgi_id": "MGI:104556",
+      "mgi_homology_class": "52444672"
+    },
+    {
+      "human_symbol": "CDKN1B",
+      "mouse_symbol": "Cdkn1b",
+      "human_entrez_id": "1027",
+      "mouse_entrez_id": "12576",
+      "mouse_mgi_id": "MGI:104565",
+      "mgi_homology_class": "52444513"
+    },
+    {
+      "human_symbol": "CDKN1C",
+      "mouse_symbol": "Cdkn1c",
+      "human_entrez_id": "1028",
+      "mouse_entrez_id": "12577",
+      "mouse_mgi_id": "MGI:104564",
+      "mgi_homology_class": "52444315"
+    },
+    {
+      "human_symbol": "CFB",
+      "mouse_symbol": "Cfb",
+      "human_entrez_id": "629",
+      "mouse_entrez_id": "14962",
+      "mouse_mgi_id": "MGI:105975",
+      "mgi_homology_class": "52443391"
+    },
+    {
+      "human_symbol": "CHST2",
+      "mouse_symbol": "Chst2",
+      "human_entrez_id": "9435",
+      "mouse_entrez_id": "54371",
+      "mouse_mgi_id": "MGI:1891160",
+      "mgi_homology_class": "52452627"
+    },
+    {
+      "human_symbol": "CHST3",
+      "mouse_symbol": "Chst3",
+      "human_entrez_id": "9469",
+      "mouse_entrez_id": "53374",
+      "mouse_mgi_id": "MGI:1858224",
+      "mgi_homology_class": "52452094"
+    },
+    {
+      "human_symbol": "CIITA",
+      "mouse_symbol": "Ciita",
+      "human_entrez_id": "4261",
+      "mouse_entrez_id": "12265",
+      "mouse_mgi_id": "MGI:108445",
+      "mgi_homology_class": "52457884"
+    },
+    {
+      "human_symbol": "CITED2",
+      "mouse_symbol": "Cited2",
+      "human_entrez_id": "10370",
+      "mouse_entrez_id": "17684",
+      "mouse_mgi_id": "MGI:1306784",
+      "mgi_homology_class": "52455216"
+    },
+    {
+      "human_symbol": "CMKLR1",
+      "mouse_symbol": "Cmklr1",
+      "human_entrez_id": "1240",
+      "mouse_entrez_id": "14747",
+      "mouse_mgi_id": "MGI:109603",
+      "mgi_homology_class": "52452139"
+    },
+    {
+      "human_symbol": "CMPK2",
+      "mouse_symbol": "Cmpk2",
+      "human_entrez_id": "129607",
+      "mouse_entrez_id": "22169",
+      "mouse_mgi_id": "MGI:99830",
+      "mgi_homology_class": "52452260"
+    },
+    {
+      "human_symbol": "CMTR1",
+      "mouse_symbol": "Cmtr1",
+      "human_entrez_id": "23070",
+      "mouse_entrez_id": "74157",
+      "mouse_mgi_id": "MGI:1921407",
+      "mgi_homology_class": "52448145"
+    },
+    {
+      "human_symbol": "COL5A1",
+      "mouse_symbol": "Col5a1",
+      "human_entrez_id": "1289",
+      "mouse_entrez_id": "12831",
+      "mouse_mgi_id": "MGI:88457",
+      "mgi_homology_class": "52453420"
+    },
+    {
+      "human_symbol": "CP",
+      "mouse_symbol": "Cp",
+      "human_entrez_id": "1356",
+      "mouse_entrez_id": "12870",
+      "mouse_mgi_id": "MGI:88476",
+      "mgi_homology_class": "52444541"
+    },
+    {
+      "human_symbol": "CSRP2",
+      "mouse_symbol": "Csrp2",
+      "human_entrez_id": "1466",
+      "mouse_entrez_id": "13008",
+      "mouse_mgi_id": "MGI:1202907",
+      "mgi_homology_class": "52456899"
+    },
+    {
+      "human_symbol": "CTLA4",
+      "mouse_symbol": "Ctla4",
+      "human_entrez_id": "1493",
+      "mouse_entrez_id": "12477",
+      "mouse_mgi_id": "MGI:88556",
+      "mgi_homology_class": "52444925"
+    },
+    {
+      "human_symbol": "CTNNB1",
+      "mouse_symbol": "Ctnnb1",
+      "human_entrez_id": "1499",
+      "mouse_entrez_id": "12387",
+      "mouse_mgi_id": "MGI:88276",
+      "mgi_homology_class": "52444927"
+    },
+    {
+      "human_symbol": "CTSW",
+      "mouse_symbol": "Ctsw",
+      "human_entrez_id": "1521",
+      "mouse_entrez_id": "13041",
+      "mouse_mgi_id": "MGI:1338045",
+      "mgi_homology_class": "52459378"
+    },
+    {
+      "human_symbol": "CXCL10",
+      "mouse_symbol": "Cxcl10",
+      "human_entrez_id": "3627",
+      "mouse_entrez_id": "15945",
+      "mouse_mgi_id": "MGI:1352450",
+      "mgi_homology_class": "52459389"
+    },
+    {
+      "human_symbol": "CXCL11",
+      "mouse_symbol": "Cxcl11",
+      "human_entrez_id": "6373",
+      "mouse_entrez_id": "56066",
+      "mouse_mgi_id": "MGI:1860203",
+      "mgi_homology_class": "52444967"
+    },
+    {
+      "human_symbol": "CXCL9",
+      "mouse_symbol": "Cxcl9",
+      "human_entrez_id": "4283",
+      "mouse_entrez_id": "17329",
+      "mouse_mgi_id": "MGI:1352449",
+      "mgi_homology_class": "52444968"
+    },
+    {
+      "human_symbol": "CXCR4",
+      "mouse_symbol": "Cxcr4",
+      "human_entrez_id": "7852",
+      "mouse_entrez_id": "12767",
+      "mouse_mgi_id": "MGI:109563",
+      "mgi_homology_class": "52444021"
+    },
+    {
+      "human_symbol": "CXCR6",
+      "mouse_symbol": "Cxcr6",
+      "human_entrez_id": "10663",
+      "mouse_entrez_id": "80901",
+      "mouse_mgi_id": "MGI:1934582",
+      "mgi_homology_class": "52459397"
+    },
+    {
+      "human_symbol": "DCN",
+      "mouse_symbol": "Dcn",
+      "human_entrez_id": "1634",
+      "mouse_entrez_id": "13179",
+      "mouse_mgi_id": "MGI:94872",
+      "mgi_homology_class": "52445067"
+    },
+    {
+      "human_symbol": "DDIT3",
+      "mouse_symbol": "Ddit3",
+      "human_entrez_id": "1649",
+      "mouse_entrez_id": "13198",
+      "mouse_mgi_id": "MGI:109247",
+      "mgi_homology_class": "52444597"
+    },
+    {
+      "human_symbol": "DDIT4",
+      "mouse_symbol": "Ddit4",
+      "human_entrez_id": "54541",
+      "mouse_entrez_id": "74747",
+      "mouse_mgi_id": "MGI:1921997",
+      "mgi_homology_class": "52450981"
+    },
+    {
+      "human_symbol": "DDX60",
+      "mouse_symbol": "Ddx60",
+      "human_entrez_id": "55601",
+      "mouse_entrez_id": "234311",
+      "mouse_mgi_id": "MGI:2384570",
+      "mgi_homology_class": "52459456"
+    },
+    {
+      "human_symbol": "DHX58",
+      "mouse_symbol": "Dhx58",
+      "human_entrez_id": "79132",
+      "mouse_entrez_id": "80861",
+      "mouse_mgi_id": "MGI:1931560",
+      "mgi_homology_class": "52449879"
+    },
+    {
+      "human_symbol": "DPYSL4",
+      "mouse_symbol": "Dpysl4",
+      "human_entrez_id": "10570",
+      "mouse_entrez_id": "26757",
+      "mouse_mgi_id": "MGI:1349764",
+      "mgi_homology_class": "52444860"
+    },
+    {
+      "human_symbol": "DTNA",
+      "mouse_symbol": "Dtna",
+      "human_entrez_id": "1837",
+      "mouse_entrez_id": "13527",
+      "mouse_mgi_id": "MGI:106039",
+      "mgi_homology_class": "52443230"
+    },
+    {
+      "human_symbol": "DUSP1",
+      "mouse_symbol": "Dusp1",
+      "human_entrez_id": "1843",
+      "mouse_entrez_id": "19252",
+      "mouse_mgi_id": "MGI:105120",
+      "mgi_homology_class": "52443916"
+    },
+    {
+      "human_symbol": "EDN2",
+      "mouse_symbol": "Edn2",
+      "human_entrez_id": "1907",
+      "mouse_entrez_id": "13615",
+      "mouse_mgi_id": "MGI:95284",
+      "mgi_homology_class": "52451917"
+    },
+    {
+      "human_symbol": "EFNA1",
+      "mouse_symbol": "Efna1",
+      "human_entrez_id": "1942",
+      "mouse_entrez_id": "13636",
+      "mouse_mgi_id": "MGI:103236",
+      "mgi_homology_class": "52445752"
+    },
+    {
+      "human_symbol": "EFNA3",
+      "mouse_symbol": "Efna3",
+      "human_entrez_id": "1944",
+      "mouse_entrez_id": "13638",
+      "mouse_mgi_id": "MGI:106644",
+      "mgi_homology_class": "52445754"
+    },
+    {
+      "human_symbol": "EGFR",
+      "mouse_symbol": "Egfr",
+      "human_entrez_id": "1956",
+      "mouse_entrez_id": "13649",
+      "mouse_mgi_id": "MGI:95294",
+      "mgi_homology_class": "52445759"
+    },
+    {
+      "human_symbol": "EIF2AK2",
+      "mouse_symbol": "Eif2ak2",
+      "human_entrez_id": "5610",
+      "mouse_entrez_id": "19106",
+      "mouse_mgi_id": "MGI:1353449",
+      "mgi_homology_class": "52450759"
+    },
+    {
+      "human_symbol": "EIF4E3",
+      "mouse_symbol": "Eif4e3",
+      "human_entrez_id": "317649",
+      "mouse_entrez_id": "66892",
+      "mouse_mgi_id": "MGI:1914142",
+      "mgi_homology_class": "52454680"
+    },
+    {
+      "human_symbol": "ENG",
+      "mouse_symbol": "Eng",
+      "human_entrez_id": "2022",
+      "mouse_entrez_id": "13805",
+      "mouse_mgi_id": "MGI:95392",
+      "mgi_homology_class": "52458566"
+    },
+    {
+      "human_symbol": "ENO2",
+      "mouse_symbol": "Eno2",
+      "human_entrez_id": "2026",
+      "mouse_entrez_id": "13807",
+      "mouse_mgi_id": "MGI:95394",
+      "mgi_homology_class": "52445819"
+    },
+    {
+      "human_symbol": "ENO3",
+      "mouse_symbol": "Eno3",
+      "human_entrez_id": "2027",
+      "mouse_entrez_id": "13808",
+      "mouse_mgi_id": "MGI:95395",
+      "mgi_homology_class": "52444275"
+    },
+    {
+      "human_symbol": "EPSTI1",
+      "mouse_symbol": "Epsti1",
+      "human_entrez_id": "94240",
+      "mouse_entrez_id": "108670",
+      "mouse_mgi_id": "MGI:1915168",
+      "mgi_homology_class": "52452017"
+    },
+    {
+      "human_symbol": "ERO1A",
+      "mouse_symbol": "Ero1a",
+      "human_entrez_id": "30001",
+      "mouse_entrez_id": "50527",
+      "mouse_mgi_id": "MGI:1354385",
+      "mgi_homology_class": "52445861"
+    },
+    {
+      "human_symbol": "ERRFI1",
+      "mouse_symbol": "Errfi1",
+      "human_entrez_id": "54206",
+      "mouse_entrez_id": "74155",
+      "mouse_mgi_id": "MGI:1921405",
+      "mgi_homology_class": "52445867"
+    },
+    {
+      "human_symbol": "ETS1",
+      "mouse_symbol": "Ets1",
+      "human_entrez_id": "2113",
+      "mouse_entrez_id": "23871",
+      "mouse_mgi_id": "MGI:95455",
+      "mgi_homology_class": "52444089"
+    },
+    {
+      "human_symbol": "EXT1",
+      "mouse_symbol": "Ext1",
+      "human_entrez_id": "2131",
+      "mouse_entrez_id": "14042",
+      "mouse_mgi_id": "MGI:894663",
+      "mgi_homology_class": "52447294"
+    },
+    {
+      "human_symbol": "F3",
+      "mouse_symbol": "F3",
+      "human_entrez_id": "2152",
+      "mouse_entrez_id": "14066",
+      "mouse_mgi_id": "MGI:88381",
+      "mgi_homology_class": "52453906"
+    },
+    {
+      "human_symbol": "FAM162A",
+      "mouse_symbol": "Fam162a",
+      "human_entrez_id": "26355",
+      "mouse_entrez_id": "70186",
+      "mouse_mgi_id": "MGI:1917436",
+      "mgi_homology_class": "52446371"
+    },
+    {
+      "human_symbol": "FAS",
+      "mouse_symbol": "Fas",
+      "human_entrez_id": "355",
+      "mouse_entrez_id": "14102",
+      "mouse_mgi_id": "MGI:95484",
+      "mgi_homology_class": "52457754"
+    },
+    {
+      "human_symbol": "FBP1",
+      "mouse_symbol": "Fbp1",
+      "human_entrez_id": "2203",
+      "mouse_entrez_id": "14121",
+      "mouse_mgi_id": "MGI:95492",
+      "mgi_homology_class": "52444127"
+    },
+    {
+      "human_symbol": "FGL2",
+      "mouse_symbol": "Fgl2",
+      "human_entrez_id": "10875",
+      "mouse_entrez_id": "14190",
+      "mouse_mgi_id": "MGI:103266",
+      "mgi_homology_class": "52447470"
+    },
+    {
+      "human_symbol": "FNTA",
+      "mouse_symbol": "Fnta",
+      "human_entrez_id": "2339",
+      "mouse_entrez_id": "14272",
+      "mouse_mgi_id": "MGI:104683",
+      "mgi_homology_class": "52449115"
+    },
+    {
+      "human_symbol": "FOS",
+      "mouse_symbol": "Fos",
+      "human_entrez_id": "2353",
+      "mouse_entrez_id": "14281",
+      "mouse_mgi_id": "MGI:95574",
+      "mgi_homology_class": "52443769"
+    },
+    {
+      "human_symbol": "FOSL2",
+      "mouse_symbol": "Fosl2",
+      "human_entrez_id": "2355",
+      "mouse_entrez_id": "14284",
+      "mouse_mgi_id": "MGI:102858",
+      "mgi_homology_class": "52454999"
+    },
+    {
+      "human_symbol": "FOXO3",
+      "mouse_symbol": "Foxo3",
+      "human_entrez_id": "2309",
+      "mouse_entrez_id": "56484",
+      "mouse_mgi_id": "MGI:1890081",
+      "mgi_homology_class": "52446554"
+    },
+    {
+      "human_symbol": "FOXP3",
+      "mouse_symbol": "Foxp3",
+      "human_entrez_id": "50943",
+      "mouse_entrez_id": "20371",
+      "mouse_mgi_id": "MGI:1891436",
+      "mgi_homology_class": "52448118"
+    },
+    {
+      "human_symbol": "FPR1",
+      "mouse_symbol": "Fpr1",
+      "human_entrez_id": "2357",
+      "mouse_entrez_id": "14293",
+      "mouse_mgi_id": "MGI:107443",
+      "mgi_homology_class": "52457341"
+    },
+    {
+      "human_symbol": "FURIN",
+      "mouse_symbol": "Furin",
+      "human_entrez_id": "5045",
+      "mouse_entrez_id": "18550",
+      "mouse_mgi_id": "MGI:97513",
+      "mgi_homology_class": "52442825"
+    },
+    {
+      "human_symbol": "GAA",
+      "mouse_symbol": "Gaa",
+      "human_entrez_id": "2548",
+      "mouse_entrez_id": "14387",
+      "mouse_mgi_id": "MGI:95609",
+      "mgi_homology_class": "52457784"
+    },
+    {
+      "human_symbol": "GALK1",
+      "mouse_symbol": "Galk1",
+      "human_entrez_id": "2584",
+      "mouse_entrez_id": "14635",
+      "mouse_mgi_id": "MGI:95730",
+      "mgi_homology_class": "52455137"
+    },
+    {
+      "human_symbol": "GAPDHS",
+      "mouse_symbol": "Gapdhs",
+      "human_entrez_id": "26330",
+      "mouse_entrez_id": "14447",
+      "mouse_mgi_id": "MGI:95653",
+      "mgi_homology_class": "52443982"
+    },
+    {
+      "human_symbol": "GBE1",
+      "mouse_symbol": "Gbe1",
+      "human_entrez_id": "2632",
+      "mouse_entrez_id": "74185",
+      "mouse_mgi_id": "MGI:1921435",
+      "mgi_homology_class": "52452021"
+    },
+    {
+      "human_symbol": "GCH1",
+      "mouse_symbol": "Gch1",
+      "human_entrez_id": "2643",
+      "mouse_entrez_id": "14528",
+      "mouse_mgi_id": "MGI:95675",
+      "mgi_homology_class": "52443654"
+    },
+    {
+      "human_symbol": "GCK",
+      "mouse_symbol": "Gck",
+      "human_entrez_id": "2645",
+      "mouse_entrez_id": "103988",
+      "mouse_mgi_id": "MGI:1270854",
+      "mgi_homology_class": "52459851"
+    },
+    {
+      "human_symbol": "GCNT2",
+      "mouse_symbol": "Gcnt2",
+      "human_entrez_id": "2651",
+      "mouse_entrez_id": "14538",
+      "mouse_mgi_id": "MGI:1100870",
+      "mgi_homology_class": "52458376"
+    },
+    {
+      "human_symbol": "GLRX",
+      "mouse_symbol": "Glrx",
+      "human_entrez_id": "2745",
+      "mouse_entrez_id": "93692",
+      "mouse_mgi_id": "MGI:2135625",
+      "mgi_homology_class": "52447087"
+    },
+    {
+      "human_symbol": "GPC1",
+      "mouse_symbol": "Gpc1",
+      "human_entrez_id": "2817",
+      "mouse_entrez_id": "14733",
+      "mouse_mgi_id": "MGI:1194891",
+      "mgi_homology_class": "52448392"
+    },
+    {
+      "human_symbol": "GPC3",
+      "mouse_symbol": "Gpc3",
+      "human_entrez_id": "2719",
+      "mouse_entrez_id": "14734",
+      "mouse_mgi_id": "MGI:104903",
+      "mgi_homology_class": "52457447"
+    },
+    {
+      "human_symbol": "GPC4",
+      "mouse_symbol": "Gpc4",
+      "human_entrez_id": "2239",
+      "mouse_entrez_id": "14735",
+      "mouse_mgi_id": "MGI:104902",
+      "mgi_homology_class": "52444654"
+    },
+    {
+      "human_symbol": "GPI",
+      "mouse_symbol": "Gpi1",
+      "human_entrez_id": "2821",
+      "mouse_entrez_id": "14751",
+      "mouse_mgi_id": "MGI:95797",
+      "mgi_homology_class": "52450715"
+    },
+    {
+      "human_symbol": "GPR18",
+      "mouse_symbol": "Gpr18",
+      "human_entrez_id": "2841",
+      "mouse_entrez_id": "110168",
+      "mouse_mgi_id": "MGI:107859",
+      "mgi_homology_class": "52451810"
+    },
+    {
+      "human_symbol": "GRHPR",
+      "mouse_symbol": "Grhpr",
+      "human_entrez_id": "9380",
+      "mouse_entrez_id": "76238",
+      "mouse_mgi_id": "MGI:1923488",
+      "mgi_homology_class": "52446737"
+    },
+    {
+      "human_symbol": "GYS1",
+      "mouse_symbol": "Gys1",
+      "human_entrez_id": "2997",
+      "mouse_entrez_id": "14936",
+      "mouse_mgi_id": "MGI:101805",
+      "mgi_homology_class": "52456576"
+    },
+    {
+      "human_symbol": "GZMA",
+      "mouse_symbol": "Gzma",
+      "human_entrez_id": "3001",
+      "mouse_entrez_id": "14938",
+      "mouse_mgi_id": "MGI:109266",
+      "mgi_homology_class": "52452388"
+    },
+    {
+      "human_symbol": "HAS1",
+      "mouse_symbol": "Has1",
+      "human_entrez_id": "3036",
+      "mouse_entrez_id": "15116",
+      "mouse_mgi_id": "MGI:106590",
+      "mgi_homology_class": "52457456"
+    },
+    {
+      "human_symbol": "HAVCR2",
+      "mouse_symbol": "Havcr2",
+      "human_entrez_id": "84868",
+      "mouse_entrez_id": "171285",
+      "mouse_mgi_id": "MGI:2159682",
+      "mgi_homology_class": "52449802"
+    },
+    {
+      "human_symbol": "HDAC1",
+      "mouse_symbol": "Hdac1",
+      "human_entrez_id": "3065",
+      "mouse_entrez_id": "433759",
+      "mouse_mgi_id": "MGI:108086",
+      "mgi_homology_class": "52444653"
+    },
+    {
+      "human_symbol": "HDLBP",
+      "mouse_symbol": "Hdlbp",
+      "human_entrez_id": "3069",
+      "mouse_entrez_id": "110611",
+      "mouse_mgi_id": "MGI:99256",
+      "mgi_homology_class": "52444125"
+    },
+    {
+      "human_symbol": "HELZ2",
+      "mouse_symbol": "Helz2",
+      "human_entrez_id": "85441",
+      "mouse_entrez_id": "229003",
+      "mouse_mgi_id": "MGI:2385169",
+      "mgi_homology_class": "52448276"
+    },
+    {
+      "human_symbol": "HERC6",
+      "mouse_symbol": "Herc6",
+      "human_entrez_id": "55008",
+      "mouse_entrez_id": "67138",
+      "mouse_mgi_id": "MGI:1914388",
+      "mgi_homology_class": "52448541"
+    },
+    {
+      "human_symbol": "HEXA",
+      "mouse_symbol": "Hexa",
+      "human_entrez_id": "3073",
+      "mouse_entrez_id": "15211",
+      "mouse_mgi_id": "MGI:96073",
+      "mgi_homology_class": "52455497"
+    },
+    {
+      "human_symbol": "HIF1A",
+      "mouse_symbol": "Hif1a",
+      "human_entrez_id": "3091",
+      "mouse_entrez_id": "15251",
+      "mouse_mgi_id": "MGI:106918",
+      "mgi_homology_class": "52448552"
+    },
+    {
+      "human_symbol": "HIPK2",
+      "mouse_symbol": "Hipk2",
+      "human_entrez_id": "28996",
+      "mouse_entrez_id": "15258",
+      "mouse_mgi_id": "MGI:1314872",
+      "mgi_homology_class": "52443734"
+    },
+    {
+      "human_symbol": "HK1",
+      "mouse_symbol": "Hk1",
+      "human_entrez_id": "3098",
+      "mouse_entrez_id": "15275",
+      "mouse_mgi_id": "MGI:96103",
+      "mgi_homology_class": "52445591"
+    },
+    {
+      "human_symbol": "HK2",
+      "mouse_symbol": "Hk2",
+      "human_entrez_id": "3099",
+      "mouse_entrez_id": "15277",
+      "mouse_mgi_id": "MGI:1315197",
+      "mgi_homology_class": "52445592"
+    },
+    {
+      "human_symbol": "HLA-DMA",
+      "mouse_symbol": "H2-DMa",
+      "human_entrez_id": "3108",
+      "mouse_entrez_id": "14998",
+      "mouse_mgi_id": "MGI:95921",
+      "mgi_homology_class": "52460013"
+    },
+    {
+      "human_symbol": "HLA-DRA",
+      "mouse_symbol": "H2-Ea",
+      "human_entrez_id": "3122",
+      "mouse_entrez_id": "100504404",
+      "mouse_mgi_id": "MGI:95900",
+      "mgi_homology_class": "52443017"
+    },
+    {
+      "human_symbol": "HMOX1",
+      "mouse_symbol": "Hmox1",
+      "human_entrez_id": "3162",
+      "mouse_entrez_id": "15368",
+      "mouse_mgi_id": "MGI:96163",
+      "mgi_homology_class": "52447034"
+    },
+    {
+      "human_symbol": "HOXB9",
+      "mouse_symbol": "Hoxb9",
+      "human_entrez_id": "3219",
+      "mouse_entrez_id": "15417",
+      "mouse_mgi_id": "MGI:96190",
+      "mgi_homology_class": "52443507"
+    },
+    {
+      "human_symbol": "HS3ST1",
+      "mouse_symbol": "Hs3st1",
+      "human_entrez_id": "9957",
+      "mouse_entrez_id": "15476",
+      "mouse_mgi_id": "MGI:1201606",
+      "mgi_homology_class": "52442696"
+    },
+    {
+      "human_symbol": "HSPA5",
+      "mouse_symbol": "Hspa5",
+      "human_entrez_id": "3309",
+      "mouse_entrez_id": "14828",
+      "mouse_mgi_id": "MGI:95835",
+      "mgi_homology_class": "52443413"
+    },
+    {
+      "human_symbol": "ICAM1",
+      "mouse_symbol": "Icam1",
+      "human_entrez_id": "3383",
+      "mouse_entrez_id": "15894",
+      "mouse_mgi_id": "MGI:96392",
+      "mgi_homology_class": "52452104"
+    },
+    {
+      "human_symbol": "ID1",
+      "mouse_symbol": "Id1",
+      "human_entrez_id": "3397",
+      "mouse_entrez_id": "15901",
+      "mouse_mgi_id": "MGI:96396",
+      "mgi_homology_class": "52443781"
+    },
+    {
+      "human_symbol": "ID2",
+      "mouse_symbol": "Id2",
+      "human_entrez_id": "3398",
+      "mouse_entrez_id": "15902",
+      "mouse_mgi_id": "MGI:96397",
+      "mgi_homology_class": "52443954"
+    },
+    {
+      "human_symbol": "ID3",
+      "mouse_symbol": "Id3",
+      "human_entrez_id": "3399",
+      "mouse_entrez_id": "15903",
+      "mouse_mgi_id": "MGI:96398",
+      "mgi_homology_class": "52445880"
+    },
+    {
+      "human_symbol": "IDO1",
+      "mouse_symbol": "Ido1",
+      "human_entrez_id": "3620",
+      "mouse_entrez_id": "15930",
+      "mouse_mgi_id": "MGI:96416",
+      "mgi_homology_class": "52448796"
+    },
+    {
+      "human_symbol": "IDS",
+      "mouse_symbol": "Ids",
+      "human_entrez_id": "3423",
+      "mouse_entrez_id": "15931",
+      "mouse_mgi_id": "MGI:96417",
+      "mgi_homology_class": "52455962"
+    },
+    {
+      "human_symbol": "IER3",
+      "mouse_symbol": "Ier3",
+      "human_entrez_id": "8870",
+      "mouse_entrez_id": "15937",
+      "mouse_mgi_id": "MGI:104814",
+      "mgi_homology_class": "52449275"
+    },
+    {
+      "human_symbol": "IFI30",
+      "mouse_symbol": "Ifi30",
+      "human_entrez_id": "10437",
+      "mouse_entrez_id": "65972",
+      "mouse_mgi_id": "MGI:2137648",
+      "mgi_homology_class": "52448332"
+    },
+    {
+      "human_symbol": "IFI35",
+      "mouse_symbol": "Ifi35",
+      "human_entrez_id": "3430",
+      "mouse_entrez_id": "70110",
+      "mouse_mgi_id": "MGI:1917360",
+      "mgi_homology_class": "52458105"
+    },
+    {
+      "human_symbol": "IFI44",
+      "mouse_symbol": "Ifi44",
+      "human_entrez_id": "10561",
+      "mouse_entrez_id": "99899",
+      "mouse_mgi_id": "MGI:2443016",
+      "mgi_homology_class": "52446633"
+    },
+    {
+      "human_symbol": "IFI44L",
+      "mouse_symbol": "Ifi44l",
+      "human_entrez_id": "10964",
+      "mouse_entrez_id": "15061",
+      "mouse_mgi_id": "MGI:95975",
+      "mgi_homology_class": "52447389"
+    },
+    {
+      "human_symbol": "IFIH1",
+      "mouse_symbol": "Ifih1",
+      "human_entrez_id": "64135",
+      "mouse_entrez_id": "71586",
+      "mouse_mgi_id": "MGI:1918836",
+      "mgi_homology_class": "52450051"
+    },
+    {
+      "human_symbol": "IFIT2",
+      "mouse_symbol": "Ifit2",
+      "human_entrez_id": "3433",
+      "mouse_entrez_id": "15958",
+      "mouse_mgi_id": "MGI:99449",
+      "mgi_homology_class": "52448803"
+    },
+    {
+      "human_symbol": "IFNAR2",
+      "mouse_symbol": "Ifnar2",
+      "human_entrez_id": "3455",
+      "mouse_entrez_id": "15976",
+      "mouse_mgi_id": "MGI:1098243",
+      "mgi_homology_class": "52444845"
+    },
+    {
+      "human_symbol": "IFNG",
+      "mouse_symbol": "Ifng",
+      "human_entrez_id": "3458",
+      "mouse_entrez_id": "15978",
+      "mouse_mgi_id": "MGI:107656",
+      "mgi_homology_class": "52448843"
+    },
+    {
+      "human_symbol": "IFNGR2",
+      "mouse_symbol": "Ifngr2",
+      "human_entrez_id": "3460",
+      "mouse_entrez_id": "15980",
+      "mouse_mgi_id": "MGI:107654",
+      "mgi_homology_class": "52444850"
+    },
+    {
+      "human_symbol": "IGFBP1",
+      "mouse_symbol": "Igfbp1",
+      "human_entrez_id": "3484",
+      "mouse_entrez_id": "16006",
+      "mouse_mgi_id": "MGI:96436",
+      "mgi_homology_class": "52444152"
+    },
+    {
+      "human_symbol": "IGFBP3",
+      "mouse_symbol": "Igfbp3",
+      "human_entrez_id": "3486",
+      "mouse_entrez_id": "16009",
+      "mouse_mgi_id": "MGI:96438",
+      "mgi_homology_class": "52448848"
+    },
+    {
+      "human_symbol": "IKZF2",
+      "mouse_symbol": "Ikzf2",
+      "human_entrez_id": "22807",
+      "mouse_entrez_id": "22779",
+      "mouse_mgi_id": "MGI:1342541",
+      "mgi_homology_class": "52453661"
+    },
+    {
+      "human_symbol": "IL10RA",
+      "mouse_symbol": "Il10ra",
+      "human_entrez_id": "3587",
+      "mouse_entrez_id": "16154",
+      "mouse_mgi_id": "MGI:96538",
+      "mgi_homology_class": "52444851"
+    },
+    {
+      "human_symbol": "IL15",
+      "mouse_symbol": "Il15",
+      "human_entrez_id": "3600",
+      "mouse_entrez_id": "16168",
+      "mouse_mgi_id": "MGI:103014",
+      "mgi_homology_class": "52457675"
+    },
+    {
+      "human_symbol": "IL15RA",
+      "mouse_symbol": "Il15ra",
+      "human_entrez_id": "3601",
+      "mouse_entrez_id": "16169",
+      "mouse_mgi_id": "MGI:104644",
+      "mgi_homology_class": "52456335"
+    },
+    {
+      "human_symbol": "IL18BP",
+      "mouse_symbol": "Il18bp",
+      "human_entrez_id": "10068",
+      "mouse_entrez_id": "16068",
+      "mouse_mgi_id": "MGI:1333800",
+      "mgi_homology_class": "52460146"
+    },
+    {
+      "human_symbol": "IL1B",
+      "mouse_symbol": "Il1b",
+      "human_entrez_id": "3553",
+      "mouse_entrez_id": "16176",
+      "mouse_mgi_id": "MGI:96543",
+      "mgi_homology_class": "52455460"
+    },
+    {
+      "human_symbol": "IL2RA",
+      "mouse_symbol": "Il2ra",
+      "human_entrez_id": "3559",
+      "mouse_entrez_id": "16184",
+      "mouse_mgi_id": "MGI:96549",
+      "mgi_homology_class": "52460162"
+    },
+    {
+      "human_symbol": "IL2RB",
+      "mouse_symbol": "Il2rb",
+      "human_entrez_id": "3560",
+      "mouse_entrez_id": "16185",
+      "mouse_mgi_id": "MGI:96550",
+      "mgi_homology_class": "52457901"
+    },
+    {
+      "human_symbol": "IL4R",
+      "mouse_symbol": "Il4ra",
+      "human_entrez_id": "3566",
+      "mouse_entrez_id": "16190",
+      "mouse_mgi_id": "MGI:105367",
+      "mgi_homology_class": "52445593"
+    },
+    {
+      "human_symbol": "IL6",
+      "mouse_symbol": "Il6",
+      "human_entrez_id": "3569",
+      "mouse_entrez_id": "16193",
+      "mouse_mgi_id": "MGI:96559",
+      "mgi_homology_class": "52458347"
+    },
+    {
+      "human_symbol": "IL7",
+      "mouse_symbol": "Il7",
+      "human_entrez_id": "3574",
+      "mouse_entrez_id": "16196",
+      "mouse_mgi_id": "MGI:96561",
+      "mgi_homology_class": "52460172"
+    },
+    {
+      "human_symbol": "INHA",
+      "mouse_symbol": "Inha",
+      "human_entrez_id": "3623",
+      "mouse_entrez_id": "16322",
+      "mouse_mgi_id": "MGI:96569",
+      "mgi_homology_class": "52453434"
+    },
+    {
+      "human_symbol": "IRF1",
+      "mouse_symbol": "Irf1",
+      "human_entrez_id": "3659",
+      "mouse_entrez_id": "16362",
+      "mouse_mgi_id": "MGI:96590",
+      "mgi_homology_class": "52449696"
+    },
+    {
+      "human_symbol": "IRF2",
+      "mouse_symbol": "Irf2",
+      "human_entrez_id": "3660",
+      "mouse_entrez_id": "16363",
+      "mouse_mgi_id": "MGI:96591",
+      "mgi_homology_class": "52449697"
+    },
+    {
+      "human_symbol": "IRF4",
+      "mouse_symbol": "Irf4",
+      "human_entrez_id": "3662",
+      "mouse_entrez_id": "16364",
+      "mouse_mgi_id": "MGI:1096873",
+      "mgi_homology_class": "52449698"
+    },
+    {
+      "human_symbol": "IRF5",
+      "mouse_symbol": "Irf5",
+      "human_entrez_id": "3663",
+      "mouse_entrez_id": "27056",
+      "mouse_mgi_id": "MGI:1350924",
+      "mgi_homology_class": "52449578"
+    },
+    {
+      "human_symbol": "IRF7",
+      "mouse_symbol": "Irf7",
+      "human_entrez_id": "3665",
+      "mouse_entrez_id": "54123",
+      "mouse_mgi_id": "MGI:1859212",
+      "mgi_homology_class": "52455001"
+    },
+    {
+      "human_symbol": "IRF8",
+      "mouse_symbol": "Irf8",
+      "human_entrez_id": "3394",
+      "mouse_entrez_id": "15900",
+      "mouse_mgi_id": "MGI:96395",
+      "mgi_homology_class": "52457093"
+    },
+    {
+      "human_symbol": "IRF9",
+      "mouse_symbol": "Irf9",
+      "human_entrez_id": "10379",
+      "mouse_entrez_id": "16391",
+      "mouse_mgi_id": "MGI:107587",
+      "mgi_homology_class": "52449706"
+    },
+    {
+      "human_symbol": "IRS2",
+      "mouse_symbol": "Irs2",
+      "human_entrez_id": "8660",
+      "mouse_entrez_id": "384783",
+      "mouse_mgi_id": "MGI:109334",
+      "mgi_homology_class": "52449702"
+    },
+    {
+      "human_symbol": "ISG15",
+      "mouse_symbol": "Isg15",
+      "human_entrez_id": "9636",
+      "mouse_entrez_id": "100038882",
+      "mouse_mgi_id": "MGI:1855694",
+      "mgi_homology_class": "52448168"
+    },
+    {
+      "human_symbol": "ISG20",
+      "mouse_symbol": "Isg20",
+      "human_entrez_id": "3669",
+      "mouse_entrez_id": "57444",
+      "mouse_mgi_id": "MGI:1928895",
+      "mgi_homology_class": "52458124"
+    },
+    {
+      "human_symbol": "ISOC1",
+      "mouse_symbol": "Isoc1",
+      "human_entrez_id": "51015",
+      "mouse_entrez_id": "66307",
+      "mouse_mgi_id": "MGI:1913557",
+      "mgi_homology_class": "52455893"
+    },
+    {
+      "human_symbol": "ITGA1",
+      "mouse_symbol": "Itga1",
+      "human_entrez_id": "3672",
+      "mouse_entrez_id": "109700",
+      "mouse_mgi_id": "MGI:96599",
+      "mgi_homology_class": "52453167"
+    },
+    {
+      "human_symbol": "ITGAE",
+      "mouse_symbol": "Itgae",
+      "human_entrez_id": "3682",
+      "mouse_entrez_id": "16407",
+      "mouse_mgi_id": "MGI:1298377",
+      "mgi_homology_class": "52449714"
+    },
+    {
+      "human_symbol": "ITGB7",
+      "mouse_symbol": "Itgb7",
+      "human_entrez_id": "3695",
+      "mouse_entrez_id": "16421",
+      "mouse_mgi_id": "MGI:96616",
+      "mgi_homology_class": "52458147"
+    },
+    {
+      "human_symbol": "JAK2",
+      "mouse_symbol": "Jak2",
+      "human_entrez_id": "3717",
+      "mouse_entrez_id": "16452",
+      "mouse_mgi_id": "MGI:96629",
+      "mgi_homology_class": "52449725"
+    },
+    {
+      "human_symbol": "JMJD6",
+      "mouse_symbol": "Jmjd6",
+      "human_entrez_id": "23210",
+      "mouse_entrez_id": "107817",
+      "mouse_mgi_id": "MGI:1858910",
+      "mgi_homology_class": "52449735"
+    },
+    {
+      "human_symbol": "JUN",
+      "mouse_symbol": "Jun",
+      "human_entrez_id": "3725",
+      "mouse_entrez_id": "16476",
+      "mouse_mgi_id": "MGI:96646",
+      "mgi_homology_class": "52444681"
+    },
+    {
+      "human_symbol": "JUNB",
+      "mouse_symbol": "Junb",
+      "human_entrez_id": "3726",
+      "mouse_entrez_id": "16477",
+      "mouse_mgi_id": "MGI:96647",
+      "mgi_homology_class": "52449741"
+    },
+    {
+      "human_symbol": "KDELR3",
+      "mouse_symbol": "Kdelr3",
+      "human_entrez_id": "11015",
+      "mouse_entrez_id": "105785",
+      "mouse_mgi_id": "MGI:2145953",
+      "mgi_homology_class": "52456643"
+    },
+    {
+      "human_symbol": "KDM3A",
+      "mouse_symbol": "Kdm3a",
+      "human_entrez_id": "55818",
+      "mouse_entrez_id": "104263",
+      "mouse_mgi_id": "MGI:98847",
+      "mgi_homology_class": "52460253"
+    },
+    {
+      "human_symbol": "KIF5A",
+      "mouse_symbol": "Kif5a",
+      "human_entrez_id": "3798",
+      "mouse_entrez_id": "16572",
+      "mouse_mgi_id": "MGI:109564",
+      "mgi_homology_class": "52449800"
+    },
+    {
+      "human_symbol": "KLF10",
+      "mouse_symbol": "Klf10",
+      "human_entrez_id": "7071",
+      "mouse_entrez_id": "21847",
+      "mouse_mgi_id": "MGI:1101353",
+      "mgi_homology_class": "52447014"
+    },
+    {
+      "human_symbol": "KLF6",
+      "mouse_symbol": "Klf6",
+      "human_entrez_id": "1316",
+      "mouse_entrez_id": "23849",
+      "mouse_mgi_id": "MGI:1346318",
+      "mgi_homology_class": "52444102"
+    },
+    {
+      "human_symbol": "KLF7",
+      "mouse_symbol": "Klf7",
+      "human_entrez_id": "8609",
+      "mouse_entrez_id": "93691",
+      "mouse_mgi_id": "MGI:1935151",
+      "mgi_homology_class": "52449820"
+    },
+    {
+      "human_symbol": "KLHL24",
+      "mouse_symbol": "Klhl24",
+      "human_entrez_id": "54800",
+      "mouse_entrez_id": "75785",
+      "mouse_mgi_id": "MGI:1923035",
+      "mgi_homology_class": "52449825"
+    },
+    {
+      "human_symbol": "KLRD1",
+      "mouse_symbol": "Klrd1",
+      "human_entrez_id": "3824",
+      "mouse_entrez_id": "16643",
+      "mouse_mgi_id": "MGI:1196275",
+      "mgi_homology_class": "52460326"
+    },
+    {
+      "human_symbol": "LAG3",
+      "mouse_symbol": "Lag3",
+      "human_entrez_id": "3902",
+      "mouse_entrez_id": "16768",
+      "mouse_mgi_id": "MGI:106588",
+      "mgi_homology_class": "52460457"
+    },
+    {
+      "human_symbol": "LALBA",
+      "mouse_symbol": "Lalba",
+      "human_entrez_id": "3906",
+      "mouse_entrez_id": "16770",
+      "mouse_mgi_id": "MGI:96742",
+      "mgi_homology_class": "52449970"
+    },
+    {
+      "human_symbol": "LAP3",
+      "mouse_symbol": "Lap3",
+      "human_entrez_id": "51056",
+      "mouse_entrez_id": "66988",
+      "mouse_mgi_id": "MGI:1914238",
+      "mgi_homology_class": "52449491"
+    },
+    {
+      "human_symbol": "LARGE1",
+      "mouse_symbol": "Large1",
+      "human_entrez_id": "9215",
+      "mouse_entrez_id": "16795",
+      "mouse_mgi_id": "MGI:1342270",
+      "mgi_homology_class": "52449847"
+    },
+    {
+      "human_symbol": "LATS2",
+      "mouse_symbol": "Lats2",
+      "human_entrez_id": "26524",
+      "mouse_entrez_id": "50523",
+      "mouse_mgi_id": "MGI:1354386",
+      "mgi_homology_class": "52451797"
+    },
+    {
+      "human_symbol": "LCP2",
+      "mouse_symbol": "Lcp2",
+      "human_entrez_id": "3937",
+      "mouse_entrez_id": "16822",
+      "mouse_mgi_id": "MGI:1321402",
+      "mgi_homology_class": "52449859"
+    },
+    {
+      "human_symbol": "LDHA",
+      "mouse_symbol": "Ldha",
+      "human_entrez_id": "3939",
+      "mouse_entrez_id": "16828",
+      "mouse_mgi_id": "MGI:96759",
+      "mgi_homology_class": "52449862"
+    },
+    {
+      "human_symbol": "LDHC",
+      "mouse_symbol": "Ldhc",
+      "human_entrez_id": "3948",
+      "mouse_entrez_id": "16833",
+      "mouse_mgi_id": "MGI:96764",
+      "mgi_homology_class": "52449864"
+    },
+    {
+      "human_symbol": "LEFTY2",
+      "mouse_symbol": "Lefty2",
+      "human_entrez_id": "7044",
+      "mouse_entrez_id": "320202",
+      "mouse_mgi_id": "MGI:2443573",
+      "mgi_homology_class": "52443076"
+    },
+    {
+      "human_symbol": "LGALS3BP",
+      "mouse_symbol": "Lgals3bp",
+      "human_entrez_id": "3959",
+      "mouse_entrez_id": "19039",
+      "mouse_mgi_id": "MGI:99554",
+      "mgi_homology_class": "52449877"
+    },
+    {
+      "human_symbol": "LOX",
+      "mouse_symbol": "Lox",
+      "human_entrez_id": "4015",
+      "mouse_entrez_id": "16948",
+      "mouse_mgi_id": "MGI:96817",
+      "mgi_homology_class": "52449926"
+    },
+    {
+      "human_symbol": "LTBP2",
+      "mouse_symbol": "Ltbp2",
+      "human_entrez_id": "4053",
+      "mouse_entrez_id": "16997",
+      "mouse_mgi_id": "MGI:99502",
+      "mgi_homology_class": "52460577"
+    },
+    {
+      "human_symbol": "LXN",
+      "mouse_symbol": "Lxn",
+      "human_entrez_id": "56925",
+      "mouse_entrez_id": "17035",
+      "mouse_mgi_id": "MGI:107633",
+      "mgi_homology_class": "52450953"
+    },
+    {
+      "human_symbol": "LY6E",
+      "mouse_symbol": "Ly6e",
+      "human_entrez_id": "4061",
+      "mouse_entrez_id": "17069",
+      "mouse_mgi_id": "MGI:106651",
+      "mgi_homology_class": "52460584"
+    },
+    {
+      "human_symbol": "LYSMD2",
+      "mouse_symbol": "Lysmd2",
+      "human_entrez_id": "256586",
+      "mouse_entrez_id": "70082",
+      "mouse_mgi_id": "MGI:1917332",
+      "mgi_homology_class": "52457022"
+    },
+    {
+      "human_symbol": "MAFF",
+      "mouse_symbol": "Maff",
+      "human_entrez_id": "23764",
+      "mouse_entrez_id": "17133",
+      "mouse_mgi_id": "MGI:96910",
+      "mgi_homology_class": "52456595"
+    },
+    {
+      "human_symbol": "MAP3K1",
+      "mouse_symbol": "Map3k1",
+      "human_entrez_id": "4214",
+      "mouse_entrez_id": "26401",
+      "mouse_mgi_id": "MGI:1346872",
+      "mgi_homology_class": "52453645"
+    },
+    {
+      "human_symbol": "MAP3K7",
+      "mouse_symbol": "Map3k7",
+      "human_entrez_id": "6885",
+      "mouse_entrez_id": "26409",
+      "mouse_mgi_id": "MGI:1346877",
+      "mgi_homology_class": "52452075"
+    },
+    {
+      "human_symbol": "MCM2",
+      "mouse_symbol": "Mcm2",
+      "human_entrez_id": "4171",
+      "mouse_entrez_id": "17216",
+      "mouse_mgi_id": "MGI:105380",
+      "mgi_homology_class": "52460654"
+    },
+    {
+      "human_symbol": "MCM5",
+      "mouse_symbol": "Mcm5",
+      "human_entrez_id": "4174",
+      "mouse_entrez_id": "17218",
+      "mouse_mgi_id": "MGI:103197",
+      "mgi_homology_class": "52450043"
+    },
+    {
+      "human_symbol": "MIF",
+      "mouse_symbol": "Mif",
+      "human_entrez_id": "4282",
+      "mouse_entrez_id": "17319",
+      "mouse_mgi_id": "MGI:96982",
+      "mgi_homology_class": "52457961"
+    },
+    {
+      "human_symbol": "MKI67",
+      "mouse_symbol": "Mki67",
+      "human_entrez_id": "4288",
+      "mouse_entrez_id": "17345",
+      "mouse_mgi_id": "MGI:106035",
+      "mgi_homology_class": "52443950"
+    },
+    {
+      "human_symbol": "MTHFD2",
+      "mouse_symbol": "Mthfd2",
+      "human_entrez_id": "10797",
+      "mouse_entrez_id": "17768",
+      "mouse_mgi_id": "MGI:1338850",
+      "mgi_homology_class": "52454485"
+    },
+    {
+      "human_symbol": "MVP",
+      "mouse_symbol": "Mvp",
+      "human_entrez_id": "9961",
+      "mouse_entrez_id": "78388",
+      "mouse_mgi_id": "MGI:1925638",
+      "mgi_homology_class": "52444220"
+    },
+    {
+      "human_symbol": "MXI1",
+      "mouse_symbol": "Mxi1",
+      "human_entrez_id": "4601",
+      "mouse_entrez_id": "17859",
+      "mouse_mgi_id": "MGI:97245",
+      "mgi_homology_class": "52445908"
+    },
+    {
+      "human_symbol": "MYD88",
+      "mouse_symbol": "Myd88",
+      "human_entrez_id": "4615",
+      "mouse_entrez_id": "17874",
+      "mouse_mgi_id": "MGI:108005",
+      "mgi_homology_class": "52455245"
+    },
+    {
+      "human_symbol": "MYH9",
+      "mouse_symbol": "Myh9",
+      "human_entrez_id": "4627",
+      "mouse_entrez_id": "17886",
+      "mouse_mgi_id": "MGI:107717",
+      "mgi_homology_class": "52446583"
+    },
+    {
+      "human_symbol": "NAGK",
+      "mouse_symbol": "Nagk",
+      "human_entrez_id": "55577",
+      "mouse_entrez_id": "56174",
+      "mouse_mgi_id": "MGI:1860418",
+      "mgi_homology_class": "52456184"
+    },
+    {
+      "human_symbol": "NAMPT",
+      "mouse_symbol": "Nampt",
+      "human_entrez_id": "10135",
+      "mouse_entrez_id": "59027",
+      "mouse_mgi_id": "MGI:1929865",
+      "mgi_homology_class": "52449154"
+    },
+    {
+      "human_symbol": "NCAM1",
+      "mouse_symbol": "Ncam1",
+      "human_entrez_id": "4684",
+      "mouse_entrez_id": "17967",
+      "mouse_mgi_id": "MGI:97281",
+      "mgi_homology_class": "52447859"
+    },
+    {
+      "human_symbol": "NCAN",
+      "mouse_symbol": "Ncan",
+      "human_entrez_id": "1463",
+      "mouse_entrez_id": "13004",
+      "mouse_mgi_id": "MGI:104694",
+      "mgi_homology_class": "52444900"
+    },
+    {
+      "human_symbol": "NCOA3",
+      "mouse_symbol": "Ncoa3",
+      "human_entrez_id": "8202",
+      "mouse_entrez_id": "17979",
+      "mouse_mgi_id": "MGI:1276535",
+      "mgi_homology_class": "52451168"
+    },
+    {
+      "human_symbol": "NCOR2",
+      "mouse_symbol": "Ncor2",
+      "human_entrez_id": "9612",
+      "mouse_entrez_id": "20602",
+      "mouse_mgi_id": "MGI:1337080",
+      "mgi_homology_class": "52448241"
+    },
+    {
+      "human_symbol": "NDRG1",
+      "mouse_symbol": "Ndrg1",
+      "human_entrez_id": "10397",
+      "mouse_entrez_id": "17988",
+      "mouse_mgi_id": "MGI:1341799",
+      "mgi_homology_class": "52444222"
+    },
+    {
+      "human_symbol": "NDST1",
+      "mouse_symbol": "Ndst1",
+      "human_entrez_id": "3340",
+      "mouse_entrez_id": "15531",
+      "mouse_mgi_id": "MGI:104719",
+      "mgi_homology_class": "52447817"
+    },
+    {
+      "human_symbol": "NDST2",
+      "mouse_symbol": "Ndst2",
+      "human_entrez_id": "8509",
+      "mouse_entrez_id": "17423",
+      "mouse_mgi_id": "MGI:97040",
+      "mgi_homology_class": "52449662"
+    },
+    {
+      "human_symbol": "NEDD4L",
+      "mouse_symbol": "Nedd4l",
+      "human_entrez_id": "23327",
+      "mouse_entrez_id": "83814",
+      "mouse_mgi_id": "MGI:1933754",
+      "mgi_homology_class": "52450294"
+    },
+    {
+      "human_symbol": "NFIL3",
+      "mouse_symbol": "Nfil3",
+      "human_entrez_id": "4783",
+      "mouse_entrez_id": "18030",
+      "mouse_mgi_id": "MGI:109495",
+      "mgi_homology_class": "52445704"
+    },
+    {
+      "human_symbol": "NFKB1",
+      "mouse_symbol": "Nfkb1",
+      "human_entrez_id": "4790",
+      "mouse_entrez_id": "18033",
+      "mouse_mgi_id": "MGI:97312",
+      "mgi_homology_class": "52461204"
+    },
+    {
+      "human_symbol": "NFKBIA",
+      "mouse_symbol": "Nfkbia",
+      "human_entrez_id": "4792",
+      "mouse_entrez_id": "18035",
+      "mouse_mgi_id": "MGI:104741",
+      "mgi_homology_class": "52447701"
+    },
+    {
+      "human_symbol": "NKG7",
+      "mouse_symbol": "Nkg7",
+      "human_entrez_id": "4818",
+      "mouse_entrez_id": "72310",
+      "mouse_mgi_id": "MGI:1931250",
+      "mgi_homology_class": "52461216"
+    },
+    {
+      "human_symbol": "NLRC5",
+      "mouse_symbol": "Nlrc5",
+      "human_entrez_id": "84166",
+      "mouse_entrez_id": "434341",
+      "mouse_mgi_id": "MGI:3612191",
+      "mgi_homology_class": "52461219"
+    },
+    {
+      "human_symbol": "NMI",
+      "mouse_symbol": "Nmi",
+      "human_entrez_id": "9111",
+      "mouse_entrez_id": "64685",
+      "mouse_mgi_id": "MGI:1928368",
+      "mgi_homology_class": "52447659"
+    },
+    {
+      "human_symbol": "NOCT",
+      "mouse_symbol": "Noct",
+      "human_entrez_id": "25819",
+      "mouse_entrez_id": "12457",
+      "mouse_mgi_id": "MGI:109382",
+      "mgi_homology_class": "52444455"
+    },
+    {
+      "human_symbol": "NOD1",
+      "mouse_symbol": "Nod1",
+      "human_entrez_id": "10392",
+      "mouse_entrez_id": "107607",
+      "mouse_mgi_id": "MGI:1341839",
+      "mgi_homology_class": "52450370"
+    },
+    {
+      "human_symbol": "NOG",
+      "mouse_symbol": "Nog",
+      "human_entrez_id": "9241",
+      "mouse_entrez_id": "18121",
+      "mouse_mgi_id": "MGI:104327",
+      "mgi_homology_class": "52447019"
+    },
+    {
+      "human_symbol": "NR3C1",
+      "mouse_symbol": "Nr3c1",
+      "human_entrez_id": "2908",
+      "mouse_entrez_id": "14815",
+      "mouse_mgi_id": "MGI:95824",
+      "mgi_homology_class": "52446395"
+    },
+    {
+      "human_symbol": "NUP93",
+      "mouse_symbol": "Nup93",
+      "human_entrez_id": "9688",
+      "mouse_entrez_id": "71805",
+      "mouse_mgi_id": "MGI:1919055",
+      "mgi_homology_class": "52445086"
+    },
+    {
+      "human_symbol": "OAS2",
+      "mouse_symbol": "Oas2",
+      "human_entrez_id": "4939",
+      "mouse_entrez_id": "246728",
+      "mouse_mgi_id": "MGI:2180852",
+      "mgi_homology_class": "52461282"
+    },
+    {
+      "human_symbol": "OAS3",
+      "mouse_symbol": "Oas3",
+      "human_entrez_id": "4940",
+      "mouse_entrez_id": "246727",
+      "mouse_mgi_id": "MGI:2180850",
+      "mgi_homology_class": "52461283"
+    },
+    {
+      "human_symbol": "OASL",
+      "mouse_symbol": "Oasl1",
+      "human_entrez_id": "8638",
+      "mouse_entrez_id": "231655",
+      "mouse_mgi_id": "MGI:2180849",
+      "mgi_homology_class": "52461284"
+    },
+    {
+      "human_symbol": "OGFR",
+      "mouse_symbol": "Ogfr",
+      "human_entrez_id": "11054",
+      "mouse_entrez_id": "72075",
+      "mouse_mgi_id": "MGI:1919325",
+      "mgi_homology_class": "52446459"
+    },
+    {
+      "human_symbol": "P2RY14",
+      "mouse_symbol": "P2ry14",
+      "human_entrez_id": "9934",
+      "mouse_entrez_id": "140795",
+      "mouse_mgi_id": "MGI:2155705",
+      "mgi_homology_class": "52461736"
+    },
+    {
+      "human_symbol": "P4HA1",
+      "mouse_symbol": "P4ha1",
+      "human_entrez_id": "5033",
+      "mouse_entrez_id": "18451",
+      "mouse_mgi_id": "MGI:97463",
+      "mgi_homology_class": "52450602"
+    },
+    {
+      "human_symbol": "P4HA2",
+      "mouse_symbol": "P4ha2",
+      "human_entrez_id": "8974",
+      "mouse_entrez_id": "18452",
+      "mouse_mgi_id": "MGI:894286",
+      "mgi_homology_class": "52450856"
+    },
+    {
+      "human_symbol": "PAM",
+      "mouse_symbol": "Pam",
+      "human_entrez_id": "5066",
+      "mouse_entrez_id": "18484",
+      "mouse_mgi_id": "MGI:97475",
+      "mgi_homology_class": "52453509"
+    },
+    {
+      "human_symbol": "PARP12",
+      "mouse_symbol": "Parp12",
+      "human_entrez_id": "64761",
+      "mouse_entrez_id": "243771",
+      "mouse_mgi_id": "MGI:2143990",
+      "mgi_homology_class": "52446143"
+    },
+    {
+      "human_symbol": "PARP14",
+      "mouse_symbol": "Parp14",
+      "human_entrez_id": "54625",
+      "mouse_entrez_id": "547253",
+      "mouse_mgi_id": "MGI:1919489",
+      "mgi_homology_class": "52450649"
+    },
+    {
+      "human_symbol": "PCK1",
+      "mouse_symbol": "Pck1",
+      "human_entrez_id": "5105",
+      "mouse_entrez_id": "18534",
+      "mouse_mgi_id": "MGI:97501",
+      "mgi_homology_class": "52444251"
+    },
+    {
+      "human_symbol": "PCNA",
+      "mouse_symbol": "Pcna",
+      "human_entrez_id": "5111",
+      "mouse_entrez_id": "18538",
+      "mouse_mgi_id": "MGI:97503",
+      "mgi_homology_class": "52443834"
+    },
+    {
+      "human_symbol": "PDCD1",
+      "mouse_symbol": "Pdcd1",
+      "human_entrez_id": "5133",
+      "mouse_entrez_id": "18566",
+      "mouse_mgi_id": "MGI:104879",
+      "mgi_homology_class": "52461790"
+    },
+    {
+      "human_symbol": "PDE4B",
+      "mouse_symbol": "Pde4b",
+      "human_entrez_id": "5142",
+      "mouse_entrez_id": "18578",
+      "mouse_mgi_id": "MGI:99557",
+      "mgi_homology_class": "52447953"
+    },
+    {
+      "human_symbol": "PDGFB",
+      "mouse_symbol": "Pdgfb",
+      "human_entrez_id": "5155",
+      "mouse_entrez_id": "18591",
+      "mouse_mgi_id": "MGI:97528",
+      "mgi_homology_class": "52450685"
+    },
+    {
+      "human_symbol": "PDK1",
+      "mouse_symbol": "Pdk1",
+      "human_entrez_id": "5163",
+      "mouse_entrez_id": "228026",
+      "mouse_mgi_id": "MGI:1926119",
+      "mgi_homology_class": "52461797"
+    },
+    {
+      "human_symbol": "PDK3",
+      "mouse_symbol": "Pdk3",
+      "human_entrez_id": "5165",
+      "mouse_entrez_id": "236900",
+      "mouse_mgi_id": "MGI:2384308",
+      "mgi_homology_class": "52456021"
+    },
+    {
+      "human_symbol": "PELI1",
+      "mouse_symbol": "Peli1",
+      "human_entrez_id": "57162",
+      "mouse_entrez_id": "67245",
+      "mouse_mgi_id": "MGI:1914495",
+      "mgi_homology_class": "52450696"
+    },
+    {
+      "human_symbol": "PFKFB3",
+      "mouse_symbol": "Pfkfb3",
+      "human_entrez_id": "5209",
+      "mouse_entrez_id": "170768",
+      "mouse_mgi_id": "MGI:2181202",
+      "mgi_homology_class": "52456783"
+    },
+    {
+      "human_symbol": "PFKL",
+      "mouse_symbol": "Pfkl",
+      "human_entrez_id": "5211",
+      "mouse_entrez_id": "18641",
+      "mouse_mgi_id": "MGI:97547",
+      "mgi_homology_class": "52450711"
+    },
+    {
+      "human_symbol": "PFKP",
+      "mouse_symbol": "Pfkp",
+      "human_entrez_id": "5214",
+      "mouse_entrez_id": "56421",
+      "mouse_mgi_id": "MGI:1891833",
+      "mgi_homology_class": "52452599"
+    },
+    {
+      "human_symbol": "PGAM2",
+      "mouse_symbol": "Pgam2",
+      "human_entrez_id": "5224",
+      "mouse_entrez_id": "56012",
+      "mouse_mgi_id": "MGI:1933118",
+      "mgi_homology_class": "52457452"
+    },
+    {
+      "human_symbol": "PGF",
+      "mouse_symbol": "Pgf",
+      "human_entrez_id": "5228",
+      "mouse_entrez_id": "18654",
+      "mouse_mgi_id": "MGI:105095",
+      "mgi_homology_class": "52450714"
+    },
+    {
+      "human_symbol": "PGK1",
+      "mouse_symbol": "Pgk1",
+      "human_entrez_id": "5230",
+      "mouse_entrez_id": "18655",
+      "mouse_mgi_id": "MGI:97555",
+      "mgi_homology_class": "52454793"
+    },
+    {
+      "human_symbol": "PGM1",
+      "mouse_symbol": "Pgm1",
+      "human_entrez_id": "5236",
+      "mouse_entrez_id": "72157",
+      "mouse_mgi_id": "MGI:97565",
+      "mgi_homology_class": "52456578"
+    },
+    {
+      "human_symbol": "PGM2",
+      "mouse_symbol": "Pgm2",
+      "human_entrez_id": "55276",
+      "mouse_entrez_id": "66681",
+      "mouse_mgi_id": "MGI:97564",
+      "mgi_homology_class": "52456835"
+    },
+    {
+      "human_symbol": "PHKG1",
+      "mouse_symbol": "Phkg1",
+      "human_entrez_id": "5260",
+      "mouse_entrez_id": "18682",
+      "mouse_mgi_id": "MGI:97579",
+      "mgi_homology_class": "52455415"
+    },
+    {
+      "human_symbol": "PIM1",
+      "mouse_symbol": "Pim1",
+      "human_entrez_id": "5292",
+      "mouse_entrez_id": "18712",
+      "mouse_mgi_id": "MGI:97584",
+      "mgi_homology_class": "52454632"
+    },
+    {
+      "human_symbol": "PKLR",
+      "mouse_symbol": "Pklr",
+      "human_entrez_id": "5313",
+      "mouse_entrez_id": "18770",
+      "mouse_mgi_id": "MGI:97604",
+      "mgi_homology_class": "52454760"
+    },
+    {
+      "human_symbol": "PKP1",
+      "mouse_symbol": "Pkp1",
+      "human_entrez_id": "5317",
+      "mouse_entrez_id": "18772",
+      "mouse_mgi_id": "MGI:1328359",
+      "mgi_homology_class": "52446470"
+    },
+    {
+      "human_symbol": "PLA2G4A",
+      "mouse_symbol": "Pla2g4a",
+      "human_entrez_id": "5321",
+      "mouse_entrez_id": "18783",
+      "mouse_mgi_id": "MGI:1195256",
+      "mgi_homology_class": "52444814"
+    },
+    {
+      "human_symbol": "PLAC8",
+      "mouse_symbol": "Plac8",
+      "human_entrez_id": "51316",
+      "mouse_entrez_id": "231507",
+      "mouse_mgi_id": "MGI:2445289",
+      "mgi_homology_class": "52450783"
+    },
+    {
+      "human_symbol": "PLAUR",
+      "mouse_symbol": "Plaur",
+      "human_entrez_id": "5329",
+      "mouse_entrez_id": "18793",
+      "mouse_mgi_id": "MGI:97612",
+      "mgi_homology_class": "52449963"
+    },
+    {
+      "human_symbol": "PLIN2",
+      "mouse_symbol": "Plin2",
+      "human_entrez_id": "123",
+      "mouse_entrez_id": "11520",
+      "mouse_mgi_id": "MGI:87920",
+      "mgi_homology_class": "52442891"
+    },
+    {
+      "human_symbol": "PMAIP1",
+      "mouse_symbol": "Pmaip1",
+      "human_entrez_id": "5366",
+      "mouse_entrez_id": "58801",
+      "mouse_mgi_id": "MGI:1930146",
+      "mgi_homology_class": "52450401"
+    },
+    {
+      "human_symbol": "PMEPA1",
+      "mouse_symbol": "Pmepa1",
+      "human_entrez_id": "56937",
+      "mouse_entrez_id": "65112",
+      "mouse_mgi_id": "MGI:1929600",
+      "mgi_homology_class": "52457188"
+    },
+    {
+      "human_symbol": "PML",
+      "mouse_symbol": "Pml",
+      "human_entrez_id": "5371",
+      "mouse_entrez_id": "18854",
+      "mouse_mgi_id": "MGI:104662",
+      "mgi_homology_class": "52461869"
+    },
+    {
+      "human_symbol": "PNPT1",
+      "mouse_symbol": "Pnpt1",
+      "human_entrez_id": "87178",
+      "mouse_entrez_id": "71701",
+      "mouse_mgi_id": "MGI:1918951",
+      "mgi_homology_class": "52461885"
+    },
+    {
+      "human_symbol": "PNRC1",
+      "mouse_symbol": "Pnrc1",
+      "human_entrez_id": "10957",
+      "mouse_entrez_id": "108767",
+      "mouse_mgi_id": "MGI:1917838",
+      "mgi_homology_class": "52453354"
+    },
+    {
+      "human_symbol": "PPARGC1A",
+      "mouse_symbol": "Ppargc1a",
+      "human_entrez_id": "10891",
+      "mouse_entrez_id": "19017",
+      "mouse_mgi_id": "MGI:1342774",
+      "mgi_homology_class": "52448264"
+    },
+    {
+      "human_symbol": "PPFIA4",
+      "mouse_symbol": "Ppfia4",
+      "human_entrez_id": "8497",
+      "mouse_entrez_id": "68507",
+      "mouse_mgi_id": "MGI:1915757",
+      "mgi_homology_class": "52456138"
+    },
+    {
+      "human_symbol": "PPM1A",
+      "mouse_symbol": "Ppm1a",
+      "human_entrez_id": "5494",
+      "mouse_entrez_id": "19042",
+      "mouse_mgi_id": "MGI:99878",
+      "mgi_homology_class": "52450789"
+    },
+    {
+      "human_symbol": "PPP1CA",
+      "mouse_symbol": "Ppp1ca",
+      "human_entrez_id": "5499",
+      "mouse_entrez_id": "19045",
+      "mouse_mgi_id": "MGI:103016",
+      "mgi_homology_class": "52446428"
+    },
+    {
+      "human_symbol": "PPP1R15A",
+      "mouse_symbol": "Ppp1r15a",
+      "human_entrez_id": "23645",
+      "mouse_entrez_id": "17872",
+      "mouse_mgi_id": "MGI:1927072",
+      "mgi_homology_class": "52454748"
+    },
+    {
+      "human_symbol": "PPP1R3C",
+      "mouse_symbol": "Ppp1r3c",
+      "human_entrez_id": "5507",
+      "mouse_entrez_id": "53412",
+      "mouse_mgi_id": "MGI:1858229",
+      "mgi_homology_class": "52444050"
+    },
+    {
+      "human_symbol": "PRDX5",
+      "mouse_symbol": "Prdx5",
+      "human_entrez_id": "25824",
+      "mouse_entrez_id": "54683",
+      "mouse_mgi_id": "MGI:1859821",
+      "mgi_homology_class": "52455519"
+    },
+    {
+      "human_symbol": "PRF1",
+      "mouse_symbol": "Prf1",
+      "human_entrez_id": "5551",
+      "mouse_entrez_id": "18646",
+      "mouse_mgi_id": "MGI:97551",
+      "mgi_homology_class": "52450817"
+    },
+    {
+      "human_symbol": "PRKCA",
+      "mouse_symbol": "Prkca",
+      "human_entrez_id": "5578",
+      "mouse_entrez_id": "18750",
+      "mouse_mgi_id": "MGI:97595",
+      "mgi_homology_class": "52449255"
+    },
+    {
+      "human_symbol": "PSMA2",
+      "mouse_symbol": "Psma2",
+      "human_entrez_id": "5683",
+      "mouse_entrez_id": "19166",
+      "mouse_mgi_id": "MGI:104885",
+      "mgi_homology_class": "52450874"
+    },
+    {
+      "human_symbol": "PSMA3",
+      "mouse_symbol": "Psma3",
+      "human_entrez_id": "5684",
+      "mouse_entrez_id": "19167",
+      "mouse_mgi_id": "MGI:104883",
+      "mgi_homology_class": "52449121"
+    },
+    {
+      "human_symbol": "PSMB10",
+      "mouse_symbol": "Psmb10",
+      "human_entrez_id": "5699",
+      "mouse_entrez_id": "19171",
+      "mouse_mgi_id": "MGI:1096380",
+      "mgi_homology_class": "52443380"
+    },
+    {
+      "human_symbol": "PSMB2",
+      "mouse_symbol": "Psmb2",
+      "human_entrez_id": "5690",
+      "mouse_entrez_id": "26445",
+      "mouse_mgi_id": "MGI:1347045",
+      "mgi_homology_class": "52457103"
+    },
+    {
+      "human_symbol": "PSMB8",
+      "mouse_symbol": "Psmb8",
+      "human_entrez_id": "5696",
+      "mouse_entrez_id": "16913",
+      "mouse_mgi_id": "MGI:1346527",
+      "mgi_homology_class": "52443385"
+    },
+    {
+      "human_symbol": "PSMB9",
+      "mouse_symbol": "Psmb9",
+      "human_entrez_id": "5698",
+      "mouse_entrez_id": "16912",
+      "mouse_mgi_id": "MGI:1346526",
+      "mgi_homology_class": "52443378"
+    },
+    {
+      "human_symbol": "PSME1",
+      "mouse_symbol": "Psme1",
+      "human_entrez_id": "5720",
+      "mouse_entrez_id": "19186",
+      "mouse_mgi_id": "MGI:1096367",
+      "mgi_homology_class": "52448054"
+    },
+    {
+      "human_symbol": "PTGS2",
+      "mouse_symbol": "Ptgs2",
+      "human_entrez_id": "5743",
+      "mouse_entrez_id": "19225",
+      "mouse_mgi_id": "MGI:97798",
+      "mgi_homology_class": "52444800"
+    },
+    {
+      "human_symbol": "PTPN1",
+      "mouse_symbol": "Ptpn1",
+      "human_entrez_id": "5770",
+      "mouse_entrez_id": "19246",
+      "mouse_mgi_id": "MGI:97805",
+      "mgi_homology_class": "52448013"
+    },
+    {
+      "human_symbol": "PTPN2",
+      "mouse_symbol": "Ptpn2",
+      "human_entrez_id": "5771",
+      "mouse_entrez_id": "19255",
+      "mouse_mgi_id": "MGI:97806",
+      "mgi_homology_class": "52444231"
+    },
+    {
+      "human_symbol": "PTPN6",
+      "mouse_symbol": "Ptpn6",
+      "human_entrez_id": "5777",
+      "mouse_entrez_id": "15170",
+      "mouse_mgi_id": "MGI:96055",
+      "mgi_homology_class": "52447729"
+    },
+    {
+      "human_symbol": "PYGM",
+      "mouse_symbol": "Pygm",
+      "human_entrez_id": "5837",
+      "mouse_entrez_id": "19309",
+      "mouse_mgi_id": "MGI:97830",
+      "mgi_homology_class": "52449478"
+    },
+    {
+      "human_symbol": "RAB31",
+      "mouse_symbol": "Rab31",
+      "human_entrez_id": "11031",
+      "mouse_entrez_id": "106572",
+      "mouse_mgi_id": "MGI:1914603",
+      "mgi_homology_class": "52451202"
+    },
+    {
+      "human_symbol": "RAPGEF6",
+      "mouse_symbol": "Rapgef6",
+      "human_entrez_id": "51735",
+      "mouse_entrez_id": "192786",
+      "mouse_mgi_id": "MGI:2384761",
+      "mgi_homology_class": "52454310"
+    },
+    {
+      "human_symbol": "RBCK1",
+      "mouse_symbol": "Rbck1",
+      "human_entrez_id": "10616",
+      "mouse_entrez_id": "24105",
+      "mouse_mgi_id": "MGI:1344372",
+      "mgi_homology_class": "52453606"
+    },
+    {
+      "human_symbol": "RBPJ",
+      "mouse_symbol": "Rbpj",
+      "human_entrez_id": "3516",
+      "mouse_entrez_id": "19664",
+      "mouse_mgi_id": "MGI:96522",
+      "mgi_homology_class": "52448943"
+    },
+    {
+      "human_symbol": "RHOA",
+      "mouse_symbol": "Rhoa",
+      "human_entrez_id": "387",
+      "mouse_entrez_id": "11848",
+      "mouse_mgi_id": "MGI:1096342",
+      "mgi_homology_class": "52443139"
+    },
+    {
+      "human_symbol": "RIPK1",
+      "mouse_symbol": "Ripk1",
+      "human_entrez_id": "8737",
+      "mouse_entrez_id": "19766",
+      "mouse_mgi_id": "MGI:108212",
+      "mgi_homology_class": "52451007"
+    },
+    {
+      "human_symbol": "RIPK2",
+      "mouse_symbol": "Ripk2",
+      "human_entrez_id": "8767",
+      "mouse_entrez_id": "192656",
+      "mouse_mgi_id": "MGI:1891456",
+      "mgi_homology_class": "52451002"
+    },
+    {
+      "human_symbol": "RNF31",
+      "mouse_symbol": "Rnf31",
+      "human_entrez_id": "55072",
+      "mouse_entrez_id": "268749",
+      "mouse_mgi_id": "MGI:1934704",
+      "mgi_homology_class": "52448630"
+    },
+    {
+      "human_symbol": "RORA",
+      "mouse_symbol": "Rora",
+      "human_entrez_id": "6095",
+      "mouse_entrez_id": "19883",
+      "mouse_mgi_id": "MGI:104661",
+      "mgi_homology_class": "52448259"
+    },
+    {
+      "human_symbol": "RRAGD",
+      "mouse_symbol": "Rragd",
+      "human_entrez_id": "58528",
+      "mouse_entrez_id": "52187",
+      "mouse_mgi_id": "MGI:1098604",
+      "mgi_homology_class": "52456055"
+    },
+    {
+      "human_symbol": "RSAD2",
+      "mouse_symbol": "Rsad2",
+      "human_entrez_id": "91543",
+      "mouse_entrez_id": "58185",
+      "mouse_mgi_id": "MGI:1929628",
+      "mgi_homology_class": "52452259"
+    },
+    {
+      "human_symbol": "RTP4",
+      "mouse_symbol": "Rtp4",
+      "human_entrez_id": "64108",
+      "mouse_entrez_id": "67775",
+      "mouse_mgi_id": "MGI:1915025",
+      "mgi_homology_class": "52458003"
+    },
+    {
+      "human_symbol": "S100A4",
+      "mouse_symbol": "S100a4",
+      "human_entrez_id": "6275",
+      "mouse_entrez_id": "20198",
+      "mouse_mgi_id": "MGI:1330282",
+      "mgi_homology_class": "52446117"
+    },
+    {
+      "human_symbol": "SAMD9L",
+      "mouse_symbol": "Samd9l",
+      "human_entrez_id": "219285",
+      "mouse_entrez_id": "209086",
+      "mouse_mgi_id": "MGI:1343184",
+      "mgi_homology_class": "52451076"
+    },
+    {
+      "human_symbol": "SAMHD1",
+      "mouse_symbol": "Samhd1",
+      "human_entrez_id": "25939",
+      "mouse_entrez_id": "56045",
+      "mouse_mgi_id": "MGI:1927468",
+      "mgi_homology_class": "52453518"
+    },
+    {
+      "human_symbol": "SAP30",
+      "mouse_symbol": "Sap30",
+      "human_entrez_id": "8819",
+      "mouse_entrez_id": "60406",
+      "mouse_mgi_id": "MGI:1929129",
+      "mgi_homology_class": "52454334"
+    },
+    {
+      "human_symbol": "SCARB1",
+      "mouse_symbol": "Scarb1",
+      "human_entrez_id": "949",
+      "mouse_entrez_id": "20778",
+      "mouse_mgi_id": "MGI:893578",
+      "mgi_homology_class": "52443736"
+    },
+    {
+      "human_symbol": "SDC2",
+      "mouse_symbol": "Sdc2",
+      "human_entrez_id": "6383",
+      "mouse_entrez_id": "15529",
+      "mouse_mgi_id": "MGI:1349165",
+      "mgi_homology_class": "52444047"
+    },
+    {
+      "human_symbol": "SDC3",
+      "mouse_symbol": "Sdc3",
+      "human_entrez_id": "9672",
+      "mouse_entrez_id": "20970",
+      "mouse_mgi_id": "MGI:1349163",
+      "mgi_homology_class": "52454372"
+    },
+    {
+      "human_symbol": "SDC4",
+      "mouse_symbol": "Sdc4",
+      "human_entrez_id": "6385",
+      "mouse_entrez_id": "20971",
+      "mouse_mgi_id": "MGI:1349164",
+      "mgi_homology_class": "52451264"
+    },
+    {
+      "human_symbol": "SELP",
+      "mouse_symbol": "Selp",
+      "human_entrez_id": "6403",
+      "mouse_entrez_id": "20344",
+      "mouse_mgi_id": "MGI:98280",
+      "mgi_homology_class": "52452217"
+    },
+    {
+      "human_symbol": "SERPINE1",
+      "mouse_symbol": "Serpine1",
+      "human_entrez_id": "5054",
+      "mouse_entrez_id": "18787",
+      "mouse_mgi_id": "MGI:97608",
+      "mgi_homology_class": "52450617"
+    },
+    {
+      "human_symbol": "SERPING1",
+      "mouse_symbol": "Serping1",
+      "human_entrez_id": "710",
+      "mouse_entrez_id": "12258",
+      "mouse_mgi_id": "MGI:894696",
+      "mgi_homology_class": "52443539"
+    },
+    {
+      "human_symbol": "SIAH2",
+      "mouse_symbol": "Siah2",
+      "human_entrez_id": "6478",
+      "mouse_entrez_id": "20439",
+      "mouse_mgi_id": "MGI:108062",
+      "mgi_homology_class": "52451345"
+    },
+    {
+      "human_symbol": "SKI",
+      "mouse_symbol": "Ski",
+      "human_entrez_id": "6497",
+      "mouse_entrez_id": "20481",
+      "mouse_mgi_id": "MGI:98310",
+      "mgi_homology_class": "52446967"
+    },
+    {
+      "human_symbol": "SKIL",
+      "mouse_symbol": "Skil",
+      "human_entrez_id": "6498",
+      "mouse_entrez_id": "20482",
+      "mouse_mgi_id": "MGI:106203",
+      "mgi_homology_class": "52453279"
+    },
+    {
+      "human_symbol": "SLAMF7",
+      "mouse_symbol": "Slamf7",
+      "human_entrez_id": "57823",
+      "mouse_entrez_id": "75345",
+      "mouse_mgi_id": "MGI:1922595",
+      "mgi_homology_class": "52462316"
+    },
+    {
+      "human_symbol": "SLC20A1",
+      "mouse_symbol": "Slc20a1",
+      "human_entrez_id": "6574",
+      "mouse_entrez_id": "20515",
+      "mouse_mgi_id": "MGI:108392",
+      "mgi_homology_class": "52443753"
+    },
+    {
+      "human_symbol": "SLC25A1",
+      "mouse_symbol": "Slc25a1",
+      "human_entrez_id": "6576",
+      "mouse_entrez_id": "13358",
+      "mouse_mgi_id": "MGI:1345283",
+      "mgi_homology_class": "52458433"
+    },
+    {
+      "human_symbol": "SLC25A28",
+      "mouse_symbol": "Slc25a28",
+      "human_entrez_id": "81894",
+      "mouse_entrez_id": "246696",
+      "mouse_mgi_id": "MGI:2180509",
+      "mgi_homology_class": "52450088"
+    },
+    {
+      "human_symbol": "SLC2A1",
+      "mouse_symbol": "Slc2a1",
+      "human_entrez_id": "6513",
+      "mouse_entrez_id": "20525",
+      "mouse_mgi_id": "MGI:95755",
+      "mgi_homology_class": "52447043"
+    },
+    {
+      "human_symbol": "SLC2A5",
+      "mouse_symbol": "Slc2a5",
+      "human_entrez_id": "6518",
+      "mouse_entrez_id": "56485",
+      "mouse_mgi_id": "MGI:1928369",
+      "mgi_homology_class": "52446596"
+    },
+    {
+      "human_symbol": "SLC37A4",
+      "mouse_symbol": "Slc37a4",
+      "human_entrez_id": "2542",
+      "mouse_entrez_id": "14385",
+      "mouse_mgi_id": "MGI:1316650",
+      "mgi_homology_class": "52447022"
+    },
+    {
+      "human_symbol": "SLC6A6",
+      "mouse_symbol": "Slc6a6",
+      "human_entrez_id": "6533",
+      "mouse_entrez_id": "21366",
+      "mouse_mgi_id": "MGI:98488",
+      "mgi_homology_class": "52447031"
+    },
+    {
+      "human_symbol": "SMAD1",
+      "mouse_symbol": "Smad1",
+      "human_entrez_id": "4086",
+      "mouse_entrez_id": "17125",
+      "mouse_mgi_id": "MGI:109452",
+      "mgi_homology_class": "52446527"
+    },
+    {
+      "human_symbol": "SMAD3",
+      "mouse_symbol": "Smad3",
+      "human_entrez_id": "4088",
+      "mouse_entrez_id": "17127",
+      "mouse_mgi_id": "MGI:1201674",
+      "mgi_homology_class": "52449981"
+    },
+    {
+      "human_symbol": "SMAD6",
+      "mouse_symbol": "Smad6",
+      "human_entrez_id": "4091",
+      "mouse_entrez_id": "17130",
+      "mouse_mgi_id": "MGI:1336883",
+      "mgi_homology_class": "52449982"
+    },
+    {
+      "human_symbol": "SMAD7",
+      "mouse_symbol": "Smad7",
+      "human_entrez_id": "4092",
+      "mouse_entrez_id": "17131",
+      "mouse_mgi_id": "MGI:1100518",
+      "mgi_homology_class": "52447874"
+    },
+    {
+      "human_symbol": "SMURF1",
+      "mouse_symbol": "Smurf1",
+      "human_entrez_id": "57154",
+      "mouse_entrez_id": "75788",
+      "mouse_mgi_id": "MGI:1923038",
+      "mgi_homology_class": "52454459"
+    },
+    {
+      "human_symbol": "SMURF2",
+      "mouse_symbol": "Smurf2",
+      "human_entrez_id": "64750",
+      "mouse_entrez_id": "66313",
+      "mouse_mgi_id": "MGI:1913563",
+      "mgi_homology_class": "52454601"
+    },
+    {
+      "human_symbol": "SOCS1",
+      "mouse_symbol": "Socs1",
+      "human_entrez_id": "8651",
+      "mouse_entrez_id": "12703",
+      "mouse_mgi_id": "MGI:1354910",
+      "mgi_homology_class": "52452481"
+    },
+    {
+      "human_symbol": "SOCS3",
+      "mouse_symbol": "Socs3",
+      "human_entrez_id": "9021",
+      "mouse_entrez_id": "12702",
+      "mouse_mgi_id": "MGI:1201791",
+      "mgi_homology_class": "52447692"
+    },
+    {
+      "human_symbol": "SOD2",
+      "mouse_symbol": "Sod2",
+      "human_entrez_id": "6648",
+      "mouse_entrez_id": "20656",
+      "mouse_mgi_id": "MGI:98352",
+      "mgi_homology_class": "52444064"
+    },
+    {
+      "human_symbol": "SP110",
+      "mouse_symbol": "Sp110",
+      "human_entrez_id": "3431",
+      "mouse_entrez_id": "109032",
+      "mouse_mgi_id": "MGI:1923364",
+      "mgi_homology_class": "52462454"
+    },
+    {
+      "human_symbol": "SPPL2A",
+      "mouse_symbol": "Sppl2a",
+      "human_entrez_id": "84888",
+      "mouse_entrez_id": "66552",
+      "mouse_mgi_id": "MGI:1913802",
+      "mgi_homology_class": "52455658"
+    },
+    {
+      "human_symbol": "SPTBN1",
+      "mouse_symbol": "Sptbn1",
+      "human_entrez_id": "6711",
+      "mouse_entrez_id": "20742",
+      "mouse_mgi_id": "MGI:98388",
+      "mgi_homology_class": "52446468"
+    },
+    {
+      "human_symbol": "SRI",
+      "mouse_symbol": "Sri",
+      "human_entrez_id": "6717",
+      "mouse_entrez_id": "109552",
+      "mouse_mgi_id": "MGI:98419",
+      "mgi_homology_class": "52462546"
+    },
+    {
+      "human_symbol": "SRPX",
+      "mouse_symbol": "Srpx",
+      "human_entrez_id": "8406",
+      "mouse_entrez_id": "51795",
+      "mouse_mgi_id": "MGI:1858306",
+      "mgi_homology_class": "52449124"
+    },
+    {
+      "human_symbol": "SSPN",
+      "mouse_symbol": "Sspn",
+      "human_entrez_id": "8082",
+      "mouse_entrez_id": "16651",
+      "mouse_mgi_id": "MGI:1353511",
+      "mgi_homology_class": "52451702"
+    },
+    {
+      "human_symbol": "ST3GAL5",
+      "mouse_symbol": "St3gal5",
+      "human_entrez_id": "8869",
+      "mouse_entrez_id": "20454",
+      "mouse_mgi_id": "MGI:1339963",
+      "mgi_homology_class": "52448365"
+    },
+    {
+      "human_symbol": "ST8SIA4",
+      "mouse_symbol": "St8sia4",
+      "human_entrez_id": "7903",
+      "mouse_entrez_id": "20452",
+      "mouse_mgi_id": "MGI:106018",
+      "mgi_homology_class": "52450876"
+    },
+    {
+      "human_symbol": "STAT1",
+      "mouse_symbol": "Stat1",
+      "human_entrez_id": "6772",
+      "mouse_entrez_id": "20846",
+      "mouse_mgi_id": "MGI:103063",
+      "mgi_homology_class": "52451367"
+    },
+    {
+      "human_symbol": "STAT2",
+      "mouse_symbol": "Stat2",
+      "human_entrez_id": "6773",
+      "mouse_entrez_id": "20847",
+      "mouse_mgi_id": "MGI:103039",
+      "mgi_homology_class": "52447942"
+    },
+    {
+      "human_symbol": "STAT3",
+      "mouse_symbol": "Stat3",
+      "human_entrez_id": "6774",
+      "mouse_entrez_id": "20848",
+      "mouse_mgi_id": "MGI:103038",
+      "mgi_homology_class": "52454643"
+    },
+    {
+      "human_symbol": "STAT4",
+      "mouse_symbol": "Stat4",
+      "human_entrez_id": "6775",
+      "mouse_entrez_id": "20849",
+      "mouse_mgi_id": "MGI:103062",
+      "mgi_homology_class": "52451366"
+    },
+    {
+      "human_symbol": "STBD1",
+      "mouse_symbol": "Stbd1",
+      "human_entrez_id": "8987",
+      "mouse_entrez_id": "52331",
+      "mouse_mgi_id": "MGI:1261768",
+      "mgi_homology_class": "52458364"
+    },
+    {
+      "human_symbol": "STC1",
+      "mouse_symbol": "Stc1",
+      "human_entrez_id": "6781",
+      "mouse_entrez_id": "20855",
+      "mouse_mgi_id": "MGI:109131",
+      "mgi_homology_class": "52453758"
+    },
+    {
+      "human_symbol": "STC2",
+      "mouse_symbol": "Stc2",
+      "human_entrez_id": "8614",
+      "mouse_entrez_id": "20856",
+      "mouse_mgi_id": "MGI:1316731",
+      "mgi_homology_class": "52447315"
+    },
+    {
+      "human_symbol": "SULT2B1",
+      "mouse_symbol": "Sult2b1",
+      "human_entrez_id": "6820",
+      "mouse_entrez_id": "54200",
+      "mouse_mgi_id": "MGI:1926342",
+      "mgi_homology_class": "52448713"
+    },
+    {
+      "human_symbol": "TAP1",
+      "mouse_symbol": "Tap1",
+      "human_entrez_id": "6890",
+      "mouse_entrez_id": "21354",
+      "mouse_mgi_id": "MGI:98483",
+      "mgi_homology_class": "52442794"
+    },
+    {
+      "human_symbol": "TAP2",
+      "mouse_symbol": "Tap2",
+      "human_entrez_id": "6891",
+      "mouse_entrez_id": "21355",
+      "mouse_mgi_id": "MGI:98484",
+      "mgi_homology_class": "52442795"
+    },
+    {
+      "human_symbol": "TAPBP",
+      "mouse_symbol": "Tapbp",
+      "human_entrez_id": "6892",
+      "mouse_entrez_id": "21356",
+      "mouse_mgi_id": "MGI:1201689",
+      "mgi_homology_class": "52452340"
+    },
+    {
+      "human_symbol": "TDRD7",
+      "mouse_symbol": "Tdrd7",
+      "human_entrez_id": "23424",
+      "mouse_entrez_id": "100121",
+      "mouse_mgi_id": "MGI:2140279",
+      "mgi_homology_class": "52452316"
+    },
+    {
+      "human_symbol": "TGFB1",
+      "mouse_symbol": "Tgfb1",
+      "human_entrez_id": "7040",
+      "mouse_entrez_id": "21803",
+      "mouse_mgi_id": "MGI:98725",
+      "mgi_homology_class": "52442954"
+    },
+    {
+      "human_symbol": "TGFB3",
+      "mouse_symbol": "Tgfb3",
+      "human_entrez_id": "7043",
+      "mouse_entrez_id": "21809",
+      "mouse_mgi_id": "MGI:98727",
+      "mgi_homology_class": "52453910"
+    },
+    {
+      "human_symbol": "TGFBI",
+      "mouse_symbol": "Tgfbi",
+      "human_entrez_id": "7045",
+      "mouse_entrez_id": "21810",
+      "mouse_mgi_id": "MGI:99959",
+      "mgi_homology_class": "52443405"
+    },
+    {
+      "human_symbol": "TGFBR1",
+      "mouse_symbol": "Tgfbr1",
+      "human_entrez_id": "7046",
+      "mouse_entrez_id": "21812",
+      "mouse_mgi_id": "MGI:98728",
+      "mgi_homology_class": "52443000"
+    },
+    {
+      "human_symbol": "TGIF1",
+      "mouse_symbol": "Tgif1",
+      "human_entrez_id": "7050",
+      "mouse_entrez_id": "21815",
+      "mouse_mgi_id": "MGI:1194497",
+      "mgi_homology_class": "52446009"
+    },
+    {
+      "human_symbol": "TGM2",
+      "mouse_symbol": "Tgm2",
+      "human_entrez_id": "7052",
+      "mouse_entrez_id": "21817",
+      "mouse_mgi_id": "MGI:98731",
+      "mgi_homology_class": "52446923"
+    },
+    {
+      "human_symbol": "THBS1",
+      "mouse_symbol": "Thbs1",
+      "human_entrez_id": "7057",
+      "mouse_entrez_id": "21825",
+      "mouse_mgi_id": "MGI:98737",
+      "mgi_homology_class": "52452672"
+    },
+    {
+      "human_symbol": "TIGIT",
+      "mouse_symbol": "Tigit",
+      "human_entrez_id": "201633",
+      "mouse_entrez_id": "100043314",
+      "mouse_mgi_id": "MGI:3642260",
+      "mgi_homology_class": "52462745"
+    },
+    {
+      "human_symbol": "TIPARP",
+      "mouse_symbol": "Tiparp",
+      "human_entrez_id": "25976",
+      "mouse_entrez_id": "99929",
+      "mouse_mgi_id": "MGI:2159210",
+      "mgi_homology_class": "52462749"
+    },
+    {
+      "human_symbol": "TJP1",
+      "mouse_symbol": "Tjp1",
+      "human_entrez_id": "7082",
+      "mouse_entrez_id": "21872",
+      "mouse_mgi_id": "MGI:98759",
+      "mgi_homology_class": "52444234"
+    },
+    {
+      "human_symbol": "TKTL1",
+      "mouse_symbol": "Tktl1",
+      "human_entrez_id": "8277",
+      "mouse_entrez_id": "83553",
+      "mouse_mgi_id": "MGI:1933244",
+      "mgi_homology_class": "52444256"
+    },
+    {
+      "human_symbol": "TNF",
+      "mouse_symbol": "Tnf",
+      "human_entrez_id": "7124",
+      "mouse_entrez_id": "21926",
+      "mouse_mgi_id": "MGI:104798",
+      "mgi_homology_class": "52449959"
+    },
+    {
+      "human_symbol": "TNFAIP2",
+      "mouse_symbol": "Tnfaip2",
+      "human_entrez_id": "7127",
+      "mouse_entrez_id": "21928",
+      "mouse_mgi_id": "MGI:104960",
+      "mgi_homology_class": "52452874"
+    },
+    {
+      "human_symbol": "TNFAIP3",
+      "mouse_symbol": "Tnfaip3",
+      "human_entrez_id": "7128",
+      "mouse_entrez_id": "21929",
+      "mouse_mgi_id": "MGI:1196377",
+      "mgi_homology_class": "52442766"
+    },
+    {
+      "human_symbol": "TNFAIP6",
+      "mouse_symbol": "Tnfaip6",
+      "human_entrez_id": "7130",
+      "mouse_entrez_id": "21930",
+      "mouse_mgi_id": "MGI:1195266",
+      "mgi_homology_class": "52462831"
+    },
+    {
+      "human_symbol": "TNFRSF9",
+      "mouse_symbol": "Tnfrsf9",
+      "human_entrez_id": "3604",
+      "mouse_entrez_id": "21942",
+      "mouse_mgi_id": "MGI:1101059",
+      "mgi_homology_class": "52442702"
+    },
+    {
+      "human_symbol": "TNFSF10",
+      "mouse_symbol": "Tnfsf10",
+      "human_entrez_id": "8743",
+      "mouse_entrez_id": "22035",
+      "mouse_mgi_id": "MGI:107414",
+      "mgi_homology_class": "52445147"
+    },
+    {
+      "human_symbol": "TOP2A",
+      "mouse_symbol": "Top2a",
+      "human_entrez_id": "7153",
+      "mouse_entrez_id": "21973",
+      "mouse_mgi_id": "MGI:98790",
+      "mgi_homology_class": "52446898"
+    },
+    {
+      "human_symbol": "TOR1B",
+      "mouse_symbol": "Tor1b",
+      "human_entrez_id": "27348",
+      "mouse_entrez_id": "30934",
+      "mouse_mgi_id": "MGI:1353605",
+      "mgi_homology_class": "52456302"
+    },
+    {
+      "human_symbol": "TOX",
+      "mouse_symbol": "Tox",
+      "human_entrez_id": "9760",
+      "mouse_entrez_id": "252838",
+      "mouse_mgi_id": "MGI:2181659",
+      "mgi_homology_class": "52451215"
+    },
+    {
+      "human_symbol": "TPBG",
+      "mouse_symbol": "Tpbg",
+      "human_entrez_id": "7162",
+      "mouse_entrez_id": "21983",
+      "mouse_mgi_id": "MGI:1341264",
+      "mgi_homology_class": "52451116"
+    },
+    {
+      "human_symbol": "TPD52",
+      "mouse_symbol": "Tpd52",
+      "human_entrez_id": "7163",
+      "mouse_entrez_id": "21985",
+      "mouse_mgi_id": "MGI:107749",
+      "mgi_homology_class": "52451982"
+    },
+    {
+      "human_symbol": "TPI1",
+      "mouse_symbol": "Tpi1",
+      "human_entrez_id": "7167",
+      "mouse_entrez_id": "21991",
+      "mouse_mgi_id": "MGI:98797",
+      "mgi_homology_class": "52443841"
+    },
+    {
+      "human_symbol": "TPST2",
+      "mouse_symbol": "Tpst2",
+      "human_entrez_id": "8459",
+      "mouse_entrez_id": "22022",
+      "mouse_mgi_id": "MGI:1309516",
+      "mgi_homology_class": "52456650"
+    },
+    {
+      "human_symbol": "TRAFD1",
+      "mouse_symbol": "Trafd1",
+      "human_entrez_id": "10906",
+      "mouse_entrez_id": "231712",
+      "mouse_mgi_id": "MGI:1923551",
+      "mgi_homology_class": "52456068"
+    },
+    {
+      "human_symbol": "TRIM14",
+      "mouse_symbol": "Trim14",
+      "human_entrez_id": "9830",
+      "mouse_entrez_id": "74735",
+      "mouse_mgi_id": "MGI:1921985",
+      "mgi_homology_class": "52458267"
+    },
+    {
+      "human_symbol": "TRIM21",
+      "mouse_symbol": "Trim21",
+      "human_entrez_id": "6737",
+      "mouse_entrez_id": "20821",
+      "mouse_mgi_id": "MGI:106657",
+      "mgi_homology_class": "52451024"
+    },
+    {
+      "human_symbol": "TRIM25",
+      "mouse_symbol": "Trim25",
+      "human_entrez_id": "7706",
+      "mouse_entrez_id": "217069",
+      "mouse_mgi_id": "MGI:102749",
+      "mgi_homology_class": "52452621"
+    },
+    {
+      "human_symbol": "TRIM26",
+      "mouse_symbol": "Trim26",
+      "human_entrez_id": "7726",
+      "mouse_entrez_id": "22670",
+      "mouse_mgi_id": "MGI:1337056",
+      "mgi_homology_class": "52463004"
+    },
+    {
+      "human_symbol": "TRIM33",
+      "mouse_symbol": "Trim33",
+      "human_entrez_id": "51592",
+      "mouse_entrez_id": "94093",
+      "mouse_mgi_id": "MGI:2137357",
+      "mgi_homology_class": "52443784"
+    },
+    {
+      "human_symbol": "TXNIP",
+      "mouse_symbol": "Txnip",
+      "human_entrez_id": "10628",
+      "mouse_entrez_id": "56338",
+      "mouse_mgi_id": "MGI:1889549",
+      "mgi_homology_class": "52451103"
+    },
+    {
+      "human_symbol": "UBE2C",
+      "mouse_symbol": "Ube2c",
+      "human_entrez_id": "11065",
+      "mouse_entrez_id": "68612",
+      "mouse_mgi_id": "MGI:1915862",
+      "mgi_homology_class": "52449196"
+    },
+    {
+      "human_symbol": "UBE2D3",
+      "mouse_symbol": "Ube2d3",
+      "human_entrez_id": "7323",
+      "mouse_entrez_id": "66105",
+      "mouse_mgi_id": "MGI:1913355",
+      "mgi_homology_class": "52446497"
+    },
+    {
+      "human_symbol": "UBE2L6",
+      "mouse_symbol": "Ube2l6",
+      "human_entrez_id": "9246",
+      "mouse_entrez_id": "56791",
+      "mouse_mgi_id": "MGI:1914500",
+      "mgi_homology_class": "52463052"
+    },
+    {
+      "human_symbol": "UGP2",
+      "mouse_symbol": "Ugp2",
+      "human_entrez_id": "7360",
+      "mouse_entrez_id": "216558",
+      "mouse_mgi_id": "MGI:2183447",
+      "mgi_homology_class": "52447632"
+    },
+    {
+      "human_symbol": "UPP1",
+      "mouse_symbol": "Upp1",
+      "human_entrez_id": "7378",
+      "mouse_entrez_id": "22271",
+      "mouse_mgi_id": "MGI:1097668",
+      "mgi_homology_class": "52449125"
+    },
+    {
+      "human_symbol": "VAMP5",
+      "mouse_symbol": "Vamp5",
+      "human_entrez_id": "10791",
+      "mouse_entrez_id": "53620",
+      "mouse_mgi_id": "MGI:1858622",
+      "mgi_homology_class": "52447239"
+    },
+    {
+      "human_symbol": "VAMP8",
+      "mouse_symbol": "Vamp8",
+      "human_entrez_id": "8673",
+      "mouse_entrez_id": "22320",
+      "mouse_mgi_id": "MGI:1336882",
+      "mgi_homology_class": "52454322"
+    },
+    {
+      "human_symbol": "VCAM1",
+      "mouse_symbol": "Vcam1",
+      "human_entrez_id": "7412",
+      "mouse_entrez_id": "22329",
+      "mouse_mgi_id": "MGI:98926",
+      "mgi_homology_class": "52447644"
+    },
+    {
+      "human_symbol": "VEGFA",
+      "mouse_symbol": "Vegfa",
+      "human_entrez_id": "7422",
+      "mouse_entrez_id": "22339",
+      "mouse_mgi_id": "MGI:103178",
+      "mgi_homology_class": "52445938"
+    },
+    {
+      "human_symbol": "VHL",
+      "mouse_symbol": "Vhl",
+      "human_entrez_id": "7428",
+      "mouse_entrez_id": "22346",
+      "mouse_mgi_id": "MGI:103223",
+      "mgi_homology_class": "52454237"
+    },
+    {
+      "human_symbol": "VLDLR",
+      "mouse_symbol": "Vldlr",
+      "human_entrez_id": "7436",
+      "mouse_entrez_id": "22359",
+      "mouse_mgi_id": "MGI:98935",
+      "mgi_homology_class": "52449940"
+    },
+    {
+      "human_symbol": "WSB1",
+      "mouse_symbol": "Wsb1",
+      "human_entrez_id": "26118",
+      "mouse_entrez_id": "78889",
+      "mouse_mgi_id": "MGI:1926139",
+      "mgi_homology_class": "52453719"
+    },
+    {
+      "human_symbol": "WWTR1",
+      "mouse_symbol": "Wwtr1",
+      "human_entrez_id": "25937",
+      "mouse_entrez_id": "97064",
+      "mouse_mgi_id": "MGI:1917649",
+      "mgi_homology_class": "52453883"
+    },
+    {
+      "human_symbol": "XAF1",
+      "mouse_symbol": "Xaf1",
+      "human_entrez_id": "54739",
+      "mouse_entrez_id": "327959",
+      "mouse_mgi_id": "MGI:3772572",
+      "mgi_homology_class": "52455910"
+    },
+    {
+      "human_symbol": "XPNPEP1",
+      "mouse_symbol": "Xpnpep1",
+      "human_entrez_id": "7511",
+      "mouse_entrez_id": "170750",
+      "mouse_mgi_id": "MGI:2180003",
+      "mgi_homology_class": "52463164"
+    },
+    {
+      "human_symbol": "ZBP1",
+      "mouse_symbol": "Zbp1",
+      "human_entrez_id": "81030",
+      "mouse_entrez_id": "58203",
+      "mouse_mgi_id": "MGI:1927449",
+      "mgi_homology_class": "52463174"
+    },
+    {
+      "human_symbol": "ZFP36",
+      "mouse_symbol": "Zfp36",
+      "human_entrez_id": "7538",
+      "mouse_entrez_id": "22695",
+      "mouse_mgi_id": "MGI:99180",
+      "mgi_homology_class": "52443913"
+    },
+    {
+      "human_symbol": "ZNF292",
+      "mouse_symbol": "Zfp292",
+      "human_entrez_id": "23036",
+      "mouse_entrez_id": "30046",
+      "mouse_mgi_id": "MGI:1353423",
+      "mgi_homology_class": "52447950"
+    },
+    {
+      "human_symbol": "ZNF683",
+      "mouse_symbol": "Zfp683",
+      "human_entrez_id": "257101",
+      "mouse_entrez_id": "100503878",
+      "mouse_mgi_id": "MGI:3650254",
+      "mgi_homology_class": "52457959"
+    },
+    {
+      "human_symbol": "ZNFX1",
+      "mouse_symbol": "Znfx1",
+      "human_entrez_id": "57169",
+      "mouse_entrez_id": "98999",
+      "mouse_mgi_id": "MGI:2138982",
+      "mgi_homology_class": "52446612"
+    }
+  ],
+  "excluded": [
+    {
+      "human_symbol": "AC124319.1",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "AK4",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ak4"
+      ]
+    },
+    {
+      "human_symbol": "ANXA2",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Anxa2"
+      ]
+    },
+    {
+      "human_symbol": "C1R",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "C1ra",
+        "C1rb"
+      ]
+    },
+    {
+      "human_symbol": "C1S",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "C1s1",
+        "C1s2"
+      ]
+    },
+    {
+      "human_symbol": "CASP4",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Casp4"
+      ]
+    },
+    {
+      "human_symbol": "CCL2",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ccl12",
+        "Ccl2"
+      ]
+    },
+    {
+      "human_symbol": "CCL7",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ccl12",
+        "Ccl7"
+      ]
+    },
+    {
+      "human_symbol": "CFH",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Cfh",
+        "Cfhr4"
+      ]
+    },
+    {
+      "human_symbol": "CSF2RB",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Csf2rb",
+        "Csf2rb2"
+      ]
+    },
+    {
+      "human_symbol": "CXCL8",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "DDX58",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "ENO1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Eno1",
+        "Eno1b"
+      ]
+    },
+    {
+      "human_symbol": "FCGR1A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Fcgr1"
+      ]
+    },
+    {
+      "human_symbol": "FCGR3A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Fcgr4"
+      ]
+    },
+    {
+      "human_symbol": "FKBP1A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Fkbp1a"
+      ]
+    },
+    {
+      "human_symbol": "GAPDH",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Gapdh",
+        "Gapdhrt",
+        "Gapdhrt2"
+      ]
+    },
+    {
+      "human_symbol": "GBP4",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Gbp3",
+        "Gbp7"
+      ]
+    },
+    {
+      "human_symbol": "GBP6",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Gbp10",
+        "Gbp4",
+        "Gbp6",
+        "Gbp8",
+        "Gbp9"
+      ]
+    },
+    {
+      "human_symbol": "GNLY",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "GZMB",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Gzmb",
+        "Gzmc",
+        "Gzmd",
+        "Gzme",
+        "Gzmf",
+        "Gzmg",
+        "Gzmn"
+      ]
+    },
+    {
+      "human_symbol": "GZMH",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Gzmd",
+        "Gzme",
+        "Gzmf",
+        "Gzmg",
+        "Gzmn"
+      ]
+    },
+    {
+      "human_symbol": "HLA-A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-D1",
+        "H2-K1",
+        "H2-Q1",
+        "H2-Q10",
+        "H2-Q2",
+        "H2-Q4",
+        "H2-Q6",
+        "H2-Q7",
+        "H2-Q8",
+        "H2-T23"
+      ]
+    },
+    {
+      "human_symbol": "HLA-B",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-D1",
+        "H2-K1",
+        "H2-M10.1",
+        "H2-M10.2",
+        "H2-M10.4",
+        "H2-M2",
+        "H2-M3",
+        "H2-Q1",
+        "H2-Q10",
+        "H2-Q2",
+        "H2-Q4",
+        "H2-Q6",
+        "H2-Q7",
+        "H2-Q8",
+        "H2-T23"
+      ]
+    },
+    {
+      "human_symbol": "HLA-DPA1",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "HLA-DPB1",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "HLA-DQA1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-Aa"
+      ]
+    },
+    {
+      "human_symbol": "HLA-DQB1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-Ab1"
+      ]
+    },
+    {
+      "human_symbol": "HLA-DRB1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-Eb1",
+        "H2-Eb2"
+      ]
+    },
+    {
+      "human_symbol": "HLA-G",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "H2-D1",
+        "H2-K1",
+        "H2-Q1",
+        "H2-Q10",
+        "H2-Q2",
+        "H2-Q4",
+        "H2-Q6",
+        "H2-Q7",
+        "H2-Q8",
+        "H2-T23"
+      ]
+    },
+    {
+      "human_symbol": "IFI27",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ifi27",
+        "Ifi27l2a",
+        "Ifi27l2b"
+      ]
+    },
+    {
+      "human_symbol": "IFIT1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ifit1",
+        "Ifit1bl1",
+        "Ifit1bl2"
+      ]
+    },
+    {
+      "human_symbol": "IFIT3",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ifit3",
+        "Ifit3b"
+      ]
+    },
+    {
+      "human_symbol": "IFITM2",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ifitm2"
+      ]
+    },
+    {
+      "human_symbol": "IFITM3",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Ifitm1",
+        "Ifitm2",
+        "Ifitm3",
+        "Ifitm6",
+        "Ifitm7"
+      ]
+    },
+    {
+      "human_symbol": "ILVBL",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "KLRK1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Klrk1"
+      ]
+    },
+    {
+      "human_symbol": "MARCH1",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "METTL7B",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "MT1E",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Mt1"
+      ]
+    },
+    {
+      "human_symbol": "MT2A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Mt2"
+      ]
+    },
+    {
+      "human_symbol": "MX1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Mx1",
+        "Mx2"
+      ]
+    },
+    {
+      "human_symbol": "MX2",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Mx1",
+        "Mx2"
+      ]
+    },
+    {
+      "human_symbol": "PLSCR1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Plscr1",
+        "Plscr1l1",
+        "Plscr2"
+      ]
+    },
+    {
+      "human_symbol": "PNP",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Pnp",
+        "Pnp2"
+      ]
+    },
+    {
+      "human_symbol": "PSME2",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Psme2",
+        "Psme2b"
+      ]
+    },
+    {
+      "human_symbol": "SECTM1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Sectm1a",
+        "Sectm1b"
+      ]
+    },
+    {
+      "human_symbol": "SELENBP1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Selenbp1",
+        "Selenbp2"
+      ]
+    },
+    {
+      "human_symbol": "SLC2A3",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Slc2a3"
+      ]
+    },
+    {
+      "human_symbol": "TES",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Tes",
+        "Tesl1"
+      ]
+    },
+    {
+      "human_symbol": "TMEM45A",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Tmem45a",
+        "Tmem45a2"
+      ]
+    },
+    {
+      "human_symbol": "USP18",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Usp18"
+      ]
+    },
+    {
+      "human_symbol": "WARS",
+      "reason": "absent_in_download",
+      "mouse_candidates": []
+    },
+    {
+      "human_symbol": "XCL1",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Xcl1"
+      ]
+    },
+    {
+      "human_symbol": "XIAP",
+      "reason": "no_reciprocal_one_to_one_mapping",
+      "mouse_candidates": [
+        "Xiap"
+      ]
+    }
+  ]
+}

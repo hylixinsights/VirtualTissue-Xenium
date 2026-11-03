@@ -24,7 +24,7 @@ import importlib
 import sys
 from pathlib import Path
 
-__version__ = "2.0.0a1"
+__version__ = "3.0.0a4"
 
 #: Folder that holds the engine modules and their recorded resources.
 ENGINE_DIR = Path(__file__).resolve().parent / "engine"

@@ -39,7 +39,9 @@ def test_every_control_yields_a_valid_bundle_with_a_control_record(bundle):
             with pytest.raises(ValueError, match="depth_conditioned_auc"):
                 apply_control(bundle, kind)
             continue
-        out = apply_control(bundle, kind, seed=3)
+        out = apply_control(bundle, kind, seed=3,
+                            **({"donor_context": dict(bundle["context"], disease="donor condition")}
+                               if kind == "jev_scrambled_context" else {}))
         validate_prepared(out)
         record = out["guidebook"]["control"]
         assert record["kind"] == kind and record["source_fingerprint"] == bundle["fingerprint"]
