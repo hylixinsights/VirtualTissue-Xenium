@@ -13,7 +13,19 @@
   },
   "perturbations": [],
   "recognition": false,
-  "time_step_hours": 1,
+  "time_step_hours": 0.5,
+  "kinetics": {
+    "mode": "hazard_per_hour",
+    "max_step_probability": 0.25
+  },
+  "scoring": {
+    "method": "depth_conditioned_auc",
+    "depth_bins": 10,
+    "min_reference_cells": 30,
+    "min_overlap": 5,
+    "beta": 1.0,
+    "min_transcripts": 0
+  },
   "interaction_mode": "spatial",
   "neighbor_radius_um": 30,
   "max_neighbors": 20,

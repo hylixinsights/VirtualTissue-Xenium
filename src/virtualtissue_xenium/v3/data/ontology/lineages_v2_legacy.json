@@ -1,0 +1,151 @@
+{
+  "version": "2.0",
+  "source_commit": "aa3fe9e2fd2b346aefd86a8b1bca530d300064f5",
+  "weights": {
+    "unknown": {
+      "REST": 1.0
+    },
+    "T_CD8": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.01,
+      "ACTIVATE": 0.15,
+      "EXHAUST": 0.02,
+      "RECOVER": 0.02,
+      "SECRETE": 0.08,
+      "APOPTOSIS": 0.005
+    },
+    "T_CD4": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.01,
+      "ACTIVATE": 0.15,
+      "EXHAUST": 0.02,
+      "RECOVER": 0.02,
+      "SECRETE": 0.08,
+      "APOPTOSIS": 0.005
+    },
+    "B": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.01,
+      "ACTIVATE": 0.1,
+      "SECRETE": 0.04,
+      "APOPTOSIS": 0.005
+    },
+    "myeloid": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.005,
+      "ACTIVATE": 0.1,
+      "SECRETE": 0.1,
+      "CLEAR_CORPSE": 0.1,
+      "APOPTOSIS": 0.005
+    },
+    "microglia": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.005,
+      "ACTIVATE": 0.1,
+      "SECRETE": 0.1,
+      "CLEAR_CORPSE": 0.1,
+      "APOPTOSIS": 0.005
+    },
+    "fibroblast": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.02,
+      "SECRETE": 0.08,
+      "APOPTOSIS": 0.005
+    },
+    "endothelial": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.01,
+      "SECRETE": 0.04,
+      "APOPTOSIS": 0.005
+    },
+    "epithelial": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.02,
+      "SECRETE": 0.04,
+      "APOPTOSIS": 0.005
+    },
+    "malignant": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.08,
+      "SECRETE": 0.08,
+      "APOPTOSIS": 0.005
+    },
+    "neuron": {
+      "REST": 1.0,
+      "ACTIVATE": 0.04,
+      "APOPTOSIS": 0.005
+    },
+    "astrocyte": {
+      "REST": 1.0,
+      "PROLIFERATE": 0.005,
+      "ACTIVATE": 0.06,
+      "SECRETE": 0.04,
+      "APOPTOSIS": 0.005
+    },
+    "oligodendrocyte": {
+      "REST": 1.0,
+      "APOPTOSIS": 0.005
+    }
+  },
+  "signatures": {
+    "cell_cycle": [
+      "MKI67",
+      "TOP2A",
+      "PCNA",
+      "MCM2",
+      "MCM5",
+      "CDK1",
+      "CCNB1",
+      "UBE2C"
+    ],
+    "cytotoxic": [
+      "NKG7",
+      "PRF1",
+      "GZMB",
+      "GNLY",
+      "CTSW",
+      "GZMH"
+    ],
+    "activation": [
+      "CD69",
+      "IL2RA",
+      "IFNG",
+      "TNFRSF9",
+      "FOS",
+      "JUN"
+    ],
+    "exhaustion_associated": [
+      "PDCD1",
+      "LAG3",
+      "HAVCR2",
+      "TIGIT",
+      "TOX",
+      "CTLA4"
+    ],
+    "apoptosis_associated": [
+      "BAX",
+      "BAK1",
+      "FAS",
+      "CASP3",
+      "CASP8",
+      "BBC3",
+      "PMAIP1"
+    ],
+    "inflammation": [
+      "IL1B",
+      "TNF",
+      "IL6",
+      "CXCL8",
+      "CCL2",
+      "NFKBIA"
+    ],
+    "antigen_presentation": [
+      "HLA-DRA",
+      "HLA-DPA1",
+      "HLA-DPB1",
+      "CD74",
+      "B2M",
+      "HLA-A"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "v3-platform-1",
+  "platform": "stereo_seq",
+  "measurement_unit": "binned_spot",
+  "panel_type": "whole_transcriptome",
+  "min_transcripts": 20,
+  "neighbor_radius_um": 30.0,
+  "mean_radius_um": 5.0,
+  "auc_top_fraction": 0.05,
+  "auc_min_rank": 1,
+  "rank_ties": "average_positive_ranks; undetected genes have zero recovery",
+  "confidence": "assumed",
+  "review_status": "Defaults for sensitivity analysis; platform-specific validation pending."
+}

@@ -175,3 +175,58 @@ def test_missing_jev_answers_do_not_silently_apply_local_choices(tmp_path):
     assert report["stop_reason"] == "provider_stopped_before_round_commit"
     assert json.loads((tmp_path / "frames.json").read_text())[0]["cells"] == initialize(bundle)
     assert (tmp_path / "decisions.jsonl").read_text() == ""
+
+
+def test_kill_target_is_nearest_in_spatial_mode_and_seeded_in_well_mixed():
+    base = cells()
+    # Two live malignant neighbours: "a_far" sorts first by ID but sits farther away.
+    base.append(dict(cell_id="a_far", cell_type="reviewed_malignant", lineage="malignant",
+                     expression={"ACTB": 10}, sample_id="sample_A", x=20, y=0))
+    base[0]["cell_id"] = "z_near"
+    bundle = prepare(base, context(), assayed_genes=["ACTB"])
+    rows, _ = decision_rows(initialize(bundle), bundle["guidebook"], bundle["context"], seed=21, step=0)
+    cd8 = next(r for r in rows if r["cell_id"] == "cd8")
+    assert cd8["targets"] == ["z_near", "a_far"] and cd8["target_rule"] == "nearest_centroid_then_id"
+    proposals = [dict(cell_id="cd8", action="KILL", targets=cd8["targets"], corpses=[], target_rule=cd8["target_rule"])]
+    _, events = commit(initialize(bundle), proposals, max_population=10, seed=4, step=0)
+    assert events[0]["target"] == "z_near" and events[0]["target_rule"] == "nearest_centroid_then_id"
+    # Well-mixed: no distance exists, so the order is a seeded draw and both targets occur across seeds.
+    mixed = prepare([{k: v for k, v in c.items() if k not in ("x", "y")} for c in base],
+                    dict(context("scrna"), interaction_mode="well_mixed"), assayed_genes=["ACTB"])
+    firsts = set()
+    for seed in range(20):
+        rows, _ = decision_rows(initialize(mixed), mixed["guidebook"], mixed["context"], seed=seed, step=0)
+        cd8 = next(r for r in rows if r["cell_id"] == "cd8")
+        assert cd8["target_rule"] == "seeded_uniform_draw"
+        firsts.add(cd8["targets"][0])
+    assert firsts == {"z_near", "a_far"}
+
+
+def test_jev_prior_divergence_is_reported_per_lineage(tmp_path):
+    from virtualtissue_xenium.v2.provider import JevProvider
+    from virtualtissue_xenium.v2.simulation import js_divergence
+    assert js_divergence({"A": .5, "B": .5}, {"A": .5, "B": .5}) == 0
+    assert abs(js_divergence({"A": 1.0, "B": 0.0}, {"A": 0.0, "B": 1.0}) - 1.0) < 1e-12
+    bundle = prepare(cells(), context(), assayed_genes=["ACTB"])
+
+    def transport(body):
+        answers = {}
+        for qid, q in body["questions"].items():
+            menu = sorted(q["criteria"])
+            # Deliberately disagree with any prior: put everything on the first non-REST action.
+            pick = next(a for a in menu if a != "REST") if len(menu) > 1 else "REST"
+            answers[qid] = dict(type="choice", choice=pick, confidence=.9,
+                                probabilities={a: (1.0 if a == pick else 0.0) for a in menu})
+        return dict(model=body["model"], answers=answers, usage=dict(input_tokens=1, output_tokens=1))
+
+    provider = JevProvider("FAKE_KEY", tmp_path / "run" / "jev_journal", {"run": 1}, max_attempts=50,
+                           transport=transport, prior_mode="hidden")
+    report = run(bundle, tmp_path / "run", steps=2, seed=3, mode="jev", provider=provider, jev_weight=1.0)
+    assert report["jev_prior_mode"] == "hidden"
+    by_lineage = report["jev_prior_divergence"]["by_lineage"]
+    assert set(by_lineage) <= {"malignant", "T_CD8", "myeloid", "neuron"} and by_lineage
+    assert all(0 < v["mean"] <= 1 for v in by_lineage.values())
+    config = json.loads((tmp_path / "run" / "config.json").read_text())
+    assert config["jev_prior_mode"] == "hidden" and config["provider_prompt_version"].endswith("hidden-prior")
+    first = json.loads((tmp_path / "run" / "decisions.jsonl").read_text().splitlines()[0])
+    assert "jev_prior_js_bits" in first

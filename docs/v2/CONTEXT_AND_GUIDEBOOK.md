@@ -95,6 +95,22 @@ At each runtime step, local gates remove unavailable actions. An abstract signal
 
 All weights apply **per decision step**, not per hour. Changing `time_step_hours` changes the simulated meaning of the same transitions; it does not automatically rescale them as hazards. Compare matched arms with the same interval, number of steps, sampling design, seed, model, graph and priors. Calibrating time-dependent division/death/exhaustion rates is future experimental work.
 
+### 4a. Depth-conditioned scoring and time units (v3 lanes A and B)
+
+Two context keys replace the 2.0.0a1 heuristics; contexts without them keep the old behaviour exactly.
+
+```json
+"time_step_hours": 0.5,
+"kinetics": {"mode": "hazard_per_hour", "max_step_probability": 0.25},
+"scoring": {"method": "depth_conditioned_auc", "depth_bins": 10, "min_reference_cells": 30,
+            "min_overlap": 5, "beta": 1.0, "min_transcripts": 0}
+```
+
+- **kinetics.mode `hazard_per_hour`** reads per-hour hazards from `src/virtualtissue_xenium/v2/kinetics_v3.json` (draft anchors with `confidence`; verify before publication). Each step: `P(event) = 1 − exp(−Σk·Δt)`, shared in proportion to `k`; `REST = exp(−Σk·Δt)`. Steps with `Σk·Δt > max_step_probability` are refused; `vtx2 inspect` prints the largest admissible step and the implied doubling time per lineage.
+- **scoring.method `depth_conditioned_auc`** (`src/virtualtissue_xenium/v2/scoring.py`): per-cell recovery AUC over the panel (deterministic average ranks), a mid-rank percentile within (cell type × depth bin) — falling back to the cell type, then to no score below `min_reference_cells` — and `z = probit(percentile)` clipped to ±3. The action multiplier is `exp(β·z) / mean_ref(exp(β·z))`, so the reference group keeps the table's mean hazard and expression only redistributes it among cells. `β = 0` (or `vtx2 control --kind beta_zero`) is the label-only model. `beta` may be a map, e.g. `{"PROLIFERATE": 1.0}`; unlisted actions get 0.
+- **min_transcripts** marks cells below the threshold `qc: below_min_transcripts`; they stay in the graph, only rest, and are excluded from references.
+- `vtx2 inspect` reports per-signature coverage (`available`, `insufficient_reference`, `insufficient_panel_overlap`). The 24-cell synthetic example has 6 cells per type, so every signature is `insufficient_reference` and expression has no effect there by design.
+
 ## 5. Declaring disease or treatment without hardcoding success
 
 A chronic-disease label alone does not force exhaustion. An anti-PD1 label alone does not activate every T cell or license killing. These labels are available to Jev as context, so a **prompt-only** perturbation can alter Jev's preferences, while local mode retains identical guidebook weights.

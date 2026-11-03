@@ -1,0 +1,36 @@
+{
+  "schema_version": "3.0",
+  "ontology_version": "3.0",
+  "platform": "xenium",
+  "assay": "xenium",
+  "tissue": "skin melanoma",
+  "organism": "human",
+  "disease": "melanoma",
+  "tissue_profile": "skin_melanoma",
+  "sampling": {
+    "design": "subsampled",
+    "description": "Template: replace with the reviewed ROI selection and sampling metadata.",
+    "missing_populations": [
+      "outside selected ROI"
+    ]
+  },
+  "perturbations": [],
+  "recognition": false,
+  "time_step_hours": 0.5,
+  "kinetics": {
+    "mode": "hazard_per_hour",
+    "max_step_probability": 0.25
+  },
+  "scoring": {
+    "method": "depth_conditioned_auc",
+    "depth_bins": 10,
+    "min_reference_cells": 30,
+    "min_overlap": 5,
+    "min_transcripts": 20,
+    "reference_scope": "sample",
+    "reference_fallback": "null"
+  },
+  "interaction_mode": "spatial",
+  "neighbor_radius_um": 30,
+  "max_neighbors": 20
+}

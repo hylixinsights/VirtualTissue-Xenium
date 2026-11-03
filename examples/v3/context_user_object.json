@@ -1,0 +1,33 @@
+{
+  "schema_version": "3.0",
+  "ontology_version": "3.0",
+  "platform": "xenium",
+  "assay": "xenium",
+  "organism": "human",
+  "tissue": "user-declared tissue; replace before preparing",
+  "disease": "not independently established",
+  "sampling": {
+    "design": "subsampled",
+    "description": "User chooses an ROI from supplied segmented objects and their composition.",
+    "missing_populations": ["outside selected ROI"]
+  },
+  "perturbations": [],
+  "recognition": false,
+  "time_step_hours": 0.25,
+  "interaction_mode": "spatial",
+  "neighbor_radius_um": 30,
+  "max_neighbors": 20,
+  "geometry": {
+    "interaction_distance": "boundary",
+    "invalid_polygon_policy": "centroid_fallback"
+  },
+  "scoring": {
+    "method": "tiered_panel_auc",
+    "depth_bins": 10,
+    "min_reference_cells": 30,
+    "min_overlap": 5,
+    "min_transcripts": 20,
+    "reference_scope": "sample",
+    "panel_max_multiplier": 2
+  }
+}

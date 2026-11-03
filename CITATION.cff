@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: Nakaya
     given-names: Helder
-version: 2.0.0a1
-date-released: 2026-10-30
+version: 3.0.0a4
+date-released: 2026-11-02
 license: MIT
 repository-code: "https://github.com/hylixinsights/VirtualTissue-Xenium"
 keywords:

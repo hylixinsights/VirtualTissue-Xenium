@@ -1,18 +1,24 @@
 """Expression evidence and explicitly assumed action preferences, without an LLM.
 
-Scores use mean ranks among positively detected assayed genes, with zero for an
-assayed but undetected gene. This is a small descriptive signature score, not
-AUCell, protein activity, transition frequency, or a calibrated fate probability.
+Two scoring methods (context.scoring.method):
+- ``rank_legacy`` (2.0.0a1): mean ranks among positively detected assayed genes,
+  zero for an assayed but undetected gene; weight *= 1 + score.
+- ``depth_conditioned_auc`` (v3 lane B, see scoring.py): within-type,
+  depth-binned recovery-AUC percentiles; hazard *= exp(beta z)/mean_ref.
+Neither is protein activity, a transition frequency or a calibrated fate probability.
 """
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
+from functools import lru_cache
 import hashlib
 import json
 import math
+from pathlib import Path
 
 from .context import ACTIONS, LINEAGES, modifier_matches, validate_context
+from .scoring import beta_for, expression_multiplier, max_rank_for, score_population
 
 DEFAULT_GENE_SETS = {
     "cell_cycle": ["MKI67", "TOP2A", "PCNA", "MCM2", "MCM5", "CDK1", "CCNB1", "UBE2C"],
@@ -33,6 +39,7 @@ DESCRIPTIONS = {
     "SECRETE": "Emit an abstract local simulated inflammatory signal.",
     "CLEAR_CORPSE": "Attempt removal of a neighboring simulated corpse.",
     "KILL": "Attempt killing of a recognized live malignant graph neighbor; local gates apply, and proximity does not establish contact.",
+    "MOVE": "Attempt a seeded displacement using the declared speed and persistence; no molecular chemotaxis is inferred.",
 }
 # These weights describe illustrative preferences per decision, not rates.
 BASE_WEIGHTS = {
@@ -50,6 +57,49 @@ BASE_WEIGHTS = {
     "astrocyte": {"REST": 1.0, "PROLIFERATE": .005, "ACTIVATE": .06, "SECRETE": .04, "APOPTOSIS": .005},
     "oligodendrocyte": {"REST": 1.0, "APOPTOSIS": .005},
 }
+KINETICS_PATH = Path(__file__).with_name("kinetics_v3.json")
+
+
+@lru_cache(maxsize=1)
+def load_kinetics():
+    """Packaged per-hour hazards with their anchors; see kinetics_v3.json review_status."""
+    table = json.loads(KINETICS_PATH.read_text(encoding="utf-8"))
+    hazards = {lineage: {action: float(row["hazard_per_hour"]) for action, row in rows.items()}
+               for lineage, rows in table["hazards"].items()}
+    for lineage, rows in hazards.items():
+        # The hazard table licenses exactly the legacy action sets; validate_prepared relies on this.
+        expected = set(BASE_WEIGHTS[lineage]) - {"REST"} | ({"KILL"} if lineage == "T_CD8" else set())
+        if set(rows) != expected or any(not math.isfinite(k) or k < 0 for k in rows.values()):
+            raise ValueError(f"kinetics_v3.json rows for {lineage} do not match the licensed action set.")
+    return table, hazards
+
+
+GATED_ACTIONS = ("KILL", "CLEAR_CORPSE")
+
+
+class KineticsStepError(ValueError):
+    """The declared time step is too coarse for the summed hazards of a cell."""
+
+
+def competing_risk_probabilities(hazards, dt, max_burden, *, where):
+    """First-event discretisation of competing Poisson processes.
+
+    ``burden`` = sum(k) * dt. P(any event in dt) = 1 - exp(-burden); each action
+    takes its share k_a / sum(k); REST = exp(-burden). At most one event per
+    cell per step, so rates are under-counted by about burden / 2; the guard
+    keeps that below max_burden / 2.
+    """
+    total = sum(hazards.values())
+    burden = total * dt
+    if burden > max_burden:
+        raise KineticsStepError(f"{where}: summed hazard x time step = {burden:.3f} exceeds kinetics.max_step_probability "
+                                f"{max_burden}; use time_step_hours <= {max_burden / total:.3f} or lower the hazards.")
+    p_any = 1 - math.exp(-burden)
+    probabilities = {a: p_any * k / total for a, k in hazards.items()} if total > 0 else {a: 0.0 for a in hazards}
+    probabilities["REST"] = math.exp(-burden)
+    return probabilities, burden
+
+
 ACTION_SIGNATURE = {
     "PROLIFERATE": "cell_cycle", "ACTIVATE": "activation", "EXHAUST": "exhaustion_associated",
     "APOPTOSIS": "apoptosis_associated", "SECRETE": "inflammation", "KILL": "cytotoxic",
@@ -60,7 +110,7 @@ def _digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
-def _validate_cells(cells):
+def _validate_cells(cells, *, lineages=LINEAGES, exact_symbols=False):
     if not isinstance(cells, list) or not cells:
         raise ValueError("cells must be a nonempty list of annotated cells.")
     checked, ids, type_lineages = [], set(), {}
@@ -73,7 +123,7 @@ def _validate_cells(cells):
         if cell["cell_id"] in ids:
             raise ValueError("cell_id values must be unique.")
         ids.add(cell["cell_id"])
-        if cell["lineage"] not in LINEAGES:
+        if cell["lineage"] not in lineages:
             raise ValueError(f"Unsupported lineage {cell['lineage']!r}; provide an explicit supported mapping.")
         previous = type_lineages.setdefault(cell["cell_type"], cell["lineage"])
         if previous != cell["lineage"]:
@@ -85,7 +135,7 @@ def _validate_cells(cells):
         for gene, value in expression.items():
             if not isinstance(gene, str) or not gene.strip():
                 raise ValueError("Expression gene names must be nonempty strings.")
-            symbol = gene.strip().upper()
+            symbol = gene.strip() if exact_symbols else gene.strip().upper()
             if symbol in normalized:
                 raise ValueError("Expression genes must be unique after case normalization.")
             if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
@@ -130,11 +180,23 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
     support remains null and cannot be interpreted as biological inactivity.
     """
     c = validate_context(context)
-    checked = _validate_cells(cells)
+    v3 = c["schema_version"] == "3.0"
+    ontology, profile, signature_source = None, None, None
+    if v3:
+        from ..v3.ontology import kinetics_for, load_platform, load_signatures
+        kinetics_table, hazards, ontology, profile = kinetics_for(c)
+        lineages = ontology["lineages"]
+        platform_profile = load_platform(c["platform"])
+    else:
+        lineages = LINEAGES
+    checked = _validate_cells(cells, lineages=lineages, exact_symbols=v3)
     if gene_sets is None:
-        if c["organism"].casefold() not in ("human", "homo sapiens"):
+        if v3:
+            gene_sets, signature_source = load_signatures(c["organism"])
+        elif c["organism"].casefold() not in ("human", "homo sapiens"):
             raise ValueError("Default signatures use human symbols. Supply reviewed gene_sets for another organism.")
-        gene_sets = DEFAULT_GENE_SETS
+        else:
+            gene_sets = DEFAULT_GENE_SETS
     if not isinstance(gene_sets, dict) or not gene_sets:
         raise ValueError("gene_sets must be a nonempty name-to-gene-list map.")
     signatures = {}
@@ -143,7 +205,7 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             raise ValueError("Each gene set needs a nonempty name and gene list.")
         if any(not isinstance(g, str) or not g.strip() for g in genes):
             raise ValueError("Gene-set symbols must be nonempty strings.")
-        signatures[name] = sorted({gene.strip().upper() for gene in genes})
+        signatures[name] = sorted({gene.strip() if v3 else gene.strip().upper() for gene in genes})
     observed = {g for cell in checked for g in cell["expression"]}
     explicit_panel = "assayed_genes" in c
     panel = set(c.get("assayed_genes", observed))
@@ -151,48 +213,105 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
         raise ValueError("Declare assayed_genes when the expression matrix has no features.")
     if explicit_panel and observed - panel:
         raise ValueError("Expression contains genes outside context.assayed_genes.")
-    records, grouped = {}, defaultdict(list)
+    hazard_mode = c["kinetics"]["mode"] == "hazard_per_hour"
+    dt = c["time_step_hours"]
+    if not v3:
+        kinetics_table, hazards = load_kinetics() if hazard_mode else (None, None)
+    scoring = c["scoring"]
+    depth_mode = scoring["method"] in ("depth_conditioned_auc", "tiered_panel_auc")
+    qc_fail = {cell["cell_id"] for cell in checked
+               if depth_mode and sum(cell["expression"].values()) < scoring["min_transcripts"]}
+    if depth_mode:
+        population, references = score_population(checked, panel, signatures, dict(scoring, _qc_fail=qc_fail))
+    records, grouped, worst_case_burden = {}, defaultdict(list), 0.0
     for cell in sorted(checked, key=lambda x: x["cell_id"]):
         lineage = cell["lineage"]
-        evidence = _rank_evidence(cell["expression"], panel, signatures)
-        weights = deepcopy(BASE_WEIGHTS[lineage])
-        if lineage == "T_CD8" and c["recognition"]:
-            weights["KILL"] = .1
+        evidence = population[cell["cell_id"]] if depth_mode else _rank_evidence(cell["expression"], panel, signatures)
+        if hazard_mode:
+            weights = dict(hazards[lineage])
+            can_kill = lineages[lineage]["can_kill"] if v3 else lineage == "T_CD8"
+            if not (can_kill and c["recognition"]):
+                weights.pop("KILL", None)
+            if v3 and (not c["dynamics"]["movement_enabled"] or c["interaction_mode"] != "spatial"):
+                weights.pop("MOVE", None)
+            weights["REST"] = None  # residual; computed after conversion
+        else:
+            weights = deepcopy(BASE_WEIGHTS[lineage])
+            if lineage == "T_CD8" and c["recognition"]:
+                weights["KILL"] = .1
         # Overrides cannot create a lineage-incompatible action. This prevents
         # a typo or context modifier from making mature neurons divide.
         overrides = c["action_priors"].get(lineage, {})
-        if set(overrides) - set(weights):
-            raise ValueError(f"Action override is incompatible with lineage {lineage} or recognition licensing.")
+        if set(overrides) - set(weights) or (hazard_mode and "REST" in overrides):
+            raise ValueError(f"Action override is incompatible with lineage {lineage}, recognition licensing, or hazard mode (REST is residual).")
         weights.update(overrides)
+        if cell["cell_id"] in qc_fail:
+            # Too few transcripts to say anything: the cell stays in the graph and only rests, visibly.
+            weights = {"REST": None if hazard_mode else 1.0}
         prior_weights = dict(weights)
         audit = []
+        if cell["cell_id"] in qc_fail:
+            audit.append({"source": "qc_gate", "applied": True, "min_transcripts": scoring["min_transcripts"],
+                          "assumption": "Below min_transcripts the cell is REST-only; not evidence of quiescence."})
         for action, weight in list(weights.items()):
             signature = ACTION_SIGNATURE.get(action)
-            score = evidence.get(signature, {}).get("score")
+            if weight is None or signature not in evidence:
+                continue
+            if depth_mode:
+                beta = beta_for(scoring, action)
+                multiplier, normaliser = expression_multiplier(evidence[signature], references[signature], beta)
+                weights[action] = weight * multiplier
+                audit.append({"action": action, "source": scoring["method"], "signature": signature,
+                              "z": evidence[signature]["z"], "status": evidence[signature]["status"],
+                              "reference": evidence[signature]["reference"], "beta": beta,
+                              "normaliser": normaliser, "multiplier": multiplier,
+                              "assumption": ("Bounded within-cell panel-rank heuristic; no population mean preservation or biological calibration"
+                                  if evidence[signature].get("status") == "available_panel_heuristic" else
+                                  "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta")})
+                continue
+            score = evidence[signature].get("score")
             if score is not None:
                 multiplier = 1 + score
                 weights[action] = weight * multiplier
                 audit.append({"action": action, "source": "expression_rank_heuristic", "signature": signature,
                               "multiplier": multiplier, "assumption": "weight *= 1 + score; uncalibrated"})
         for index, rule in enumerate(c["context_modifiers"]):
-            applies = lineage in rule["lineages"] and modifier_matches(rule, c)
-            if applies and rule["action"] in weights:
+            applies = lineage in rule["lineages"] and modifier_matches(rule, c) and weights.get(rule["action"]) is not None
+            if applies:
                 weights[rule["action"]] *= rule["multiplier"]
-            audit.append({"source": "declared_context_modifier", "rule_index": index,
-                          "applied": applies and rule["action"] in weights,
+            audit.append({"source": "declared_context_modifier", "rule_index": index, "applied": applies,
                           "action": rule["action"], "multiplier": rule["multiplier"], "reason": rule["reason"]})
-        if any(not math.isfinite(w) for w in weights.values()):
+        if any(w is not None and not math.isfinite(w) for w in weights.values()):
             raise ValueError("Action weights overflowed; reduce prior or modifier magnitudes.")
-        total = sum(weights.values())
-        if not math.isfinite(total) or total <= 0 or weights["REST"] <= 0:
-            raise ValueError("Finite action weights and a positive REST fallback are required.")
-        actions = {a: {"weight": w, "prior_weight": prior_weights[a], "probability": w / total, "description": DESCRIPTIONS[a],
-                       "provenance": "uncalibrated_assumed_preference_per_decision"}
-                   for a, w in sorted(weights.items()) if w > 0}
+        if hazard_mode:
+            limit = c["kinetics"]["max_step_probability"]
+            hazard_rows = {a: k for a, k in weights.items() if a != "REST"}
+            # Gated actions (KILL, CLEAR_CORPSE) only enter the menu with a local target, so
+            # the build-time guard covers the always-available actions; the kernel guards the
+            # actual gated menu every step and preflight reports the gated worst case.
+            ungated = {a: k for a, k in hazard_rows.items() if a not in GATED_ACTIONS}
+            competing_risk_probabilities(ungated, dt, limit, where=f"Cell {cell['cell_id']!r} (ungated actions)")
+            probabilities, burden = competing_risk_probabilities(hazard_rows, dt, float("inf"), where="")
+            worst_case_burden = max(worst_case_burden, burden)
+            actions = {a: {"weight": p, "probability": p, "step_probability": p,
+                           "hazard_per_hour": weights[a] if a != "REST" else None,
+                           "prior_hazard_per_hour": prior_weights[a] if a != "REST" else None,
+                           "prior_weight": prior_weights[a] if a != "REST" else None,
+                           "description": DESCRIPTIONS[a],
+                           "provenance": "competing_risk_first_event: p_a = (1-exp(-sum(k)*dt)) * k_a/sum(k); REST = exp(-sum(k)*dt); uncalibrated anchors"}
+                       for a, p in sorted(probabilities.items()) if p > 0}
+        else:
+            total = sum(weights.values())
+            if not math.isfinite(total) or total <= 0 or weights["REST"] <= 0:
+                raise ValueError("Finite action weights and a positive REST fallback are required.")
+            actions = {a: {"weight": w, "prior_weight": prior_weights[a], "probability": w / total, "description": DESCRIPTIONS[a],
+                           "provenance": "uncalibrated_assumed_preference_per_decision"}
+                       for a, w in sorted(weights.items()) if w > 0}
         expression_total = sum(cell["expression"].values())
         if not math.isfinite(expression_total):
             raise ValueError("Expression total overflowed; supply finite counts within numeric range.")
         record = {"cell_type": cell["cell_type"], "lineage": lineage, "actions": actions,
+                  "qc": "below_min_transcripts" if cell["cell_id"] in qc_fail else "pass",
                   "evidence": evidence, "weight_adjustments": audit,
                   "detected_genes": sum(v > 0 for v in cell["expression"].values()),
                   "expression_total": expression_total,
@@ -213,19 +332,37 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
                 for values in [[item["evidence"][signature]["score"] for item in group
                                 if item["evidence"][signature]["score"] is not None]]},
         }
-    return {
-        "schema_version": "2.0", "context": c, "cells": records, "by_cell_type": by_type,
+    result = {
+        "schema_version": c["schema_version"], "context": c, "cells": records, "by_cell_type": by_type,
         "provenance": {
             "guidebook_version": "v2-guidebook-1", "context_sha256": _digest(c),
             "default_action_weights": deepcopy(BASE_WEIGHTS),
             "recognition_licensed_kill_weight": .1,
+            "kinetics_mode": c["kinetics"]["mode"],
+            "kinetics_version": kinetics_table["kinetics_version"] if hazard_mode else None,
+            "kinetics_sha256": _digest(kinetics_table) if hazard_mode else None,
+            "default_hazards_per_hour": deepcopy(hazards) if hazard_mode else None,
+            "kinetics_review_status": kinetics_table["review_status"] if hazard_mode else None,
+            "kinetics_worst_case_step_burden": worst_case_burden if hazard_mode else None,
+            "kinetics_recommended_max_time_step_hours": (
+                c["kinetics"]["max_step_probability"] * dt / worst_case_burden if hazard_mode and worst_case_burden > 0 else None),
             "input_sha256": _digest(checked), "gene_sets_sha256": _digest(signatures),
             "gene_sets": signatures, "assayed_genes": sorted(panel),
             "panel_source": "context.assayed_genes" if explicit_panel else "input_feature_union_incomplete_if_sparse",
-            "score_method": "mean_positive_expression_rank_with_undetected_assayed_genes_zero; minimum_overlap=3",
+            "score_method": ("depth_conditioned_recovery_auc_within_cell_type; z=probit(mid-rank percentile); m=exp(beta z)/mean_ref"
+                             if depth_mode else
+                             "mean_positive_expression_rank_with_undetected_assayed_genes_zero; minimum_overlap=3"),
+            "scoring": deepcopy(scoring),
+            "scoring_max_rank": max_rank_for(len(panel), scoring) if depth_mode else None,
+            "qc_fail_cells": len(qc_fail),
+            "scoring_coverage": ({name: dict(Counter(population[cid][name]["status"] for cid in population))
+                                  for name in signatures} if depth_mode else None),
             "symbol_normalization": "uppercase; no orthology inference",
             "probability_semantics": "Uncalibrated heuristic action preferences conditional on the offered menu; not learned fate probabilities or rates.",
-            "time_semantics": "One preference distribution per decision; changing the decision interval changes the model and requires calibration.",
+            "time_semantics": ("Per-hour hazards; first-event competing-risk discretisation per step (at most one event per cell per step); "
+                               "rates are under-counted by about sum(k)*dt/2, bounded by kinetics.max_step_probability."
+                               if hazard_mode else
+                               "One preference distribution per decision; changing the decision interval changes the model and requires calibration."),
             "limitations": [
                 "Expression is fixed baseline evidence; dynamic states are simulated, not remeasured.",
                 "Exhaustion-associated and apoptosis-associated transcripts do not establish functional exhaustion or impending death.",
@@ -235,3 +372,31 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             ],
         },
     }
+    if v3:
+        provenance = result["provenance"]
+        provenance.update(
+            guidebook_version="v3-guidebook-1", default_action_weights=None,
+            recognition_licensed_kill_weight=None,
+            symbol_normalization="exact case-preserved symbols; no runtime orthology inference",
+            ontology_version=c["ontology_version"], ontology_sha256=_digest(ontology),
+            ontology_hashes=ontology["hashes"], lineage_rules=deepcopy(lineages),
+            signature_source=signature_source or {"source": "explicit_user_gene_sets", "review_status": "investigator_declared"},
+            platform_profile=platform_profile, tissue_profile=profile,
+            beta_table=kinetics_table.get("beta_by_action", {}),
+            coverage_warnings={name: "fewer_than_half_signature_genes_assayed"
+                               for name, genes in signatures.items() if len(set(genes) & panel) / len(genes) < .5},
+            unexpected_lineages=sorted({cell["lineage"] for cell in checked} - set(profile["expected_lineages"])) if profile else [],
+        )
+        if depth_mode:
+            provenance["scoring_reference_coverage"] = {
+                name: dict(Counter(population[cid][name].get("reference") or population[cid][name]["status"]
+                                   for cid in population)) for name in signatures}
+        if scoring["method"] == "tiered_panel_auc":
+            provenance["score_method"] = "tiered_panel_auc_v1: sample/type/depth, then sample/type, then bounded within-cell random-gene rank reference"
+            provenance["limitations"].append("The panel-only fallback is a weak heuristic, not a calibrated cell-type percentile; its multiplier does not preserve a population mean.")
+        for record in records.values():
+            record["lineage_rules"] = deepcopy(lineages[record["lineage"]])
+            record["local_gates_required"][-1] = "PROLIFERATE is subject to declared local crowding and living population capacity."
+            if "PROLIFERATE" in record["actions"]:
+                record["actions"]["PROLIFERATE"]["description"] = "Attempt one daughter cell with declared radius, local crowding and soft repulsion."
+    return result

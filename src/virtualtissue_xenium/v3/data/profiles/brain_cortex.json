@@ -1,0 +1,19 @@
+{
+  "version": "v3-profile-1",
+  "name": "brain_cortex",
+  "organism": "mouse",
+  "expected_lineages": [
+    "neuron",
+    "astrocyte",
+    "microglia",
+    "oligodendrocyte",
+    "endothelial",
+    "pericyte",
+    "T_CD8",
+    "T_CD4",
+    "myeloid",
+    "unknown"
+  ],
+  "hazard_overrides": {},
+  "review_status": "No numerical tissue calibration supplied; unexpected lineages produce a preparation warning."
+}
