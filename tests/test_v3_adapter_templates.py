@@ -26,10 +26,11 @@ def test_atera_template_needs_only_obs_geometry_and_is_not_an_annotation(tmp_pat
     import zarr
     from zarr.storage import ZipStore
     with ZipStore(str(tmp_path/'cell_feature_matrix.zarr.zip'), mode='w') as store:
-        root = zarr.open_group(store=store, mode='w', zarr_format=2)
+        v3 = int(zarr.__version__.split('.')[0]) >= 3
+        root = zarr.open_group(store=store, mode='w', **({'zarr_format': 2} if v3 else {}))
         for key, values in {'obs/barcode': ['b', 'a'], 'obs/centroid_column': [20., 10.],
                             'obs/centroid_row': [4., 2.]}.items():
-            root.create_array(key, data=np.asarray(values))
+            (root.create_array if v3 else root.create_dataset)(key, data=np.asarray(values))
         # X and var are deliberately absent: templates must never touch them.
     output = write_template('atera', tmp_path, tmp_path/'review.csv')
     annotations = rows(output)
