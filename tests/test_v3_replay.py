@@ -41,12 +41,55 @@ def test_chunks_are_bounded_lightweight_and_roundtrip_exactly(tmp_path):
     assert json.loads((tmp_path / "replay_frames/manifest.json").read_text()) == data
 
 
+def test_sidebar_history_counts_recorded_events_and_populations_across_chunks(tmp_path):
+    frames = fixtures(103)
+    for frame in frames:
+        step = frame["step"]
+        if step >= 50:
+            frame["cells"]["daughter"] = dict(cell_id="daughter", lineage="malignant", x=0, y=0,
+                                               status="alive" if step < 100 else "dead")
+        if step >= 101:
+            frame["cells"]["daughter"]["status"] = "removed"
+        if step == 50:
+            frame["events"] = [dict(kind="division", cell_id="cell", daughter="daughter")]
+        if step == 100:
+            frame["events"] = [dict(kind="kill", cell_id="cd8", target="daughter")]
+        if step == 101:
+            frame["events"] = [dict(kind="clear_corpse", cell_id="macrophage", target="daughter")]
+    source = tmp_path / "frames.jsonl"
+    source.write_text("".join(json.dumps(f) + "\n" for f in frames))
+    write_replay_stream(tmp_path / "replay.html", source, dict(schema_version="3.0"))
+    stubs = payload(tmp_path / "replay.html")["frames"]
+    assert all("cells" not in frame for frame in stubs)
+    assert [stubs[i]["metrics"]["malignant"] for i in [0, 49, 50, 99, 100, 101]] == [1, 1, 2, 2, 1, 1]
+    assert [stubs[i]["metrics"]["dead"] for i in [99, 100, 101]] == [0, 1, 0]
+    assert stubs[101]["metrics"]["removed"] == 1
+    assert stubs[49]["metrics"]["events"] == {}
+    assert stubs[50]["metrics"]["events"] == {"division": 1}
+    assert stubs[102]["metrics"]["events"] == {"division": 1, "kill": 1, "clear_corpse": 1}
+
+
 def test_v2_still_uses_self_contained_legacy_replay(tmp_path):
     frames = fixtures(2)
     write_replay(tmp_path / "v2.html", frames, dict(schema_version="2.0"))
     data = payload(tmp_path / "v2.html")
     assert data["frames"] == frames and "replay" not in data
     assert not (tmp_path / "v2_frames").exists()
+
+
+def test_embedded_and_streamed_players_restore_the_same_dark_dashboard(tmp_path):
+    frames = fixtures(2)
+    source = tmp_path / "frames.jsonl"
+    source.write_text("".join(json.dumps(frame) + "\n" for frame in frames))
+    for writer, argument, name in [(write_replay, frames, "v2.html"),
+                                   (write_replay_stream, source, "v3.html")]:
+        target = tmp_path / name
+        writer(target, argument, dict(schema_version="3.0" if name == "v3.html" else "2.0"))
+        html = target.read_text()
+        assert "--bg:#0a0e1a" in html.replace(" ", "")
+        for element in ["tTumor", "tLiving", "tDiv", "tDeath", "chart", "inspector", "feed", "slider"]:
+            assert f'id="{element}"' in html
+        assert html.count("<script") == 2
 
 
 def test_untrusted_text_cannot_terminate_data_or_chunk_scripts(tmp_path):
@@ -90,6 +133,13 @@ def test_actual_player_loader_seek_cache_play_and_selection_with_dom_double(tmp_
     for frame in frames[1:]:
         i = frame["step"]
         frame["events"] = [dict(kind="move", cell_id="cell", from_xy=[i-1, 1-i], to_xy=[i, -i])]
+        if i >= 50:
+            frame["cells"]["daughter"] = dict(cell_id="daughter", lineage="malignant", x=i+10, y=-i,
+                                               status="alive" if i < 110 else "dead")
+        if i == 50:
+            frame["events"].append(dict(kind="division", cell_id="cell", daughter="daughter"))
+        if i == 110:
+            frame["events"].append(dict(kind="kill", cell_id="cd8", target="daughter"))
     source = tmp_path / "frames.jsonl"
     source.write_text("".join(json.dumps(f)+"\n" for f in frames))
     report = dict(schema_version="3.0", kernel="cell_agent", preflight=dict(interaction_mode="spatial"),

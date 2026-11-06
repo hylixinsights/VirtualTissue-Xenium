@@ -445,6 +445,42 @@ def cmd_expression_audit(args):
     return result
 
 
+def cmd_replay(args):
+    """Refresh presentation from saved snapshots; never rerun a decision round."""
+    from .replay import write_replay, write_replay_stream
+
+    directory = Path(args.run_directory)
+    report = read_json(directory / "report.json")
+    if not isinstance(report, dict) or report.get("schema_version") not in {"2.0", "3.0"}:
+        raise ValueError("Replay refresh requires a saved schema-2.0 or schema-3.0 run report.")
+    output = Path(args.output) if args.output else directory / "replay.html"
+    if output.suffix.lower() != ".html":
+        raise ValueError("Replay output must end in .html; scientific exports are not replay destinations.")
+    if output.is_symlink():
+        raise ValueError("Replay output must not be a symbolic link to another saved artifact.")
+    if output.exists() and not output.is_file():
+        raise ValueError("Replay output must be an HTML file path, not an existing directory.")
+    protected = [path for path in directory.iterdir() if path.is_file() and path.suffix.lower() != ".html"]
+    if output.exists() and any(output.samefile(path) for path in protected):
+        raise ValueError("Replay output collides with a saved artifact; choose another .html path.")
+    stream = directory / "frames.jsonl"
+    array = directory / "frames.json"
+    if report.get("schema_version") == "3.0":
+        if not stream.is_file():
+            raise ValueError("A v3 replay requires the saved frames.jsonl stream.")
+        sidecars = output.with_name(output.stem + "_frames")
+        if sidecars.is_symlink() or (sidecars.exists() and any(path.is_symlink() for path in sidecars.iterdir())):
+            raise ValueError("Replay sidecars must not be symbolic links to other saved artifacts.")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        write_replay_stream(output, stream, report)
+    else:
+        frames = read_json(array)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        write_replay(output, frames, report)
+    return dict(replay=str(output.resolve()), source=str(directory.resolve()),
+                refreshed_from_saved_frames=True)
+
+
 def parser():
     p = argparse.ArgumentParser(prog="vtx2", description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
@@ -478,6 +514,10 @@ def parser():
     s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown",
                    help="hidden omits the guidebook prior from the prompt (anchoring control); journals never mix modes.")
     s.add_argument("--resume", action="store_true"); s.set_defaults(func=cmd_run)
+    s = sub.add_parser("replay", help="Refresh a saved run's offline replay without rerunning the simulation or calling Jev.")
+    s.add_argument("run_directory", help="Saved run folder containing report.json and frames.jsonl (v3) or frames.json (v2).")
+    s.add_argument("--output", help="Replay HTML destination; defaults to RUN_DIRECTORY/replay.html.")
+    s.set_defaults(func=cmd_replay)
     s = sub.add_parser("cost", help="Estimate Jev HTTP calls and input tokens for a run; no API use.")
     s.add_argument("prepared"); s.add_argument("--steps", type=int, default=12); s.add_argument("--seed", type=int, default=21)
     s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--max-questions", type=int, default=20)

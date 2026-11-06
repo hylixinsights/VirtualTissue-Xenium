@@ -72,6 +72,18 @@ make figures ENSEMBLE=outputs/v3/demo/ensemble FIGURES=outputs/v3/demo/figures
 
 This creates 270 synthetic cells with heterogeneous expression, a β=0 arm and a within-type expression-shuffle arm. Readouts distinguish bootstrap confidence intervals of the median from the distribution across seeds. A completed run includes decisions, events, reports, frames and `replay.html`; the ensemble adds long-form CSVs, paired differences and provenance.
 
+## Refresh the replay of an existing run
+
+The original dark replay layout is restored with tissue indicators, the malignant-cell chart, event feed and cell inspector. The v3 player retains its bounded frame cache. After updating your checkout and package in the environment used for the run:
+
+```bash
+git pull --ff-only
+pip install -e .
+vtx2 replay outputs/v3/ensemble_990_1350_48h/runs/recognition/seed_4
+```
+
+Open that run's `replay.html`. This command reads the saved frames and report and replaces only the replay HTML and its presentation sidecars. It does not rerun the simulation, call Jev or change decisions, readouts or scientific exports. Keep `replay.html` beside its `replay_frames` folder when moving it. Repeat the command for other arms/seeds as needed; `--output another/replay.html` writes a separate presentation copy. V3 uses `frames.jsonl`; v2 uses `frames.json`.
+
 ## Use measured data
 
 Supply existing `cell_type`/`lineage` annotations, exact gene symbols and measured coordinates in micrometres, recording their origin. For raw Xenium:
