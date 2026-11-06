@@ -74,7 +74,11 @@ This creates 270 synthetic cells with heterogeneous expression, a β=0 arm and a
 
 ## Refresh the replay of an existing run
 
-The original dark replay layout is restored with tissue indicators, the malignant-cell chart, event feed and cell inspector. The v3 player retains its bounded frame cache. After updating your checkout and package in the environment used for the run:
+The original dark replay layout is restored with tissue indicators, the malignant-cell chart, event feed and cell inspector. The v3 player retains its bounded frame cache.
+
+Cells also use the original renderer: rounded cell bodies clipped against neighboring bodies, sizes in tissue coordinates, visible nuclei, context transparency and event glows. **Original cells** uses the original transition from supplied t0 segmentation to illustrative simulated silhouettes. Choose **Provided outlines** to inspect exact saved polygons, or **Centroids** for position markers. These display choices do not change the recorded coordinates, interaction graph, segmentation evidence or model dynamics.
+
+Update your checkout and package in the environment used for the run:
 
 ```bash
 git pull --ff-only

@@ -13,7 +13,7 @@ function inlineMetadata(){
   const contour=shape?shape.polygon_um.map(p=>[p[0]+c.x-shape.anchor_um[0],p[1]+c.y-shape.anchor_um[1]]):[];
   for(const p of [[c.x,c.y],...contour])if(p.every(Number.isFinite)){xmin=Math.min(xmin,p[0]);xmax=Math.max(xmax,p[0]);ymin=Math.min(ymin,p[1]);ymax=Math.max(ymax,p[1])}
  }
- return {lineages:[...lineages].sort(),cell_order:[...order],bounds:Number.isFinite(xmin)?[xmin,xmax,ymin,ymax]:[0,1,0,1],has_polygons:polygons};
+ return {lineages:[...lineages].sort(),cell_order:[...order],bounds:Number.isFinite(xmin)?[xmin,xmax,ymin,ymax]:[0,1,0,1],has_polygons:polygons,radii_um:data.radii_um||{}};
 }
 const meta=data.replay||inlineMetadata(),lazy=!!data.replay;
 const slider=$('slider'),canvas=$('canvas'),ctx=canvas.getContext('2d'),play=$('play'),tracks=$('tracks');
@@ -25,12 +25,17 @@ $('badge').textContent=`${Number(frames.at(-1)?.time_hours||0).toFixed(2)} h sim
 slider.max=Math.max(0,frames.length-1);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const human=s=>String(s??'').replaceAll('_',' ');
-const PALETTE={malignant:'#ff8a5c',myeloid:'#f2c14e',T_reg:'#cfa2f5',NK:'#38d6cf',stromal:'#b9cf8c',epithelial:'#d8573f',Tumor:'#d8573f',Tumor_proliferating:'#ff8a5c',T_CD8:'#38d6cf',T_CD8_cytotoxic:'#38d6cf',T_CD4:'#6fa8ff',B:'#8f7cf6',B_cell:'#8f7cf6',plasma:'#cfa2f5',Plasma_cell:'#cfa2f5',macrophage:'#f2c14e',Macrophage:'#f2c14e',Macrophage_SPP1:'#f2c14e',fibroblast:'#b9cf8c',Fibroblast:'#b9cf8c',CAF:'#86b35a',endothelial:'#ec6fae',Endothelial:'#ec6fae',unknown:'#5d6684'};
+const PALETTE={malignant:'#ff8a5c',myeloid:'#f2c14e',T_reg:'#cfa2f5',NK:'#38d6cf',stromal:'#b9cf8c',epithelial:'#d8573f',Tumor:'#d8573f',Tumor_proliferating:'#ff8a5c',T_CD8:'#38d6cf',T_CD8_cytotoxic:'#38d6cf',T_CD4:'#6fa8ff',B:'#8f7cf6',B_cell:'#8f7cf6',plasma:'#cfa2f5',Plasma_cell:'#cfa2f5',macrophage:'#f2c14e',Macrophage:'#f2c14e',Macrophage_SPP1:'#f2c14e',fibroblast:'#b9cf8c',Fibroblast:'#b9cf8c',CAF:'#86b35a',endothelial:'#ec6fae',Endothelial:'#ec6fae',unknown:'#5d6684',occluded:'#3a4360'};
 const fallback=['#cfa2f5','#86b35a','#ec6fae','#6fa8ff','#b9cf8c','#f2c14e','#8f7cf6'];
 const colors=Object.fromEntries(meta.lineages.map((t,i)=>[t,PALETTE[t]||PALETTE[Object.keys(PALETTE).find(k=>k.toLowerCase()===String(t).toLowerCase())]||fallback[i%fallback.length]]));
 const EVENT_STYLE={kill:['CD8 kill','#ff4d5e'],apoptosis:['Apoptosis','#c878ff'],division:['Cell division','#ffab7e'],clear_corpse:['Corpse cleared','#f2c14e'],corpse_degraded:['Corpse removed','#9a8fa6'],deactivate:['Activation ended','#8d97b3'],move:['Movement','#21e6a8'],activate:['Activation','#38d6cf'],exhaust:['Exhaustion','#f2c14e'],recover:['Recovery','#6fa8ff'],population_cap_blocked:['Division blocked by population cap','#ffd36b'],conflict_blocked:['Conflicting action blocked','#8d97b3']};
-const warning=lattice?'Fixed measured bins. Occupancy is an abstract amount per bin, not a cell count. Empty bins are faint outlines.':spatial?(meta.has_polygons?'Provided t0 segmentation is shown when valid. Movement rigidly translates outlines; daughter outlines are inherited abstractions. Invalid outlines use centroid markers.':'Centroid markers show recorded positions. Marker size is illustrative. Daughter offsets are synthetic; mechanics and physical contact are not modelled.'):'Schematic layout for well-mixed interactions. Positions are display coordinates and have no anatomical meaning.';
-$('warning').textContent=warning;
+function viewWarning(){
+ if(lattice)return 'Fixed measured bins. Occupancy is an abstract amount per bin, not a cell count. Empty bins are faint outlines.';
+ if(!spatial)return 'Well-mixed schematic. Cell positions and bodies have no anatomical meaning.';
+ const mode=$('shapeMode').value||'cells';
+ return mode==='cells'?'Original cell rendering · illustrative cell bodies at recorded positions. Available t0 segmentation blends into cell bodies during the first 20 simulated minutes.':mode==='provided'?'Provided outlines · saved t0 segmentation translated with recorded centroids. Missing outlines use centroid markers.':'Recorded cell centroids · marker size is illustrative.';
+}
+$('warning').textContent=viewWarning();
 $('summary').textContent=JSON.stringify({mode:report.mode,completed:report.completed,steps:report.completed_steps,seed:report.seed,events:report.events,usage:report.usage},null,2);
 if(lattice){$('tumorLabel').textContent='occupied bins';$('corpseLabel').textContent='empty bins';$('livingLabel').textContent='total bins';$('chartTitle').textContent='Occupied bins over time'}
 const index=Object.fromEntries(meta.cell_order.map((id,i)=>[id,i])),nCells=meta.cell_order.length,nColumns=Math.max(1,Math.ceil(Math.sqrt(nCells)));
@@ -58,7 +63,7 @@ function loadChunk(id){
 function frameAt(position,version){loadChain=loadChain.catch(()=>{}).then(async()=>{if(version!==requestVersion)return null;if(!lazy)return frames[position];const stub=frames[position];const chunk=await loadChunk(stub.chunk);return version===requestVersion?chunk[stub.offset]:null});return loadChain}
 function xy(c){const i=index[c.cell_id]??0;return spatial?[c.x,c.y]:[i%nColumns,Math.floor(i/nColumns)]}
 function toScreen(p,box){return [(p[0]-view.x)*view.scale+box.width/2,(p[1]-view.y)*view.scale+box.height/2]}
-function fitView(){const box=canvas.getBoundingClientRect();view.x=(xmin+xmax)/2;view.y=(ymin+ymax)/2;view.scale=Math.min(Math.max(1,box.width-70)/Math.max(1,xmax-xmin),Math.max(1,box.height-110)/Math.max(1,ymax-ymin));view.initialScale=view.scale;viewFitted=true}
+function fitView(){const box=canvas.getBoundingClientRect();let padding=5;if(spatial)for(const radius of Object.values(meta.radii_um||LEGACY_RADII))if(Number.isFinite(radius)&&radius>0)padding=Math.max(padding,radius);view.x=(xmin+xmax)/2;view.y=(ymin+ymax)/2;view.scale=Math.min(Math.max(1,box.width-70)/Math.max(1,xmax-xmin+(spatial?padding*2:1)),Math.max(1,box.height-110)/Math.max(1,ymax-ymin+(spatial?padding*2:1)));view.initialScale=view.scale;viewFitted=true}
 function drawTracks(f,box){
  if(!tracks.checked||!spatial||lattice)return;
  ctx.globalAlpha=.3;ctx.lineWidth=1;
@@ -75,18 +80,80 @@ function drawTracks(f,box){
 }
 function pointInside(x,y,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
 function stateColor(c){return c.status==='dead'?'#4a4458':c.exhausted?'#f2c14e':c.activated?'#38d6cf':'#6f7eab'}
-function cellColor(c,events){const mode=$('colorMode').value;if(mode==='state')return stateColor(c);if(mode==='event'){const event=events.findLast(e=>e.cell_id===c.cell_id||e.target===c.cell_id);return event?(EVENT_STYLE[event.kind]?.[1]||'#bba6ff'):'#39425f'}if(mode==='signal'){const s=Math.max(0,Number(c.signal)||0);return `hsl(${250-200*s/(1+s)},65%,${35+20*s/(1+s)}%)`}return colors[c.lineage]||'#5d6684'}
-function pathCell(polygon,x,y,r){ctx.beginPath();if(polygon){ctx.moveTo(...polygon[0]);for(const vertex of polygon.slice(1))ctx.lineTo(...vertex);ctx.closePath()}else ctx.arc(x,y,r,0,Math.PI*2)}
+function cellColor(c,events){const mode=$('colorMode').value;if(mode==='state')return stateColor(c);if(mode==='event'){const event=events.findLast(e=>e.cell_id===c.cell_id||e.target===c.cell_id);return event?(EVENT_STYLE[event.kind]?.[1]||'#bba6ff'):'#39425f'}if(mode==='signal'){const s=Math.max(0,Number(c.signal)||0);return `hsl(${250-200*s/(1+s)},65%,${35+20*s/(1+s)}%)`}return PALETTE[c.cell_type]||colors[c.lineage]||'#5d6684'}
+// Original 40-sided bounded power-cell renderer. Bodies are presentation only:
+// the saved positions, contact graph and all simulation records stay unchanged.
+const LEGACY_RADII={malignant:8,Tumor:8,Tumor_proliferating:8,T_CD8:5,T_CD8_cytotoxic:5,T_CD4:5,T_reg:5,NK:5,B:5,B_cell:5,plasma:6,Plasma_cell:6,myeloid:8,macrophage:8,Macrophage:8,Macrophage_SPP1:8,fibroblast:7,Fibroblast:7,CAF:7,stromal:7,endothelial:6,Endothelial:6,epithelial:8,unknown:5};
+function cellRadius(c){
+ const area=c.area_um2??c.cell_area_um2??c.cell_area??c.t0_geometry?.area_um2;
+ for(const radius of [c.radius_um,c.r,c.rho,c.radius,Number.isFinite(area)&&area>0?Math.sqrt(area/Math.PI):null,meta.radii_um?.[c.lineage],LEGACY_RADII[c.lineage],5])if(Number.isFinite(radius)&&radius>0)return radius;
+}
+const smooth=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+function bodyScale(c,f){return c.status==='dead'?1-.42*smooth(Number.isFinite(c.dead_since)?Math.max(0,f.time_hours-c.dead_since)/4:1):1}
+function isContext(c){return ['halo','occluded'].includes(c.legacy_role||c.origin||c.o)||c.is_context===true}
+function powerCells(cells){
+  const n=cells.length;let maxR=0;for(const c of cells)maxR=Math.max(maxR,c.r);
+  const size=maxR*2,grid=new Map();
+  cells.forEach((c,i)=>{const key=Math.floor(c.x/size)+","+Math.floor(c.y/size);(grid.get(key)||grid.set(key,[]).get(key)).push(i);});
+  const polys=new Array(n);
+  for(let i=0;i<n;i++){
+    const c=cells[i],x=c.x,y=c.y,r=c.r,bx=Math.floor(x/size),by=Math.floor(y/size);
+    let poly=[];for(let k=0;k<40;k++)poly.push([x+r*Math.cos(k*Math.PI/20),y+r*Math.sin(k*Math.PI/20)]);
+    for(let u=-1;u<=1;u++)for(let v=-1;v<=1;v++){const list=grid.get((bx+u)+","+(by+v));if(!list)continue;
+      for(const j of list){if(i===j||!poly.length)continue;const d=cells[j],dx=d.x-x,dy=d.y-y,d2=dx*dx+dy*dy;
+        if(d2>(r+d.r)**2)continue;if(d2<1e-12){if(d.r>r||j<i)poly=[];continue;}
+        const lim=(d2+r*r-d.r*d.r)/2,val=p=>dx*(p[0]-x)+dy*(p[1]-y)-lim,clip=[];
+        let a=poly[poly.length-1],va=val(a);
+        for(const b of poly){const vb=val(b);if((va<=0)!==(vb<=0)){const q=va/(va-vb);clip.push([a[0]+q*(b[0]-a[0]),a[1]+q*(b[1]-a[1])]);}if(vb<=0)clip.push(b);a=b;va=vb;}
+        poly=clip;}}
+    polys[i]=poly;
+  }
+  return polys;
+}
+
+function bodyGeometry(f){
+ const cells=Object.values(f.cells).filter(c=>c.status!=='removed'||lattice),mode=$('shapeMode').value||'cells';
+ const sites=cells.map(c=>{const p=xy(c);return {x:p[0],y:p[1],r:spatial?cellRadius(c):.39}});
+ const outlines=!lattice&&mode==='cells'?powerCells(sites):null;
+ const originalBlend=1-smooth(Math.min(1,Math.max(0,f.time_hours*60/20)));
+ return cells.map((c,i)=>{
+  const shape=spatial&&mode!=='centroids'&&c.t0_geometry?.status==='valid'?c.t0_geometry:null;
+  const measured=shape?shape.polygon_um.map(p=>[p[0]+c.x-shape.anchor_um[0],p[1]+c.y-shape.anchor_um[1]]):null;
+  const synthetic=outlines?outlines[i]:null,measuredBlend=measured?(mode==='provided'||lattice?1:originalBlend):0;
+  return {c,site:sites[i],measured,synthetic,measuredBlend};
+ });
+}
+function pathCell(polygon,x,y,r){ctx.beginPath();if(polygon){if(polygon.length<3)return;ctx.moveTo(...polygon[0]);for(const vertex of polygon.slice(1))ctx.lineTo(...vertex);ctx.closePath()}else ctx.arc(x,y,r,0,Math.PI*2)}
+// Original event glows, rings and directed crawling arrows, driven only by
+// recorded events. Recent events come from the bounded replay cache.
+function glow(p,color,radius,alpha){const gradient=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,radius);gradient.addColorStop(0,color);gradient.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=alpha;ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+function ring(p,color,radius,alpha,width){ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
+function eventLine(a,b,color,width){ctx.globalAlpha=1;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
 function drawInteractions(f,box){
  if(!$('showFx').checked)return;
  const byId=new Map(points.map(p=>[p.c.cell_id,p]));
+ // Imported saved trajectories may include the original recorded action/target.
+ for(const p of points){const action=p.c.legacy_action,target=p.c.legacy_target,b=byId.get(String(target));if(!b)continue;
+  if(['APPROACH_TUMOR','APPROACH_CORPSE'].includes(action)){const dx=b.x-p.x,dy=b.y-p.y,norm=Math.hypot(dx,dy)||1,length=Math.min(norm*.6,p.r*1.6),x2=p.x+dx/norm*length,y2=p.y+dy/norm*length,angle=Math.atan2(dy,dx),head=Math.max(3,view.scale*1.6);ctx.strokeStyle=action==='APPROACH_TUMOR'?'#21e6a8':'#ffd36b';ctx.globalAlpha=.85;ctx.lineWidth=Math.max(1,view.scale*.45);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(x2,y2);ctx.lineTo(x2-head*Math.cos(angle-.5),y2-head*Math.sin(angle-.5));ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(angle+.5),y2-head*Math.sin(angle+.5));ctx.stroke()}
+  if(action==='DEGRANULATE')eventLine(p,b,'rgba(255,77,94,.55)',Math.max(1,view.scale*.5));
+  if(action==='EFFEROCYTOSE')eventLine(p,b,'rgba(242,169,59,.6)',Math.max(1,view.scale*.6));
+ }
+ // Arrows encode a saved displacement direction, not an inferred target.
  for(const event of f.events||[]){
-  if(!['kill','division','apoptosis','clear_corpse'].includes(event.kind))continue;
-  const a=byId.get(event.cell_id),b=byId.get(event.target);
-  const color=EVENT_STYLE[event.kind]?.[1]||'#bba6ff';
-  if(a&&b&&['kill','clear_corpse'].includes(event.kind)){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.globalAlpha=.85;ctx.stroke()}
-  const p=event.kind==='kill'?b:a;
-  if(p&&['kill','division','apoptosis','clear_corpse'].includes(event.kind)){ctx.beginPath();ctx.arc(p.x,p.y,p.r+5,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=.9;ctx.stroke()}
+  if(event.kind!=='move'||!event.from_xy||!event.to_xy)continue;
+  const p=byId.get(event.cell_id);if(!p)continue;
+  const dx=event.to_xy[0]-event.from_xy[0],dy=event.to_xy[1]-event.from_xy[1],norm=Math.hypot(dx,dy);if(!norm)continue;
+  const length=p.r*1.6,x2=p.x+dx/norm*length,y2=p.y+dy/norm*length,angle=Math.atan2(dy,dx),head=Math.max(3,view.scale*1.6);
+  ctx.strokeStyle='#21e6a8';ctx.globalAlpha=.85;ctx.lineWidth=Math.max(1,view.scale*.45);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(x2,y2);ctx.lineTo(x2-head*Math.cos(angle-.5),y2-head*Math.sin(angle-.5));ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(angle+.5),y2-head*Math.sin(angle+.5));ctx.stroke();
+ }
+ const chunks=lazy?[...cache.values()]:[frames],recent=[];
+ for(const chunk of chunks)for(const previous of chunk){if(previous.step>f.step||previous.time_hours<f.time_hours-1)continue;for(const event of previous.events||[])if(['kill','division','apoptosis','clear_corpse'].includes(event.kind))recent.push({event,time:event.time_hours??previous.time_hours})}
+ for(const {event,time} of recent){
+  const age=Math.max(0,(f.time_hours-time)*60),a=byId.get(event.cell_id),b=byId.get(event.target);
+  if(event.kind==='kill'&&age<=40){const k=1-age/40;if(a&&b){eventLine(a,b,`rgba(255,77,94,${.9*k})`,Math.max(1.5,view.scale*.9));glow(b,'rgba(255,77,94,.9)',b.r*1.6,.7*k)}}
+  if(event.kind==='division'&&a&&age<=60){const k=age/60;ring(a,'#fff2dc',a.r*(1+1.6*k),.9*(1-k),Math.max(1,view.scale*.6));glow(a,'rgba(255,180,120,.9)',a.r*1.8,.5*(1-k))}
+  if(event.kind==='apoptosis'&&a&&age<=60)glow(a,'rgba(200,120,255,.9)',a.r*1.7,.55*(1-age/60));
+  if(event.kind==='clear_corpse'&&a&&age<=50){const k=age/50;if(b)eventLine(a,b,'rgba(242,169,59,.6)',Math.max(1,view.scale*.6));glow(a,'rgba(242,193,78,.95)',a.r*2,.6*(1-k));ring(a,'#f2c14e',a.r*1.15,.9*(1-k),Math.max(1.2,view.scale*.6))}
  }
  ctx.globalAlpha=1;
 }
@@ -98,7 +165,9 @@ function drawHighlights(f,box){
 }
 function drawHud(f,box){
  ctx.fillStyle='#8d97b3';ctx.font='11px Inter,system-ui,sans-serif';
- ctx.fillText(spatial?(meta.has_polygons?'Saved geometry · rigid translations':'Recorded centroids · illustrative markers'):'Well-mixed · schematic coordinates',18,box.height-20);
+ const mode=$('shapeMode').value||'cells';
+ const description=lattice?'Fixed measured bins':!spatial?'Well-mixed · schematic cell bodies':mode==='provided'?'Provided segmentation · recorded rigid translations':mode==='centroids'?'Recorded centroids · illustrative markers':meta.has_polygons&&f.time_hours<1/3?'Original cells · source segmentation blending to bodies':'Original cells · illustrative power-cell bodies';
+ ctx.fillText(description,18,box.height-20);
  if(spatial){let um=10;for(const value of [1,5,10,20,50,100,200])if(value*view.scale<=140)um=value;const px=um*view.scale;if(px>=4&&px<box.width-30){ctx.fillStyle='#e7ebf5';ctx.fillRect(18,box.height-45,px,2);ctx.fillText(`${um} µm`,18,box.height-51)}}
 }
 function metricsAt(position){return frames[position]?.metrics||data.metrics?.[position]||null}
@@ -148,23 +217,40 @@ function updatePanel(f){
 function draw(f){
  currentFrame=f;if(!viewFitted)fitView();const box=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=box.width*dpr;canvas.height=box.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,box.width,box.height);points=[];
  const gradient=ctx.createRadialGradient(box.width/2,box.height/2,Math.min(box.width,box.height)*.1,box.width/2,box.height/2,Math.max(box.width,box.height)*.75);gradient.addColorStop(0,'#111830');gradient.addColorStop(1,'#070a14');ctx.fillStyle=gradient;ctx.fillRect(0,0,box.width,box.height);drawTracks(f,box);
- const events=f.events||[];
- for(const c of Object.values(f.cells)){
-  if(c.status==='removed'&&!lattice)continue;
-  const p=xy(c),[x,y]=toScreen(p,box),r=Math.max(1,Math.min(25,(nCells>400?3:5)*view.scale/view.initialScale));
-  const shape=spatial&&c.t0_geometry?.status==='valid'?c.t0_geometry:null;
-  const polygon=shape?shape.polygon_um.map(p=>toScreen([p[0]+c.x-shape.anchor_um[0],p[1]+c.y-shape.anchor_um[1]],box)):null;
-  pathCell(polygon,x,y,r);ctx.fillStyle=c.status==='dead'?'#4a4458':cellColor(c,events);ctx.globalAlpha=(focused.size&&!focused.has(c.lineage)?.18:1)*(lattice&&c.occupancy===0?.15:c.status==='dead'?.45:.9);
-  if(lattice&&c.occupancy===0){ctx.strokeStyle=colors[c.lineage];ctx.lineWidth=.8;ctx.stroke()}else ctx.fill();
-  ctx.globalAlpha=.55;ctx.strokeStyle=c.status==='dead'?'#9a8fa6':'rgba(255,255,255,.35)';ctx.lineWidth=.65;if(c.status==='dead'||c.geometry_model==='synthetic_inherited_rigid_translation')ctx.setLineDash([3,2]);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+ const events=f.events||[],bodies=bodyGeometry(f),mode=$('shapeMode').value||'cells',lw=Math.max(.4,Math.min(1.4,view.scale*.35));
+ for(let pass=0;pass<2;pass++)for(const body of bodies){
+  const {c,site,measured,synthetic,measuredBlend}=body,context=isContext(c);if(context!==(pass===0)||context&&!$('showContext').checked)continue;
+  if(synthetic&&synthetic.length<3&&measuredBlend===0)continue;
+  const [x,y]=toScreen([site.x,site.y],box),scale=bodyScale(c,f);
+  const provided=measured?measured.map(p=>toScreen(p,box)):null;
+  const illustrated=synthetic?synthetic.map(p=>toScreen([site.x+(p[0]-site.x)*scale*.97,site.y+(p[1]-site.y)*scale*.97],box)):null;
+  const polygon=measuredBlend>=.5&&provided?provided:illustrated?.length>=3?illustrated:provided;
+  const r=lattice||mode!=='cells'?Math.max(2,Math.min(12,4*view.scale/view.initialScale)):site.r*view.scale*scale;
+  const alpha=(context?.28:.92)*(focused.size&&!focused.has(c.lineage)?.18:1)*(lattice&&c.occupancy===0?.15:1);
+  const fill=c.status==='dead'?'#4a4458':cellColor(c,events);
+  if(illustrated&&illustrated.length>=3&&measuredBlend<1){pathCell(illustrated,x,y,r);ctx.fillStyle=fill;ctx.globalAlpha=alpha*(1-measuredBlend);ctx.fill()}
+  if(provided&&measuredBlend>0){pathCell(provided,x,y,r);ctx.fillStyle=fill;ctx.globalAlpha=alpha*measuredBlend;ctx.fill()}
+  if(!illustrated&&!provided){pathCell(null,x,y,r);ctx.fillStyle=fill;ctx.globalAlpha=alpha;if(lattice&&c.occupancy===0){ctx.strokeStyle=colors[c.lineage];ctx.lineWidth=.8;ctx.stroke()}else ctx.fill()}
+  // The same measured-to-power-cell blend used by the original player.
+  pathCell(measuredBlend===1&&provided?provided:illustrated||provided,x,y,r);ctx.globalAlpha=context?.25:.55;ctx.strokeStyle=c.status==='dead'?'#9a8fa6':'rgba(255,255,255,.35)';ctx.lineWidth=lw;
+  if(c.status==='dead'||c.geometry_model==='synthetic_inherited_rigid_translation')ctx.setLineDash([2,2]);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
   if(c.cell_id===selected){ctx.strokeStyle='#ffffff';ctx.lineWidth=2.4;ctx.stroke()}
-  if(!lattice&&c.status==='alive'&&r>2){ctx.beginPath();ctx.arc(x,y,Math.max(1,r*.28),0,Math.PI*2);ctx.fillStyle='#0a0e1a';ctx.globalAlpha=.5;ctx.fill();ctx.globalAlpha=1}
-  if(c.status==='dead'){ctx.beginPath();ctx.moveTo(x-r*.6,y-r*.6);ctx.lineTo(x+r*.6,y+r*.6);ctx.strokeStyle='#b8a9c3';ctx.lineWidth=1;ctx.stroke()}
-  points.push({x,y,r,c,polygon});
+  if(!lattice&&!context&&mode==='cells'&&r>1.5){
+   const nr=Math.max(1,r*.28);ctx.globalAlpha=(c.status==='dead'?.5:.35)*alpha;ctx.fillStyle=c.status==='dead'?'#1b1722':'#0a0e1a';ctx.beginPath();
+   if(c.status==='dead'){for(let k=0;k<3;k++){const nx=x+nr*.8*Math.cos(k*2.1),ny=y+nr*.8*Math.sin(k*2.1);ctx.moveTo(nx+nr*.45,ny);ctx.arc(nx,ny,nr*.45,0,Math.PI*2)}}
+   else ctx.arc(x,y,nr,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  }
+  const cycle=c.legacy_cycle_progress;
+  if($('showFx').checked&&Number.isFinite(cycle)&&cycle>=0&&c.status==='alive'){
+   ctx.globalAlpha=.9;ctx.lineWidth=Math.max(1,view.scale*.5);ctx.strokeStyle=c.legacy_cycle_blocked?'#9aa3bf':'#fff2dc';if(c.legacy_cycle_blocked)ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(x,y,r*.62,-Math.PI/2,-Math.PI/2+2*Math.PI*Math.max(.02,Math.min(1,cycle)));ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  }
+  points.push({x,y,r,c,polygon,worldRadius:site.r,measured:!!provided&&measuredBlend>=.5,synthetic:!!illustrated&&measuredBlend<.5});
  }
+ canvas.dataset.cellRenderer=mode;canvas.dataset.illustrativeBodies=String(points.filter(p=>p.synthetic).length);canvas.dataset.providedOutlines=String(points.filter(p=>p.measured).length);
+ $('warning').textContent=viewWarning();
  drawInteractions(f,box);drawHighlights(f,box);drawHud(f,box);updatePanel(f);canvas.dataset.frameStep=String(f.step);document.body.dataset.replayStatus='ready';
 }
-async function render(){const version=++requestVersion,position=Number(slider.value);document.body.dataset.replayStatus='loading';try{const frame=await frameAt(position,version);if(frame&&version===requestVersion){$('warning').textContent=warning;draw(frame)}}catch(error){if(version===requestVersion){document.body.dataset.replayStatus='error';$('warning').textContent=`Cannot load replay: ${error.message}`;playing=false;clearTimeout(timer);play.textContent='Play'}}}
+async function render(){const version=++requestVersion,position=Number(slider.value);document.body.dataset.replayStatus='loading';try{const frame=await frameAt(position,version);if(frame&&version===requestVersion){$('warning').textContent=viewWarning();draw(frame)}}catch(error){if(version===requestVersion){document.body.dataset.replayStatus='error';$('warning').textContent=`Cannot load replay: ${error.message}`;playing=false;clearTimeout(timer);play.textContent='Play'}}}
 slider.oninput=render;tracks.onchange=()=>{if(currentFrame)draw(currentFrame)};
 function hit(x,y){const containing=points.filter(p=>p.polygon&&pointInside(x,y,p.polygon)),candidates=containing.length?containing:points;let near=null,dist=Infinity;for(const p of candidates){const d=(p.x-x)**2+(p.y-y)**2;if(d<dist){near=p;dist=d}}return near&&(containing.length||dist<Math.max(225,(near.r+5)**2))?near:null}
 canvas.onclick=e=>{if(suppressClick){suppressClick=false;return}const b=canvas.getBoundingClientRect(),near=hit(e.clientX-b.left,e.clientY-b.top);if(near){selected=near.c.cell_id;if(currentFrame)draw(currentFrame)}};
@@ -185,7 +271,7 @@ async function startRecording(){
  }catch(error){stream.getTracks().forEach(track=>track.stop());recorder=null;$('warning').textContent=`Cannot record video: ${error.message}`}
 }
 $('record').onclick=()=>recorder?stopRecording():startRecording();
-for(const id of ['colorMode','showFx','showHighlights'])$(id).onchange=()=>{if(currentFrame)draw(currentFrame)};
+for(const id of ['colorMode','shapeMode','showContext','showFx','showHighlights'])$(id).onchange=()=>{if(currentFrame)draw(currentFrame)};
 canvas.addEventListener('wheel',e=>{e.preventDefault();const box=canvas.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,wx=(x-box.width/2)/view.scale+view.x,wy=(y-box.height/2)/view.scale+view.y,factor=Math.exp(-e.deltaY*.0015);view.scale=Math.max(view.initialScale*.2,Math.min(view.initialScale*30,view.scale*factor));view.x=wx-(x-box.width/2)/view.scale;view.y=wy-(y-box.height/2)/view.scale;if(currentFrame)draw(currentFrame)},{passive:false});
 canvas.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y,moved:false};canvas.classList.add('dragging')});
 window.addEventListener('mouseup',()=>{if(drag?.moved)suppressClick=true;drag=null;canvas.classList.remove('dragging')});

@@ -15,6 +15,13 @@ TEMPLATE = (WEB / "replay_dark.html").read_text(encoding="utf8").replace("__SCRI
 LAZY_TEMPLATE = TEMPLATE
 
 
+def _display_radii(lineages):
+    """Freeze the declared radius fallback for the presentation, not the model."""
+    from ..v3.ontology import lineage_rules
+    rules = lineage_rules()
+    return {name: rules[name]["mean_radius_um"] for name in sorted(lineages) if name in rules}
+
+
 def _frame_metrics(frame, cumulative):
     """Tiny summaries make the sidebar/plot independent of the frame cache."""
     cells = frame["cells"].values()
@@ -30,7 +37,9 @@ def _frame_metrics(frame, cumulative):
 
 def write_replay(path, frames, report):
     cumulative = Counter()
-    value = dict(frames=frames, report=report, metrics=[_frame_metrics(f, cumulative) for f in frames])
+    lineages = {c["lineage"] for frame in frames for c in frame["cells"].values()}
+    value = dict(frames=frames, report=report, metrics=[_frame_metrics(f, cumulative) for f in frames],
+                 radii_um=_display_radii(lineages))
     data = json.dumps(value, allow_nan=False).replace("<", "\\u003c")
     Path(path).write_text(TEMPLATE.replace("__DATA__", data), encoding="utf8")
 
@@ -107,6 +116,7 @@ def write_replay_stream(path, frames_jsonl, report, *, chunk_size=50):
         raise ValueError("Replay requires at least one committed frame.")
     metadata = dict(format="vtx-offline-chunks-2", chunk_size=chunk_size, cache_chunks=2,
                     chunks=chunks, lineages=sorted(lineages), cell_order=cell_order, has_polygons=has_polygons,
+                    radii_um=_display_radii(lineages),
                     geometry_encoding="immutable t0 records shared once per chunk; runtime contours are rigid translations",
                     bounds=bounds if bounds[0] is not None else [0, 1, 0, 1])
     value = dict(frames=stubs, report=report, replay=metadata)
