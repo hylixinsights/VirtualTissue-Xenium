@@ -1,4 +1,4 @@
-"""Ordered collaborator workflow: vtx2 prepare -> inspect -> run -> compare."""
+"""VirtualTissue v4 workflow: prepare -> inspect -> run -> replay -> compare."""
 from __future__ import annotations
 
 import argparse
@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import sys
 
+from .. import __version__
 from .inputs import digest, load_cells, prepare, read_json, write_json
 from .simulation import preflight, run
 
@@ -482,7 +483,9 @@ def cmd_replay(args):
 
 
 def parser():
-    p = argparse.ArgumentParser(prog="vtx2", description=__doc__)
+    invoked = Path(sys.argv[0]).name
+    p = argparse.ArgumentParser(prog=invoked if invoked in {"vtx2", "vtx4"} else "vtx4", description=__doc__)
+    p.add_argument("--version", action="version", version=f"virtualtissue-xenium {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
     for name in ("prepare", "prepare-xenium"):
         s = sub.add_parser(name, help="Build a reviewed context-conditioned guidebook and prepared JSON.")
@@ -595,7 +598,8 @@ def parser():
 
 
 def main(argv=None):
-    args = parser().parse_args(argv)
+    command = parser()
+    args = command.parse_args(argv)
     try:
         result = args.func(args)
         print(json.dumps(result, indent=2, default=str, allow_nan=False))
@@ -603,7 +607,7 @@ def main(argv=None):
             return 2
         return 0
     except (ValueError, KeyError, OSError, RuntimeError) as e:
-        print(f"vtx2: {e}", file=sys.stderr)
+        print(f"{command.prog}: {e}", file=sys.stderr)
         return 1
 
 

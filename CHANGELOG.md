@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## 4.0.0 — 2026-11-06
 
+- Make v4 the current primary software release and add `vtx4` as the recommended command. `vtx2` remains a compatible alias and the legacy physical engine keeps `vtx`. Simulation schema 3.0, ontologies and existing `docs/v3`/`examples/v3` paths are retained.
 - Restore the original cell-body renderer as well as the dashboard: bounded weighted silhouettes, world-space sizes, nuclei, tissue context opacity and event glows. Original cells blend supplied t0 contours into the legacy simulated silhouettes; Provided outlines retains exact saved contours. Centroids remains available for inspection. These presentation modes do not alter positions, geometry evidence or simulation mechanics.
 - Restore the original dark replay layout and its tissue indicators, chart, event feed and cell inspector while retaining the v3 bounded frame loader. Simulation mechanisms and rates remain unchanged.
-- Add `vtx2 replay RUN_DIRECTORY [--output PATH]` to refresh a saved trajectory's presentation without rerunning the simulation or calling Jev. Scientific outputs remain unchanged.
+- Add `vtx4 replay RUN_DIRECTORY [--output PATH]` (also available through `vtx2`) to refresh a saved trajectory's presentation without rerunning the simulation or calling Jev. Scientific outputs remain unchanged.
+- Preserve v3 simulation mechanisms, rates and recorded scientific outputs. Kinetic defaults remain DRAFT assumptions and biological validation remains unestablished. This release does not change Jev event timing or the volume/duplication of scientific exports.
 
 ## 3.0.0a4 — 2026-11-02 (alpha prerelease)
 

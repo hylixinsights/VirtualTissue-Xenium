@@ -1,7 +1,7 @@
 // A DOM test double executes the actual lazy player and its generated sidecars.
 // This tests loader/cache/seek behavior, not browser visual rendering.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const folder=process.argv[2],html=fs.readFileSync(path.join(folder,'replay.html'),'utf8');
+const folder=process.argv[2],html=fs.readFileSync(path.join(folder,process.argv[4]||'replay.html'),'utf8');
 const encoded=html.match(/<script id="run-data" type="application\/json">([\s\S]*?)<\/script>/)[1];
 const data=JSON.parse(encoded);
 const player=html.split('</script><script>')[1].split('</script>')[0];
@@ -46,6 +46,10 @@ const document={
 realm=vm.createContext({document,devicePixelRatio:1,setTimeout,clearTimeout,console,performance:{now:()=>Date.now()},requestAnimationFrame:fn=>setImmediate(()=>fn(Date.now()))});
 realm.window=realm;realm.window.addEventListener=()=>{};
 vm.runInContext(player,realm);
+if(data.product_version){
+ assert.equal(document.title,`VirtualTissue v${data.product_version} · research replay`);
+ assert(ids.subtitle.textContent.startsWith(`v${data.product_version} ·`));
+}
 async function waitFor(predicate){for(let i=0;i<100;i++){if(predicate())return;await new Promise(resolve=>setTimeout(resolve,5))}throw new Error('Timed out waiting for replay state: '+JSON.stringify(body.dataset))}
 async function seek(step){ids.slider.value=String(step);await ids.slider.oninput();assert.equal(ids.canvas.dataset.frameStep,String(step));assert.equal(body.dataset.replayStatus,'ready');assert(Number(body.dataset.replayCachedChunks)<=2);assert(Number(body.dataset.replayCachedFrames)<=100);const metrics=data.frames[step].metrics;if(metrics){assert.equal(Number(ids.tTumor.textContent),metrics.malignant,'Sidebar tumor count follows selected frame');assert.equal(Number(ids.tLiving.textContent),metrics.living,'Sidebar living count follows selected frame');assert.equal(Number(ids.tDiv.textContent),metrics.events.division||0,'Cumulative divisions do not depend on which chunks were viewed')}}
 function renderedBodies(){return JSON.parse(vm.runInContext('JSON.stringify(points.map(p=>({id:p.c.cell_id,x:p.x,y:p.y,r:p.r,polygon:p.polygon,worldRadius:p.worldRadius,measured:p.measured,synthetic:p.synthetic})))',realm))}
@@ -131,6 +135,10 @@ async function checkShapes(){
  console.log(JSON.stringify({passed:true,checked:['original-renderer-equivalence','organic-default','40-sided-isolated-cell','neighbor-clipping','saved-world-radii','old-palette','visible-nuclei','exact-provided-outlines','zoom','centroid-mode','original20minute-transition']}));
 }
 (async()=>{
+ if(process.argv[3]==='version'){
+  await waitFor(()=>ids.canvas.dataset.frameStep==='0');
+  console.log(JSON.stringify({passed:true,productVersion:data.product_version,schemaVersion:data.report.schema_version,title:document.title}));return;
+ }
  if(process.argv[3]==='shapes'){await checkShapes();return}
  await waitFor(()=>ids.canvas.dataset.frameStep==='0');assert.equal(requested.length,1);assert.equal(body.dataset.replayCachedChunks,'1');
  if(process.argv[3]==='provided'){ids.shapeMode.value='provided';ids.shapeMode.onchange()}

@@ -1,8 +1,20 @@
 # VirtualTissue-Xenium documentation
 
-**V2 starts with the [ordered workflow](v2/WORKFLOW.md), [context and guidebook contract](v2/CONTEXT_AND_GUIDEBOOK.md), [datasets](v2/DATASETS.md), and [v0.1.3 review](v2/CODE_REVIEW_V0_1_3.md).**
+**V4 is the current primary release on `main`.** Start with the [repository README](../README.md), run [START_TEST.command](../START_TEST.command), and read the [4.0.0 release notes](v4/RELEASE_NOTES.md). The modern command is `vtx4`; `vtx2` remains a compatible alias.
 
-New collaborators should use the [own-data walkthrough](v2/YOUR_DATA.md) and the [v2 notebook](../notebooks/V2_Context_Guidebook_Workflow.ipynb). V2 is the default on `main`.
+V4 restores the original cell rendering and dark replay while preserving the v3 simulation mechanisms. Simulation schema 3.0 and the documentation under `v3/` remain current for those contracts. Kinetic defaults remain DRAFT assumptions; software tests do not establish biological predictive validity.
+
+| Current task | Guide |
+|---|---|
+| Install and test the current release | [README quick start](../README.md#start-here) |
+| Select an ROI and prepare your object | [ROI workflow](v3/ROI_WORKFLOW.md) and [annotation inputs](v3/ANNOTATION.md) |
+| Understand expression, lineages and rates | [Expression policy](v3/EXPRESSION_POLICY.md), [ontology](v3/ONTOLOGY.md) and [rate review](v3/RATE_REVIEW.md) |
+| Refresh an existing saved replay | [Replay refresh](../README.md#refresh-the-replay-of-an-existing-run) using `vtx4 replay RUN_DIRECTORY` |
+| Interpret measurements and readouts | [Platform contracts](v3/PLATFORMS.md), [analysis](../analysis/README.md) and [scientific scope](v3/SCIENTIFIC_SCOPE.md) |
+
+The earlier [v2 ordered workflow](v2/WORKFLOW.md), [context and guidebook contract](v2/CONTEXT_AND_GUIDEBOOK.md), [dataset guide](v2/DATASETS.md), [own-data walkthrough](v2/YOUR_DATA.md) and [v2 notebook](../notebooks/V2_Context_Guidebook_Workflow.ipynb) remain available for historical workflows and compatibility references.
+
+## Historical physical-engine guides
 
 The guides below describe the preserved v0.1.3 lung-specific `vtx` workflow. Its original README is available at the [v0.1.3 tag](https://github.com/hylixinsights/VirtualTissue-Xenium/blob/v0.1.3/README.md). Install its pinned environment with `pip install -e '.[legacy,notebooks]'`.
 

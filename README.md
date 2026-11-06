@@ -1,6 +1,6 @@
-# VirtualTissue-Xenium v3
+# VirtualTissue-Xenium v4
 
-A research simulator using supplied expression, existing cell labels and segmentation polygons. Version **3.0.0a4** is an alpha prerelease for testing.
+A research simulator using supplied expression, existing cell labels and segmentation polygons. **4.0.0** is the current primary software release. It restores the original cell rendering and dark replay interface while preserving the v3 simulation mechanisms. See the [v4 release notes](docs/v4/RELEASE_NOTES.md).
 
 **Scientific status:** default kinetic rates are **DRAFT assumptions, not calibrated biological rates**. Verified citations provide context, not validation of the numerical values. Passing software tests does not validate biological predictions. See [rate review](docs/v3/RATE_REVIEW.md) and [limitations](LIMITATIONS.md).
 
@@ -20,11 +20,11 @@ The test opens one **RESULT.html** page with PASS/FAIL, an interactive synthetic
 
 Linux users with the same Python/Node.js prerequisites and `zsh` can run `zsh START_TEST.command --no-open`, then open the result page manually.
 
-For the prepared `V3_teste` folder, use its top-level **START_TEST.command**. You do not need to read the internal documents to run the test.
+Existing prepared `V3_teste` folders retain their own top-level **START_TEST.command** and pinned package. Use the current repository checkout for v4.
 
 A passing result applies to the exact recorded source snapshot. Keep the scientific scope: expression influence, contextual Jev preferences and selected structural statistics must still be evaluated on appropriate real inputs. Existing labels are accepted; H&E and a new annotation review are not required. The model does not establish a proven prediction of tissue seven days later.
 
-**Compatibility:** create new prepared inputs and runs with v3. Changed kernel, prompt and ontology fingerprints prevent resuming older runs with this version; retain their original pinned checkout. The legacy `vtx` interface remains available; v3 uses `vtx2`.
+**Commands and compatibility:** use `vtx4` for the current workflow. `vtx2` remains an alias for the same workflow; the legacy physical engine keeps `vtx`. V4 retains simulation schema **3.0**, the existing ontologies and the `docs/v3` and `examples/v3` paths. Saved v3 trajectories can refresh their replay without a new simulation. Resume still requires matching configuration and fingerprints; retain pinned checkouts for incompatible historical runs.
 
 ## Choose an ROI from your object
 
@@ -32,11 +32,11 @@ For a raw JSON object containing cells, exact labels, counts, coordinates and
 optional polygons:
 
 ```bash
-vtx2 roi-catalog object.json regions.html --cells-per-roi 1000
+vtx4 roi-catalog object.json regions.html --cells-per-roi 1000
 # Open regions.html, inspect composition and explicitly download a selection.
-vtx2 select-roi object.json selection.json selected.json --context context.json
-vtx2 expression-audit selected.json expression_audit.json
-vtx2 cost selected.json --steps 48
+vtx4 select-roi object.json selection.json selected.json --context context.json
+vtx4 expression-audit selected.json expression_audit.json
+vtx4 cost selected.json --steps 48
 ```
 
 Use `examples/v3/context_user_object.json` as an explicit starting profile and
@@ -64,8 +64,8 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[xenium,test,spatial,analysis]'
 python examples/v3/make_demo.py --output outputs/v3/demo
-vtx2 inspect outputs/v3/demo/control.json
-vtx2 ensemble outputs/v3/demo/arms.json outputs/v3/demo/ensemble \
+vtx4 inspect outputs/v3/demo/control.json
+vtx4 ensemble outputs/v3/demo/arms.json outputs/v3/demo/ensemble \
   --horizon-hours 24 --seeds 0 1 2 3 4
 make figures ENSEMBLE=outputs/v3/demo/ensemble FIGURES=outputs/v3/demo/figures
 ```
@@ -74,7 +74,7 @@ This creates 270 synthetic cells with heterogeneous expression, a β=0 arm and a
 
 ## Refresh the replay of an existing run
 
-The original dark replay layout is restored with tissue indicators, the malignant-cell chart, event feed and cell inspector. The v3 player retains its bounded frame cache.
+The original dark replay layout is restored with tissue indicators, the malignant-cell chart, event feed and cell inspector. The v4 player retains the bounded frame cache introduced in v3.
 
 Cells also use the original renderer: rounded cell bodies clipped against neighboring bodies, sizes in tissue coordinates, visible nuclei, context transparency and event glows. **Original cells** uses the original transition from supplied t0 segmentation to illustrative simulated silhouettes. Choose **Provided outlines** to inspect exact saved polygons, or **Centroids** for position markers. These display choices do not change the recorded coordinates, interaction graph, segmentation evidence or model dynamics.
 
@@ -83,21 +83,21 @@ Update your checkout and package in the environment used for the run:
 ```bash
 git pull --ff-only
 pip install -e .
-vtx2 replay outputs/v3/ensemble_990_1350_48h/runs/recognition/seed_4
+vtx4 replay outputs/v3/ensemble_990_1350_48h/runs/recognition/seed_4
 ```
 
-Open that run's `replay.html`. This command reads the saved frames and report and replaces only the replay HTML and its presentation sidecars. It does not rerun the simulation, call Jev or change decisions, readouts or scientific exports. Keep `replay.html` beside its `replay_frames` folder when moving it. Repeat the command for other arms/seeds as needed; `--output another/replay.html` writes a separate presentation copy. V3 uses `frames.jsonl`; v2 uses `frames.json`.
+Open that run's `replay.html`. This command reads the saved frames and report and replaces only the replay HTML and its presentation sidecars. It does not rerun the simulation, call Jev or change decisions, readouts or scientific exports. Keep `replay.html` beside its `replay_frames` folder when moving it. Repeat the command for other arms/seeds as needed; `--output another/replay.html` writes a separate presentation copy. Schema-3.0 runs use `frames.jsonl`; schema-2.0 runs use `frames.json`.
 
 ## Use measured data
 
 Supply existing `cell_type`/`lineage` annotations, exact gene symbols and measured coordinates in micrometres, recording their origin. For raw Xenium:
 
 ```bash
-vtx2 prepare-xenium DATA_DIR context_v3.json prepared.json \
+vtx4 prepare-xenium DATA_DIR context_v3.json prepared.json \
   --annotations existing_labels.csv --lineage-map lineage_map.csv \
   --center 1200 1600 --max-cells 1000
-vtx2 inspect prepared.json
-vtx2 run prepared.json outputs/sample_local --steps 48 --seed 21
+vtx4 inspect prepared.json
+vtx4 run prepared.json outputs/sample_local --steps 48 --seed 21
 ```
 
 The centre above is only an example. Prefer the composition catalogue for user selection. `roi-candidates` and `annotation-agreement` remain optional tools for studies using the earlier front/core or independent-review design. The bundled historical unknown-only annotations do not supply usable cell identities.
@@ -113,8 +113,8 @@ For scRNA/snRNA without measured XY, use well-mixed interactions. Unsegmented Vi
 ## Jev experiments
 
 ```bash
-vtx2 cost prepared.json --steps 48
-vtx2 run prepared.json outputs/sample_jev --mode jev --jev-prior hidden \
+vtx4 cost prepared.json --steps 48
+vtx4 run prepared.json outputs/sample_jev --mode jev --jev-prior hidden \
   --steps 48 --seed 21 --max-http-attempts 500
 ```
 
@@ -125,11 +125,11 @@ Set `TYPESAFE_API_KEY` or `JEV_API_KEY` for live use and choose a budget from th
 ```bash
 make test
 make clock
-vtx2 --help
+vtx4 --help
 ```
 
-The CI runs v2/v3 tests, exports coverage and produces the restricted local clock-validation figure. `make figures` regenerates PNG/SVG outputs with a hash manifest. No clinical or treatment-efficacy results are claimed by these software checks.
+The CI checks the current replay and the retained v2/v3 simulation contracts, exports coverage and produces the restricted local clock-validation figure. `make figures` regenerates PNG/SVG outputs with a hash manifest. No clinical or treatment-efficacy results are claimed by these software checks.
 
-The immutable physical engine remains under `src/virtualtissue_xenium/engine` with the legacy `vtx` command. Its bundle format differs from `vtx2`. The general v2/v3 kernel now resolves competing death proposals without double-counting; old run fingerprints require their original checkout for resumption.
+The immutable physical engine remains under `src/virtualtissue_xenium/engine` with the legacy `vtx` command. Its bundle format differs from `vtx4`/`vtx2`. The general kernel retains the v3 fix that resolves competing death proposals without double-counting; incompatible old run fingerprints require their original checkout for resumption.
 
 MIT software license. Dataset and signature source terms/attribution remain attached to their manifests. Cite the software using `CITATION.cff` and cite the actual data, biological resources and provider model used.

@@ -8,6 +8,7 @@ import subprocess
 
 import pytest
 
+from virtualtissue_xenium import __version__
 from virtualtissue_xenium.v2.replay import LAZY_SCRIPT, write_replay, write_replay_stream
 
 
@@ -87,10 +88,21 @@ def test_embedded_and_streamed_players_restore_the_same_dark_dashboard(tmp_path)
         target = tmp_path / name
         writer(target, argument, dict(schema_version="3.0" if name == "v3.html" else "2.0"))
         html = target.read_text()
+        assert payload(target)["product_version"] == __version__
         assert "--bg:#0a0e1a" in html.replace(" ", "")
         for element in ["tTumor", "tLiving", "tDiv", "tDeath", "chart", "inspector", "feed", "slider"]:
             assert f'id="{element}"' in html
         assert html.count("<script") == 2
+        node = shutil.which("node")
+        if node:
+            harness = Path(__file__).with_name("test_v3_replay_loader.cjs")
+            checked = subprocess.run([node, str(harness), str(tmp_path), "version", name],
+                                     capture_output=True, text=True, timeout=15)
+            assert checked.returncode == 0, checked.stderr
+            actual = json.loads(checked.stdout)
+            assert actual["productVersion"] == __version__
+            assert actual["schemaVersion"] == ("3.0" if name == "v3.html" else "2.0")
+            assert actual["title"] == f"VirtualTissue v{__version__} · research replay"
 
 
 def test_untrusted_text_cannot_terminate_data_or_chunk_scripts(tmp_path):
