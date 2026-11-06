@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Restore the original dark replay layout and its tissue indicators, chart, event feed and cell inspector while retaining the v3 bounded frame loader. Simulation mechanisms and rates remain unchanged.
+- Add `vtx2 replay RUN_DIRECTORY [--output PATH]` to refresh a saved trajectory's presentation without rerunning the simulation or calling Jev. Scientific outputs remain unchanged.
+
 ## 3.0.0a4 — 2026-11-02 (alpha prerelease)
 
 - Publish the accumulated v3 implementation for external software testing. The a1–a3 entries below describe internal development milestones included in this prerelease.
