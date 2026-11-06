@@ -8,6 +8,7 @@ from pathlib import Path
 import json
 import hashlib
 
+from .. import __version__
 
 WEB = Path(__file__).with_name("web")
 LAZY_SCRIPT = (WEB / "replay_dark.js").read_text(encoding="utf8")
@@ -38,7 +39,7 @@ def _frame_metrics(frame, cumulative):
 def write_replay(path, frames, report):
     cumulative = Counter()
     lineages = {c["lineage"] for frame in frames for c in frame["cells"].values()}
-    value = dict(frames=frames, report=report, metrics=[_frame_metrics(f, cumulative) for f in frames],
+    value = dict(frames=frames, report=report, product_version=__version__, metrics=[_frame_metrics(f, cumulative) for f in frames],
                  radii_um=_display_radii(lineages))
     data = json.dumps(value, allow_nan=False).replace("<", "\\u003c")
     Path(path).write_text(TEMPLATE.replace("__DATA__", data), encoding="utf8")
@@ -119,7 +120,7 @@ def write_replay_stream(path, frames_jsonl, report, *, chunk_size=50):
                     radii_um=_display_radii(lineages),
                     geometry_encoding="immutable t0 records shared once per chunk; runtime contours are rigid translations",
                     bounds=bounds if bounds[0] is not None else [0, 1, 0, 1])
-    value = dict(frames=stubs, report=report, replay=metadata)
+    value = dict(frames=stubs, report=report, replay=metadata, product_version=__version__)
     encoded = json.dumps(value, allow_nan=False).replace("<", "\\u003c")
     path.write_text(LAZY_TEMPLATE.replace("__DATA__", encoded), encoding="utf8")
     (sidecars / "manifest.json").write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf8")

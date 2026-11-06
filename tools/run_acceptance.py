@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tarfile
 import time
+import tomllib
 import traceback
 import uuid
 import xml.etree.ElementTree as ET
@@ -25,6 +26,7 @@ import zipfile
 from release_integrity import snapshot, compare_snapshots, write_github_payload
 
 REPO = Path(__file__).resolve().parents[1]
+PACKAGE_VERSION = tomllib.loads((REPO / "pyproject.toml").read_text())["project"]["version"]
 ALLOWED_SKIPS = {
     ("tests.test_helpers.BundleRunTests", "test_cli_check_run_local_and_explore"),
     ("tests.test_release_012.RealBundleRegression", "test_reporting_preserves_one_hour_biological_state_and_legacy_bundle"),
@@ -80,7 +82,7 @@ def page(root, result):
     source = html.escape(result.get("source_tree_sha256", "not yet recorded"))
     document = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VirtualTissue — {title}</title><style>body{{font:17px/1.6 system-ui,sans-serif;background:#f3f5f8;color:#172638;margin:0}}main{{max-width:850px;margin:40px auto;padding:32px;background:white;border-radius:16px}}h1{{color:{color};font-size:46px;margin:8px 0}}.button{{display:inline-block;margin:6px 8px 6px 0;padding:11px 17px;border-radius:8px;background:#235caf;color:white;text-decoration:none}}small,.muted{{color:#536174}}code,pre{{overflow-wrap:anywhere;white-space:pre-wrap;background:#f4f6f8;padding:10px;border-radius:6px}}ul{{padding-left:24px}}@media(max-width:600px){{main{{margin:12px;padding:20px}}}}</style>
-<main><small>VirtualTissue {html.escape(result.get("version", "v3"))} · Local acceptance test</small><h1>{title}</h1><p>{message}</p>{checks}{links}{error}
+<main><small>VirtualTissue {html.escape(result.get("version", PACKAGE_VERSION))} · Local acceptance test</small><h1>{title}</h1><p>{message}</p>{checks}{links}{error}
 <h2>What was checked</h2><ul>{stages}</ul><p class="muted">The catalogue uses synthetic data. It starts with no region selected. The automated workflow uses a separate fixed test selection; it is not a choice made by you.</p>
 <p class="muted">A software PASS does not establish biological validation, real Jev behaviour or a proven prediction of future tissue. No paid API calls were made.</p>
 <details><summary>Exact source and logs</summary><p>Run: {html.escape(result["run_id"])}<br>Source SHA-256: <code>{source}</code></p><a href="{html.escape(result["run_relative"], quote=True)}/validation.json">Validation record</a> · <a href="{html.escape(result["run_relative"], quote=True)}/logs/">Logs</a><p>The source package and patch in this run's GitHub handoff belong only to this snapshot. Re-run the test after changing the code.</p></details></main></html>'''
