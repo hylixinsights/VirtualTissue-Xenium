@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Restore the original cell-body renderer as well as the dashboard: bounded weighted silhouettes, world-space sizes, nuclei, tissue context opacity and event glows. Original cells blend supplied t0 contours into the legacy simulated silhouettes; Provided outlines retains exact saved contours. Centroids remains available for inspection. These presentation modes do not alter positions, geometry evidence or simulation mechanics.
 - Restore the original dark replay layout and its tissue indicators, chart, event feed and cell inspector while retaining the v3 bounded frame loader. Simulation mechanisms and rates remain unchanged.
 - Add `vtx2 replay RUN_DIRECTORY [--output PATH]` to refresh a saved trajectory's presentation without rerunning the simulation or calling Jev. Scientific outputs remain unchanged.
 

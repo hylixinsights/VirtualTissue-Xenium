@@ -113,6 +113,8 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
 <section id="stage"><canvas id="canvas" aria-label="Recorded tissue trajectory; click a cell to inspect it"></canvas>
 <div class="overlay-tools">
 <label>Color <select id="colorMode"><option value="type">Cell type</option><option value="state">Cell state</option><option value="event">Recorded event</option><option value="signal">Abstract signal</option></select></label>
+<label>Shape <select id="shapeMode"><option value="cells" selected>Original cells</option><option value="provided">Provided outlines</option><option value="centroids">Centroids</option></select></label>
+<label><input id="showContext" type="checkbox" checked> Context</label>
 <label><input id="tracks" type="checkbox" title="Movement segments from recently viewed steps"> Recent tracks</label>
 <label><input id="showFx" type="checkbox" checked> Interactions</label>
 <label><input id="showHighlights" type="checkbox" checked> Highlights</label>
@@ -130,6 +132,7 @@ footer{border-top:1px solid var(--line);padding:10px 18px 12px;display:flex;flex
 </div><div id="deathBreakdown" class="hint"></div><div id="stats"></div></div>
 <div><h2 id="legendTitle">Cell types · click to focus</h2><div id="legend"></div></div>
 <div><h2>Visual key</h2><div class="keys">
+<div><svg width="26" height="14"><line x1="2" y1="7" x2="20" y2="7" stroke="#21e6a8" stroke-width="2"/><path d="M15 3 L21 7 L15 11" fill="none" stroke="#21e6a8" stroke-width="2"/></svg>recorded movement</div>
 <div><svg width="26" height="14"><line x1="2" y1="7" x2="22" y2="7" stroke="#ff4d5e" stroke-width="3"/></svg>recorded CD8 kill</div>
 <div><svg width="26" height="14"><circle cx="13" cy="7" r="5" fill="none" stroke="#fff2dc" stroke-width="2"/></svg>recorded division</div>
 <div><svg width="26" height="14"><circle cx="13" cy="7" r="5" fill="#4a4458" stroke="#9a8fa6" stroke-dasharray="2 2"/></svg>dead cell</div>

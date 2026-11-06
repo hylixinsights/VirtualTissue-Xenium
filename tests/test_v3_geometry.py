@@ -169,6 +169,6 @@ def test_polygon_player_rehydrates_draws_and_selects_supplied_outlines(tmp_path)
     source=tmp_path/"frames.jsonl";source.write_text(''.join(json.dumps(f)+'\n' for f in frames))
     report=dict(schema_version="3.0",kernel="cell_agent",preflight=dict(interaction_mode="spatial"),mode="local",completed=True,completed_steps=150,seed=1,events={},usage={})
     write_replay_stream(tmp_path/"replay.html",source,report)
-    completed=subprocess.run([node,str(Path(__file__).with_name('test_v3_replay_loader.cjs')),str(tmp_path)],capture_output=True,text=True,timeout=15)
+    completed=subprocess.run([node,str(Path(__file__).with_name('test_v3_replay_loader.cjs')),str(tmp_path),'provided'],capture_output=True,text=True,timeout=15)
     assert completed.returncode==0,completed.stderr
-    assert json.loads(completed.stdout)["polygonDraws"]>0
+    assert json.loads(completed.stdout)["polygonVertexCounts"]["5"]>0

@@ -1,4 +1,5 @@
 """Offline lazy replay preserves data while bounding the browser's frame cache."""
+from copy import deepcopy
 import json
 from pathlib import Path
 import re
@@ -150,3 +151,44 @@ def test_actual_player_loader_seek_cache_play_and_selection_with_dom_double(tmp_
     assert checked.returncode == 0, checked.stderr
     evidence = json.loads(checked.stdout)
     assert evidence["passed"] and evidence["cacheChunks"] <= 2
+
+
+def test_default_cell_bodies_preserve_organic_shapes_nuclei_radii_and_supplied_outlines(tmp_path):
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("Node is optional for renderer DOM tests.")
+    from virtualtissue_xenium.v3.geometry import normalize_geometry
+
+    def cell(cid, x, y, lineage="malignant", radius=None, polygon=None):
+        value = dict(cell_id=cid, cell_type=lineage, lineage=lineage, x=x, y=y,
+                     status="alive", expression={}, sample_id="fixture")
+        if radius is not None:
+            value["radius_um"] = radius
+        if polygon is not None:
+            value["polygon"] = polygon
+        return value
+
+    cells = [cell("cell", 0, 0, radius=8), cell("cd8", 30, 0, "T_CD8", radius=5),
+             cell("pair_a", 0, 30, radius=8), cell("pair_b", 10, 30, radius=8),
+             cell("provided", 40, 30, polygon=[[36, 26], [44, 26], [44, 34], [36, 34]]),
+             cell("default_radius", 60, 0, "unknown")]
+    normalized, _ = normalize_geometry(cells)
+    frame = dict(step=0, time_hours=0, cells={c["cell_id"]: c for c in normalized}, events=[])
+    source = tmp_path / "frames.jsonl"
+    frames = []
+    for i, time in enumerate([0, 1/6, 1/3, 1]):
+        saved = deepcopy(frame)
+        saved.update(step=i, time_hours=time)
+        saved["cells"]["provided"].update(x=40+4*i, y=30+2*i)
+        frames.append(saved)
+    source.write_text("".join(json.dumps(saved) + "\n" for saved in frames))
+    original = source.read_bytes()
+    report = dict(schema_version="3.0", kernel="cell_agent", preflight=dict(interaction_mode="spatial"),
+                  mode="local", completed=True, completed_steps=3, seed=1, events={}, usage={})
+    write_replay_stream(tmp_path / "replay.html", source, report)
+    harness = Path(__file__).with_name("test_v3_replay_loader.cjs")
+    checked = subprocess.run([node, str(harness), str(tmp_path), "shapes"],
+                             capture_output=True, text=True, timeout=15)
+    assert checked.returncode == 0, checked.stderr
+    assert json.loads(checked.stdout)["passed"]
+    assert source.read_bytes() == original
