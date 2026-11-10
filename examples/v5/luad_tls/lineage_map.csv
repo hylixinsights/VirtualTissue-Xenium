@@ -1,0 +1,11 @@
+cell_type,lineage
+B_cell,B
+DC,dendritic
+Endothelial,endothelial
+Mast_NK,unknown
+Myeloid,myeloid
+Stromal,fibroblast
+T_CD4,T_CD4
+T_CD8,T_CD8
+Tumor,malignant
+Undefined,unknown

@@ -170,7 +170,9 @@ def _v3_interaction_graph(cells, context, *, seed, step):
 def initialize(bundle, *, seed=21):
     result = {}
     for c in bundle["cells"]:
-        state = {k: deepcopy(v) for k, v in c.items() if k != "expression"}
+        # Frozen t0 measurements (counts, imported scores) live in the bundle and
+        # guidebook; the evolving state carries neither.
+        state = {k: deepcopy(v) for k, v in c.items() if k not in ("expression", "measured_scores")}
         state.update(status="alive", activated=c.get("initial_state", {}).get("activated", False),
                      exhausted=c.get("initial_state", {}).get("exhausted", False), signal=0.0,
                      guidebook_id=c["cell_id"], generation=0)
@@ -191,6 +193,8 @@ def decision_rows(cells, guidebook, context, *, seed, step):
     hazard_mode, dt = kinetics["mode"] == "hazard_per_hour", context["time_step_hours"]
     v3 = dynamics.enabled(context)
     lattice_mode = lattice.enabled(context)
+    # v5 policy bundles only: one shared record describing imported scores for the provider prompt.
+    definitions = guidebook.get("provenance", {}).get("measured_definitions") if v3 else None
     rows = []
     for cid in sorted(cells):
         cell = cells[cid]
@@ -290,17 +294,109 @@ def decision_rows(cells, guidebook, context, *, seed, step):
         rows.append(dict(cell_id=cid, actions=actions, prior=prior, observation=observation,
                          excluded=excluded, targets=licensed_targets, corpses=corpses, target_rule=target_rule,
                          **(dict(division_targets=division_targets) if lattice_mode else {}),
-                         **(dict(effective_hazards_per_hour=hazards) if v3 and hazard_mode else {})))
+                         **(dict(effective_hazards_per_hour=hazards) if v3 and hazard_mode else {}),
+                         **(dict(evidence_definitions=definitions) if definitions else {})))
     return rows, graph
 
 
-def distribution(prior, answer=None, jev_weight=.5):
-    """Explicit log-linear preference pooling, not Bayesian biological inference."""
+DECISION_LOG_FORMAT = "t0-evidence-by-reference-1"
+DECISION_LOG_MODES = ("reference", "inline")
+_EVIDENCE_FILE = "guidebook.json"
+
+
+def evidence_reference(guidebook_id, evidence):
+    """Pointer to one guidebook entry's frozen t0 evidence, with its content hash."""
+    return dict(file=_EVIDENCE_FILE, guidebook_id=guidebook_id, sha256=digest(evidence))
+
+
+def logged_observation(observation, reference):
+    """Decision-log view of an observation: t0 evidence by reference, same key order.
+
+    Frozen t0 evidence is identical at every step and for every descendant of a
+    cell, and ``guidebook.json`` in the run folder already holds it. Only the
+    stored log changes; the provider payload is built from the full observation.
+    """
+    return {("t0_evidence_ref" if key == "t0_evidence" else key): (reference if key == "t0_evidence" else value)
+            for key, value in observation.items()}
+
+
+def read_decisions(directory, *, expand=True):
+    """Yield the decisions of a run folder; ``expand`` restores the inline v4 form.
+
+    A by-reference record is rebuilt from ``guidebook.json`` in the same folder
+    and verified against the hash stored with the reference, so a missing
+    guidebook, or one whose evidence differs from what the run recorded, fails
+    instead of reconstructing other evidence. This is an integrity check against
+    mix-ups and accidental edits; it does not detect someone rewriting both files.
+    Each expanded record owns an independent copy of its evidence, in the
+    original key order. Inline logs (schema 2.0, v4 runs, ``--decision-log
+    inline``) are yielded unchanged.
+    """
+    directory = Path(directory)
+    entries, verified = None, {}
+    with (directory / "decisions.jsonl").open(encoding="utf8") as handle:
+        for number, line in enumerate(handle, 1):
+            if not line.strip():
+                continue
+            decision = json.loads(line)
+            if not isinstance(decision, dict):
+                raise ValueError(f"decisions.jsonl line {number} is not a decision record.")
+            observation = decision.get("observation")
+            if expand and isinstance(observation, dict) and "t0_evidence_ref" in observation:
+                reference = observation["t0_evidence_ref"]
+                if "t0_evidence" in observation:
+                    raise ValueError(f"decisions.jsonl line {number} holds both inline and referenced t0 evidence.")
+                if (not isinstance(reference, dict) or reference.get("file") != _EVIDENCE_FILE
+                        or not isinstance(reference.get("guidebook_id"), str)
+                        or not isinstance(reference.get("sha256"), str)):
+                    raise ValueError(f"decisions.jsonl line {number} has an invalid t0 evidence reference; "
+                                     f"only {_EVIDENCE_FILE} in the run folder is accepted.")
+                key = reference["guidebook_id"]
+                if key not in verified:
+                    if entries is None:
+                        path = directory / _EVIDENCE_FILE
+                        if not path.is_file():
+                            raise ValueError(f"Expanding this decision log requires {_EVIDENCE_FILE} beside decisions.jsonl.")
+                        document = json.loads(path.read_text(encoding="utf8"))
+                        entries = document.get("cells") if isinstance(document, dict) else None
+                        if not isinstance(entries, dict):
+                            raise ValueError(f"{_EVIDENCE_FILE} has no cells map; it is not this run's guidebook.")
+                    if not isinstance(entries.get(key), dict):
+                        raise ValueError(f"{_EVIDENCE_FILE} has no entry {key!r}; it is not this run's guidebook.")
+                    evidence = entries[key].get("evidence", {})
+                    verified[key] = (digest(evidence), json.dumps(evidence, allow_nan=False))
+                checksum, serialized = verified[key]
+                if checksum != reference["sha256"]:
+                    raise ValueError(f"t0 evidence of {key!r} in {_EVIDENCE_FILE} does not match the hash recorded "
+                                     f"in decisions.jsonl line {number}; the guidebook was replaced or edited.")
+                decision["observation"] = {
+                    ("t0_evidence" if name == "t0_evidence_ref" else name):
+                        (json.loads(serialized) if name == "t0_evidence_ref" else value)
+                    for name, value in observation.items()}
+            yield decision
+
+
+JEV_POOLING_MODES = ("full_distribution", "event_share")
+
+
+def distribution(prior, answer=None, jev_weight=.5, pooling="full_distribution"):
+    """Explicit log-linear preference pooling, not Bayesian biological inference.
+
+    ``full_distribution`` (the v4 rule, default) pools every action including
+    REST, so Jev's REST preference also sets how often events happen and the
+    event rate depends on the time step. ``event_share`` (opt-in) keeps the
+    kernel's event mass, 1 - prior[REST] = 1 - exp(-sum(k) dt), and pools only
+    the shares among non-REST actions; Jev then decides which event, not when.
+    """
     if answer is None or jev_weight == 0:
         return dict(prior)
     p = answer["probabilities"]
     if set(p) != set(prior):
         raise ValueError("Provider actions differ from the gated menu.")
+    if pooling == "event_share":
+        return _event_share(prior, p, jev_weight)
+    if pooling != "full_distribution":
+        raise ValueError(f"jev_pooling must be one of {JEV_POOLING_MODES}.")
     if jev_weight == 1:
         return dict(p)
     weights = {a: prior[a] ** (1-jev_weight) * p[a] ** jev_weight for a in prior}
@@ -308,6 +404,25 @@ def distribution(prior, answer=None, jev_weight=.5):
     if not math.isfinite(total) or total <= 0:
         raise ValueError("Combined distribution is empty or invalid.")
     return {a: w/total for a, w in weights.items()}
+
+
+def _event_share(prior, p, jev_weight):
+    """P(a) = (1 - prior[REST]) * share_a; REST keeps the kernel's exp(-sum(k) dt).
+
+    share_a is the normalised pool of the prior share and Jev's share among the
+    non-REST actions. If Jev puts no mass on any event, or the pool is empty,
+    the prior shares are kept: the provider cannot veto the kernel's clock.
+    """
+    events = [a for a in prior if a != "REST"]
+    event_mass = 1.0 - prior["REST"]
+    prior_events, jev_events = sum(prior[a] for a in events), sum(p[a] for a in events)
+    if not events or event_mass <= 0 or prior_events <= 0 or jev_events <= 0:
+        return dict(prior)
+    pooled = {a: (prior[a] / prior_events) ** (1 - jev_weight) * (p[a] / jev_events) ** jev_weight for a in events}
+    total = sum(pooled.values())
+    if not math.isfinite(total) or total <= 0:
+        return dict(prior)
+    return {a: (prior["REST"] if a == "REST" else event_mass * pooled[a] / total) for a in prior}
 
 
 def js_divergence(p, q):
@@ -513,6 +628,11 @@ def kinetics_summary(bundle, rows):
     return result
 
 
+def _action_evidence(bundle):
+    from ..v5.evidence import action_evidence
+    return action_evidence(bundle)
+
+
 def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21, prior_mode="shown"):
     validate_prepared(bundle)
     cells = initialize(bundle, seed=seed)
@@ -527,6 +647,7 @@ def preflight(bundle, *, model="jev-1.14.0", max_questions=20, seed=21, prior_mo
                      qc_fail_cells=bundle["guidebook"]["provenance"].get("qc_fail_cells", 0),
                      note="Statuses 'available' and 'available_panel_heuristic' can support expression modulation; the latter is weak panel calibration. Unavailable evidence keeps multiplier 1; available evidence may still be neutral."),
         isolated_cells=sum(not ns for ns in graph.values()), interaction_mode=bundle["context"].get("interaction_mode"),
+        **(dict(action_evidence=_action_evidence(bundle)) if bundle["schema_version"] == "3.0" else {}),
         limitations=[("Hazards and state clocks have hour units but remain uncalibrated." if bundle["context"]["kinetics"]["mode"] == "hazard_per_hour" else "Legacy per-decision weights use time_step_hours as labels only."),
                     "t0 expression stays fixed; state transitions do not predict a new transcriptome.",
                     ("Spatial edges use declared outline gap with centroid fallback; segmentation proximity does not establish physical contact."
@@ -557,8 +678,18 @@ def run(bundle, output_dir, **kwargs):
 
 
 def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, jev_weight=.5,
-        max_population=2000, resume=False):
+        max_population=2000, resume=False, decision_log="reference", jev_pooling="full_distribution"):
     validate_prepared(bundle)
+    if decision_log not in DECISION_LOG_MODES:
+        raise ValueError(f"decision_log must be one of {DECISION_LOG_MODES}.")
+    if jev_pooling not in JEV_POOLING_MODES:
+        raise ValueError(f"jev_pooling must be one of {JEV_POOLING_MODES}.")
+    if jev_pooling != "full_distribution" and mode != "jev":
+        raise ValueError("jev_pooling applies only to Jev mode.")
+    if jev_pooling != "full_distribution" and bundle["schema_version"] != "3.0":
+        raise ValueError("event_share keeps the hazard kernel's event probability and requires schema 3.0.")
+    if mode == "jev" and getattr(provider, "pooling", "full_distribution") != jev_pooling:
+        raise ValueError("Provider and run disagree about jev_pooling; the prompt must describe the applied rule.")
     context = bundle["context"]
     v3 = dynamics.enabled(context)
     if type(steps) is not int or not 1 <= steps <= 10000 or type(seed) is not int:
@@ -613,6 +744,12 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
             shape_evolution="rigid translation; daughters inherit an explicitly synthetic copy of the ancestral t0 shape",
             interaction_distance=config["geometry"]["interaction_distance"],
             distance_cost="bounding-box candidate sweep; exact polygon gap worst-case O(vertices_a*vertices_b) per pair")
+    if jev_pooling != "full_distribution":
+        # Recorded only when it departs from the v4 rule, so default configurations
+        # and their hashes stay identical to v4.
+        config.update(jev_pooling=jev_pooling,
+            probability_semantics="kernel event mass 1-exp(-sum(k)dt) kept; Jev pooled only among non-REST shares: "
+                                  "share_a ~ prior_share^(1-alpha)*Jev_share^alpha; seeded categorical sample")
     if lattice.enabled(context):
         config.update(kernel="vtx-lattice-occupancy-3.0", lattice=context["lattice"])
         config["assumptions"].update(geometry="fixed measured bin centroids; occupancy changes on existing bins only",
@@ -637,6 +774,7 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
     frames = FrameStore(directory) if v3 else []
     frames.append(dict(step=0, time_hours=0, cells=cells if v3 else deepcopy(cells), events=[]))
     decisions, stop, error, divergences = [], "completed", None, {}
+    by_reference, evidence_refs, event_mass = v3 and decision_log == "reference", {}, {}
     decision_file = (directory / "decisions.jsonl").open("w", encoding="utf8") if v3 else None
     completed_steps, event_counts = 0, Counter()
     try:
@@ -662,7 +800,7 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
             for row in rows:
                 cid = row["cell_id"]
                 answer = answers.get(cid)
-                probabilities = distribution(row["prior"], answer, jev_weight)
+                probabilities = distribution(row["prior"], answer, jev_weight, jev_pooling)
                 action = draw(probabilities, seeded_rng(seed, "decision", step, cid))
                 divergence = js_divergence(row["prior"], answer["probabilities"]) if answer else None
                 if divergence is not None:
@@ -670,13 +808,25 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
                     stats["n"] += 1
                     stats["total"] += divergence
                     stats["maximum"] = max(stats["maximum"], divergence)
+                    # How much event probability the kernel declared, Jev stated and the run applied.
+                    mass = event_mass.setdefault(row["observation"]["lineage"], dict(n=0, prior=0.0, jev=0.0, applied=0.0))
+                    mass["n"] += 1
+                    mass["prior"] += 1 - row["prior"]["REST"]
+                    mass["jev"] += 1 - answer["probabilities"]["REST"]
+                    mass["applied"] += 1 - probabilities["REST"]
+                observation = row["observation"]
+                if by_reference:
+                    key = cells[cid]["guidebook_id"]
+                    if key not in evidence_refs:
+                        evidence_refs[key] = evidence_reference(key, observation["t0_evidence"])
+                    observation = logged_observation(observation, evidence_refs[key])
                 proposals.append(dict(cell_id=cid, action=action, targets=row["targets"], corpses=row["corpses"],
                                       target_rule=row["target_rule"],
                                       **(dict(division_targets=row["division_targets"]) if "division_targets" in row else {})))
                 decisions.append(dict(step=step, time_hours=step*bundle["context"]["time_step_hours"], cell_id=cid,
                     action=action, prior=row["prior"], jev=answer, applied_probabilities=probabilities,
                     jev_prior_js_bits=divergence,
-                    observation=row["observation"], excluded=row["excluded"],
+                    observation=observation, excluded=row["excluded"],
                     provenance="local_guidebook" if mode == "local" else ("jev_pooled_preferences" if answer else "single_permitted_action")))
             cells, events = commit(cells, proposals, max_population=max_population, seed=seed, step=step, context=context)
             frames.append(dict(step=step+1, time_hours=(step+1)*context["time_step_hours"], cells=cells if v3 else deepcopy(cells), events=events))
@@ -709,7 +859,26 @@ def _run(bundle, output_dir, *, steps=12, seed=21, mode="local", provider=None, 
             model=getattr(provider, "model", "jev-1.14.0"), max_questions=getattr(provider, "max_questions", 20),
             prior_mode=getattr(provider, "prior_mode", "shown")))
     if v3:
+        report["decision_log"] = (dict(format=DECISION_LOG_FORMAT, t0_evidence_file=_EVIDENCE_FILE,
+                t0_evidence="by reference: cells[observation.t0_evidence_ref.guidebook_id].evidence, verified by sha256",
+                reader="virtualtissue_xenium.v2.simulation.read_decisions; CLI: decisions RUN_DIR --output FILE",
+                note="Keep guidebook.json with decisions.jsonl; the reader restores the inline v4 records exactly "
+                     "and fails if the guidebook's evidence differs from the recorded hashes.")
+            if by_reference else dict(format="inline", t0_evidence="copied into every decision (v4 layout)"))
         report["expected_events_per_hour_by_lineage"] = report["preflight"]["kinetics"]["expected_events_per_hour_by_lineage"]
+    if mode == "jev" and v3:
+        dt = context["time_step_hours"]
+        report["jev_pooling"] = jev_pooling
+        report["jev_event_mass"] = dict(
+            unit="mean probability per decision that the cell does anything but REST; divide by time_step_hours for a rate",
+            time_step_hours=dt,
+            by_lineage={lineage: dict(n=v["n"], prior=v["prior"]/v["n"], jev=v["jev"]/v["n"], applied=v["applied"]/v["n"],
+                                      applied_over_prior=(v["applied"]/v["prior"] if v["prior"] > 0 else None),
+                                      prior_events_per_hour=v["prior"]/v["n"]/dt, applied_events_per_hour=v["applied"]/v["n"]/dt)
+                        for lineage, v in sorted(event_mass.items())},
+            interpretation=("full_distribution pools REST too, so Jev's REST preference sets event frequency and "
+                            "applied_over_prior changes with time_step_hours; compare arms only at one time step. "
+                            "event_share keeps applied equal to prior by construction."))
     if lattice.enabled(context):
         report.update(kernel="lattice", occupancy=lattice.summary(cells, context),
                       occupied_bins=sum(c["occupancy"] > 0 for c in cells.values()),

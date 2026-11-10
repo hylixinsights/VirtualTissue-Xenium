@@ -186,8 +186,21 @@ def validate_context(context: dict) -> dict:
         if "geometry" in c:
             from ..v3.geometry import validate_geometry_config
             c["geometry"] = validate_geometry_config(c["geometry"])
+        if "evidence_policy" in c:
+            # Absent means the v4 action-to-signature table; no default is inserted.
+            from ..v5.evidence import validate_policy
+            c["evidence_policy"] = validate_policy(c["evidence_policy"], rules)
+    elif "evidence_policy" in c:
+        raise ValueError("evidence_policy requires schema 3.0.")
     for field in ("tissue", "organism", "disease"):
         c[field] = _text(c.get(field), field)
+    if "sample_context" in c:
+        details = c["sample_context"]
+        fields = {"anatomical_region", "developmental_stage", "cell_state_notes", "secretion_notes"}
+        if not isinstance(details, dict) or set(details) - fields:
+            raise ValueError("sample_context must be an object containing only anatomical_region, "
+                             "developmental_stage, cell_state_notes, and secretion_notes.")
+        c["sample_context"] = {key: _text(value, f"sample_context.{key}") for key, value in details.items()}
     assays = ("xenium", "scrna", "snrna", "atera", "visium_hd", "stereo_seq") if v3 else ("xenium", "scrna", "snrna")
     if c.get("assay") not in assays:
         raise ValueError("assay must be xenium, scrna, or snrna.")

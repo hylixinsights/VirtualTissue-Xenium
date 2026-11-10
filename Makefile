@@ -4,7 +4,7 @@ FIGURES ?= outputs/v3/demo/figures
 
 .PHONY: test figures clock demo
 test:
-	PYTHONPATH=src $(PYTHON) -m pytest tests/test_v2_*.py tests/test_v3_*.py -q
+	PYTHONPATH=src $(PYTHON) -m pytest tests/test_v2_*.py tests/test_v3_*.py tests/test_v5_*.py -q
 
 figures:
 	PYTHONPATH=src $(PYTHON) analysis/figures.py --ensemble "$(ENSEMBLE)" --output "$(FIGURES)"

@@ -9,7 +9,7 @@ from copy import deepcopy
 from statistics import mean
 
 from ..v2.controls import apply_control
-from ..v2.guidebook import ACTION_SIGNATURE
+from ..v5.evidence import declared_evidence
 from ..v2.inputs import digest, prepare, validate_prepared
 from ..v2.simulation import decision_rows, initialize, js_divergence
 
@@ -55,7 +55,7 @@ def _contrast(reference, candidate, bundle, other):
             direct = hazard_before != hazard_after
             probabilities[action] = dict(reference=before, counterfactual=after, delta=after-before,
                 reference_hazard_per_hour=hazard_before, counterfactual_hazard_per_hour=hazard_after,
-                declared_signature=ACTION_SIGNATURE.get(action),
+                declared_signature=declared_evidence(bundle["context"], original["observation"]["lineage"], action)[0],
                 local_path=("expression_hazard_or_qc" if direct else "competing_risk_redistribution") if changed else "unchanged")
         evidence_changed = digest(original["observation"]["t0_evidence"]) != digest(altered["observation"]["t0_evidence"])
         def provider_evidence(row):
@@ -112,7 +112,8 @@ Beta zero disables local expression modulation, not the evidence sent to Jev.
     beta_zero = prepare(bundle["cells"], context,
         assayed_genes=bundle["guidebook"]["provenance"]["assayed_genes"],
         gene_sets=bundle["guidebook"]["provenance"]["gene_sets"],
-        measurement=bundle.get("measurement"), annotation_provenance=bundle.get("annotation_provenance"))
+        measurement=bundle.get("measurement"), annotation_provenance=bundle.get("annotation_provenance"),
+        measured_evidence=bundle.get("measured_evidence"))
     arms = dict(baseline=bundle, beta_zero=beta_zero,
         shuffle_expression_within_type=apply_control(bundle, "shuffle_expression_within_type", seed=seed),
         shuffle_expression_global=apply_control(bundle, "shuffle_expression_global", seed=seed))

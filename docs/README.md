@@ -1,15 +1,16 @@
 # VirtualTissue-Xenium documentation
 
-**V4 is the current primary release on `main`.** Start with the [repository README](../README.md), run [START_TEST.command](../START_TEST.command), and read the [4.0.0 release notes](v4/RELEASE_NOTES.md). The modern command is `vtx4`; `vtx2` remains a compatible alias.
+**V5 is the current primary release on `main`.** Start with the [repository README](../README.md), run [START_TEST.command](../START_TEST.command), and read the [5.0.0 release notes](v5/RELEASE_NOTES.md). V5 keeps the v4 simulation and replay unchanged and adds [sample-context questions](v5/SAMPLE_CONTEXT.md), the [evidence policy](v5/EVIDENCE_POLICY.md) and the [Jev decision tools](v5/JEV_DECISIONS.md). The modern command is `vtx5`; `vtx4` and `vtx2` remain compatible aliases. See the [4.0.0 release notes](v4/RELEASE_NOTES.md) for the earlier presentation release.
 
-V4 restores the original cell rendering and dark replay while preserving the v3 simulation mechanisms. Simulation schema 3.0 and the documentation under `v3/` remain current for those contracts. Kinetic defaults remain DRAFT assumptions; software tests do not establish biological predictive validity.
+V5 retains the original cell rendering and dark replay restored in v4, together with the v3 simulation mechanisms. Simulation schema 3.0 and the documentation under `v3/` remain current for those contracts. Kinetic defaults remain DRAFT assumptions; software tests do not establish biological predictive validity.
 
 | Current task | Guide |
 |---|---|
 | Install and test the current release | [README quick start](../README.md#start-here) |
+| Declare sample tissue, disease and explicit restrictions | [English sample-context questionnaire](v5/SAMPLE_CONTEXT.md) |
 | Select an ROI and prepare your object | [ROI workflow](v3/ROI_WORKFLOW.md) and [annotation inputs](v3/ANNOTATION.md) |
 | Understand expression, lineages and rates | [Expression policy](v3/EXPRESSION_POLICY.md), [ontology](v3/ONTOLOGY.md) and [rate review](v3/RATE_REVIEW.md) |
-| Refresh an existing saved replay | [Replay refresh](../README.md#refresh-the-replay-of-an-existing-run) using `vtx4 replay RUN_DIRECTORY` |
+| Refresh an existing saved replay | [Replay refresh](../README.md#refresh-the-replay-of-an-existing-run) using `vtx5 replay RUN_DIRECTORY` |
 | Interpret measurements and readouts | [Platform contracts](v3/PLATFORMS.md), [analysis](../analysis/README.md) and [scientific scope](v3/SCIENTIFIC_SCOPE.md) |
 
 The earlier [v2 ordered workflow](v2/WORKFLOW.md), [context and guidebook contract](v2/CONTEXT_AND_GUIDEBOOK.md), [dataset guide](v2/DATASETS.md), [own-data walkthrough](v2/YOUR_DATA.md) and [v2 notebook](../notebooks/V2_Context_Guidebook_Workflow.ipynb) remain available for historical workflows and compatibility references.

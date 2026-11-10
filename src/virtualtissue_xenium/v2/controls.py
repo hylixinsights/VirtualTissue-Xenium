@@ -25,6 +25,11 @@ CONTROLS = {
 }
 
 
+# A cell's counts and the scores imported from those counts move together, so an
+# expression shuffle cannot leave measured evidence attached to the original cell.
+_T0_MEASUREMENTS = ("expression", "measured_scores")
+
+
 def _rng(bundle, kind, seed):
     return random.Random(int(digest([bundle["fingerprint"], "control", kind, seed]), 16))
 
@@ -68,13 +73,16 @@ def apply_control(bundle: dict, kind: str, *, seed: int = 0, donor_context=None)
         context["context_modifiers"] = [dict(rule, when={}) for rule in context["context_modifiers"] if modifier_matches(rule, context)]
         for field in ("tissue", "disease", "perturbations"):
             context[field] = deepcopy(donor[field])
+        context.pop("sample_context", None)
+        if "sample_context" in donor:
+            context["sample_context"] = deepcopy(donor["sample_context"])
     elif kind == "shuffle_expression_within_type":
         groups = {}
         for c in cells:
             groups.setdefault((c["sample_id"], c["cell_type"]) if bundle["schema_version"] == "3.0" else c["cell_type"], []).append(c)
-        _permute_field(cells, groups, ("expression",), rng)
+        _permute_field(cells, groups, _T0_MEASUREMENTS, rng)
     elif kind == "shuffle_expression_global":
-        _permute_field(cells, {"all": cells}, ("expression",), rng)
+        _permute_field(cells, {"all": cells}, _T0_MEASUREMENTS, rng)
     elif kind == "label_permutation":
         groups = {"all": cells}
         if bundle["schema_version"] == "3.0":
@@ -106,7 +114,8 @@ def apply_control(bundle: dict, kind: str, *, seed: int = 0, donor_context=None)
     assayed = context.get("assayed_genes")
     extra = {}
     if bundle["schema_version"] == "3.0":
-        extra = dict(measurement=deepcopy(bundle["measurement"]), annotation_provenance=bundle.get("annotation_provenance"))
+        extra = dict(measurement=deepcopy(bundle["measurement"]), annotation_provenance=bundle.get("annotation_provenance"),
+                     measured_evidence=deepcopy(bundle.get("measured_evidence")))
     result = prepare(cells, context, assayed_genes=assayed, gene_sets=gene_sets, **extra)
     record = dict(kind=kind, description=CONTROLS[kind], seed=seed,
                   source_fingerprint=bundle["fingerprint"], source_input_sha256=provenance["input_sha256"],
@@ -116,6 +125,8 @@ def apply_control(bundle: dict, kind: str, *, seed: int = 0, donor_context=None)
         record["donor_context_sha256"] = digest(donor)
     if kind == "label_permutation" and bundle["schema_version"] == "3.0":
         record["permutation_scope"] = "within sample; binned units failing purity remain fixed unknown"
+    if kind in ("shuffle_expression_within_type", "shuffle_expression_global") and bundle.get("measured_evidence") is not None:
+        record["measured_scores"] = "permuted together with the expression vector they were computed from"
     result["guidebook"]["control"] = record
     content = {k: v for k, v in result.items() if k != "fingerprint"}
     return dict(content, fingerprint=digest(content))
