@@ -151,17 +151,13 @@ def score_population(cells, panel, signatures, scoring):
     return evidence, references
 
 
-def _score_population_v3(cells, panel, signatures, scoring):
-    """Partition references by sample and type; never silently borrow another sample.
+def reference_partition(eligible, bins, scoring):
+    """{cell_id: (sample, cell_type, depth bin or None)}: one non-overlapping reference per cell.
 
     With explicit cell_type fallback, the entire type falls back when any depth
-    stratum is undersized. Percentiles and normalisation then use the same
-    non-overlapping partition. The default is null for undersized strata.
+    stratum is undersized. Shared by the internal AUC and imported measured
+    scores, so both kinds of evidence are standardised against the same cells.
     """
-    max_rank = max_rank_for(len(panel), scoring)
-    qc_fail = scoring.get("_qc_fail", set())
-    eligible = [c for c in cells if c["cell_id"] not in qc_fail]
-    bins = depth_bins(eligible, scoring["depth_bins"])
     groups = defaultdict(list)
     for c in eligible:
         sample = c.get("sample_id", "sample") if scoring["reference_scope"] == "sample" else "__pooled__"
@@ -175,6 +171,21 @@ def _score_population_v3(cells, panel, signatures, scoring):
                     any(len(m) < scoring["min_reference_cells"] for m in strata.values()))
         for c in members:
             partition[c["cell_id"]] = (*group, None if fallback else bins[c["cell_id"]])
+    return partition
+
+
+def _score_population_v3(cells, panel, signatures, scoring):
+    """Partition references by sample and type; never silently borrow another sample.
+
+    With explicit cell_type fallback, the entire type falls back when any depth
+    stratum is undersized. Percentiles and normalisation then use the same
+    non-overlapping partition. The default is null for undersized strata.
+    """
+    max_rank = max_rank_for(len(panel), scoring)
+    qc_fail = scoring.get("_qc_fail", set())
+    eligible = [c for c in cells if c["cell_id"] not in qc_fail]
+    bins = depth_bins(eligible, scoring["depth_bins"])
+    partition = reference_partition(eligible, bins, scoring)
     evidence = {c["cell_id"]: {} for c in cells}
     references = {}
     for name, genes in signatures.items():

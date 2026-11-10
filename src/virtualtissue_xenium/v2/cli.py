@@ -1,4 +1,4 @@
-"""VirtualTissue v4 workflow: prepare -> inspect -> run -> replay -> compare."""
+"""VirtualTissue workflow: prepare -> inspect -> run -> replay -> compare."""
 from __future__ import annotations
 
 import argparse
@@ -12,6 +12,22 @@ from .inputs import digest, load_cells, prepare, read_json, write_json
 from .simulation import preflight, run
 
 
+def cmd_context_init(args):
+    """Ask for sample context in English without sending a provider request."""
+    from ..v5.context_questions import collect_context
+    output = Path(args.output)
+    if output.exists() or output.is_symlink():
+        raise ValueError("Context output exists; choose a new path.")
+    context = collect_context(read_json(args.template))
+    # Check again after user input, before creating a new file exclusively.
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("x", encoding="utf-8") as stream:
+        json.dump(context, stream, indent=2, allow_nan=False)
+        stream.write("\n")
+    return dict(context=str(output.resolve()), requests_sent=0,
+                next="Review the sample declarations and context_modifiers, then use this context with prepare.")
+
+
 def cmd_prepare(args):
     context = read_json(args.context)
     if args.polygon_key and context.get("schema_version") != "3.0":
@@ -19,7 +35,7 @@ def cmd_prepare(args):
     from .measurement import read_lineage_map, organism_key
     lineage_map = read_lineage_map(args.lineage_map) if args.lineage_map else None
     measurement = read_json(args.measurement) if args.measurement else None
-    annotation_provenance = None
+    annotation_provenance, measured_evidence = None, None
     if context.get("schema_version") == "3.0" and Path(args.input).suffix == ".json":
         source_object = read_json(args.input)
         if not args.measurement:
@@ -27,6 +43,18 @@ def cmd_prepare(args):
         annotation_provenance = source_object.get("annotation_provenance")
         if annotation_provenance is not None and not isinstance(annotation_provenance, dict):
             raise ValueError("annotation_provenance must be an object.")
+        measured_evidence = source_object.get("measured_evidence")
+    if getattr(args, "measured_evidence", None):
+        if measured_evidence is not None:
+            raise ValueError("The input object already carries a measured_evidence manifest; use one source.")
+        measured_evidence = read_json(args.measured_evidence)
+    if getattr(args, "evidence_policy", None):
+        if "evidence_policy" in context:
+            raise ValueError("The context already declares an evidence_policy; use one source.")
+        context["evidence_policy"] = read_json(args.evidence_policy)
+    score_keys = getattr(args, "score_key", None) or []
+    if score_keys and (args.command != "prepare" or Path(args.input).suffix != ".h5ad"):
+        raise ValueError("--score-key reads AnnData obs columns; JSON objects carry measured_scores per cell.")
     if args.lineage_map:
         import hashlib
         annotation_provenance = dict(annotation_provenance or {}, lineage_map_file_sha256=hashlib.sha256(Path(args.lineage_map).read_bytes()).hexdigest())
@@ -58,7 +86,7 @@ def cmd_prepare(args):
     else:
         cells, genes = load_cells(args.input, cell_type_key=args.cell_type_key, lineage_key=args.lineage_key,
             sample_key=args.sample_key, layer=args.layer, coordinate_scale=args.coordinate_scale, max_cells=args.max_cells,
-            lineage_map=lineage_map, polygon_key=args.polygon_key)
+            lineage_map=lineage_map, polygon_key=args.polygon_key, **(dict(score_keys=score_keys) if score_keys else {}))
         if len(cells) > args.max_cells:
             raise ValueError("Subset the input first or explicitly increase --max-cells.")
     if args.polygons:
@@ -74,7 +102,8 @@ def cmd_prepare(args):
         # Keys starting with "_" are file-level notes (provenance, review status), not gene sets.
         gene_sets = {k: v for k, v in gene_sets.items() if not k.startswith("_")}
     bundle = prepare(cells, context, assayed_genes=genes, gene_sets=gene_sets, measurement=measurement,
-                     lineage_map=lineage_map, annotation_provenance=annotation_provenance)
+                     lineage_map=lineage_map, annotation_provenance=annotation_provenance,
+                     measured_evidence=measured_evidence)
     report = preflight(bundle)
     sidecar = Path(args.output).with_suffix(".guidebook.json")
     if Path(args.output).exists() or sidecar.exists():
@@ -86,14 +115,20 @@ def cmd_prepare(args):
 
 def cmd_cost(args):
     """Estimate Jev HTTP calls and input tokens from step-0 payloads; no API use."""
-    from .provider import estimate_cost
+    from .provider import estimate_cost, prompt_version
     from .simulation import decision_rows, initialize
     bundle = read_json(args.prepared)
     preflight(bundle, model=args.model, max_questions=args.max_questions, prior_mode=args.jev_prior)
     rows, _ = decision_rows(initialize(bundle), bundle["guidebook"], bundle["context"], seed=args.seed, step=0)
     active = [r for r in rows if len(r["actions"]) > 1]
-    return estimate_cost(active, bundle["context"], model=args.model, steps=args.steps, max_questions=args.max_questions,
-                         prior_mode=args.jev_prior, max_http_attempts=args.max_http_attempts)
+    estimate = estimate_cost(active, bundle["context"], model=args.model, steps=args.steps, max_questions=args.max_questions,
+                             prior_mode=args.jev_prior, max_http_attempts=args.max_http_attempts,
+                             **(dict(pooling=args.jev_pooling) if args.jev_pooling != "full_distribution" else {}))
+    policy = bundle["context"].get("evidence_policy") is not None
+    if policy or args.jev_pooling != "full_distribution":
+        estimate["prompt_version"] = prompt_version(args.jev_prior, bundle["schema_version"], evidence_policy=policy,
+                                                    pooling=args.jev_pooling)
+    return estimate
 
 
 def cmd_run(args):
@@ -108,13 +143,17 @@ def cmd_run(args):
         identity = dict(bundle_fingerprint=bundle["fingerprint"], steps=args.steps, seed=args.seed,
                         mode=args.mode, jev_weight=effective_weight, max_population=args.max_population,
                         model=args.model, max_questions=args.max_questions, jev_prior=args.jev_prior)
+        if args.jev_pooling != "full_distribution":
+            identity["jev_pooling"] = args.jev_pooling
         provider = JevProvider(key, Path(args.output)/"jev_journal", identity, model=args.model,
             max_attempts=args.max_http_attempts, workers=args.workers, max_questions=args.max_questions,
-            prior_mode=args.jev_prior, schema_version=bundle["schema_version"])
+            prior_mode=args.jev_prior, schema_version=bundle["schema_version"],
+            evidence_policy=bundle["context"].get("evidence_policy") is not None, pooling=args.jev_pooling)
     else:
         provider = None
     report = run(bundle, args.output, steps=args.steps, seed=args.seed, mode=args.mode,
-                 provider=provider, jev_weight=effective_weight, max_population=args.max_population, resume=args.resume)
+                 provider=provider, jev_weight=effective_weight, max_population=args.max_population, resume=args.resume,
+                 decision_log=args.decision_log, jev_pooling=args.jev_pooling)
     return dict(**report, replay=str(Path(args.output).resolve()/"replay.html"))
 
 
@@ -186,8 +225,8 @@ def compare(paths, *, allow_ontology_diff=False):
                     "default_action_weights", "recognition_licensed_kill_weight", "time_semantics", "kinetics_mode"):
             if reference.get(key) != candidate.get(key):
                 raise ValueError(f"Unmatched guidebook scoring assumption: {key}")
-        for key in ("time_step_hours", "kinetics", "scoring", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease", "platform", "dynamics", "kernel", "lattice"):
-            if key in ("tissue", "disease") and control.get("kind") == "jev_scrambled_context":
+        for key in ("time_step_hours", "kinetics", "scoring", "interaction_mode", "neighbor_radius_um", "max_neighbors", "sampling", "organism", "assay", "tissue", "disease", "platform", "dynamics", "kernel", "lattice", "evidence_policy", "sample_context"):
+            if key in ("tissue", "disease", "sample_context") and control.get("kind") == "jev_scrambled_context":
                 continue
             if key == "interaction_mode" and control.get("kind") == "well_mixed_equivalent":
                 continue
@@ -306,26 +345,31 @@ def cmd_ensemble(args):
     for name, spec in manifest["arms"].items():
         if isinstance(spec, str):
             spec = {"prepared": spec}
-        if not isinstance(spec, dict) or "prepared" not in spec or set(spec) - {"prepared", "mode", "jev_weight", "jev_prior"}:
-            raise ValueError("Each ensemble arm declares prepared, and optionally mode, jev_weight, jev_prior.")
+        if not isinstance(spec, dict) or "prepared" not in spec or set(spec) - {"prepared", "mode", "jev_weight", "jev_prior", "jev_pooling"}:
+            raise ValueError("Each ensemble arm declares prepared, and optionally mode, jev_weight, jev_prior, jev_pooling.")
         arms[name] = str((manifest_path.parent / spec["prepared"]).resolve())
         mode = spec.get("mode", "local")
         prior = spec.get("jev_prior", "shown")
         if prior not in ("shown", "hidden"):
             raise ValueError("jev_prior must be shown or hidden.")
         options[name] = {"mode": mode, "jev_weight": 1.0 if prior == "hidden" else spec.get("jev_weight", .5)}
+        if "jev_pooling" in spec:
+            options[name]["jev_pooling"] = spec["jev_pooling"]
         prior_modes[name] = prior
     key = os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY")
     if any(o["mode"] == "jev" for o in options.values()) and not key:
         raise ValueError("Set TYPESAFE_API_KEY or JEV_API_KEY for declared Jev ensemble arms.")
 
-    def provider_factory(*, arm, bundle, output_dir, seed, steps, jev_weight):
+    def provider_factory(*, arm, bundle, output_dir, seed, steps, jev_weight, jev_pooling="full_distribution"):
         identity = dict(bundle_fingerprint=bundle["fingerprint"], arm=arm, seed=seed, steps=steps,
                         mode="jev", jev_weight=jev_weight, max_population=args.max_population,
                         model=args.model, prior_mode=prior_modes[arm])
+        if jev_pooling != "full_distribution":
+            identity["jev_pooling"] = jev_pooling
         return JevProvider(key, Path(output_dir)/"jev_journal", identity, model=args.model,
                            max_attempts=args.max_http_attempts, workers=args.workers,
-                           prior_mode=prior_modes[arm], schema_version=bundle["schema_version"])
+                           prior_mode=prior_modes[arm], schema_version=bundle["schema_version"],
+                           evidence_policy=bundle["context"].get("evidence_policy") is not None, pooling=jev_pooling)
     return run_ensemble(arms, args.output, seeds=args.seeds, steps=args.steps,
                         horizon_hours=args.horizon_hours, max_population=args.max_population,
                         bootstrap_replicates=args.bootstrap_replicates, bootstrap_seed=args.bootstrap_seed,
@@ -406,6 +450,10 @@ def cmd_select_roi(args):
         raise ValueError("Selecting from raw JSON requires --context; only the chosen ROI will be prepared.")
     if context.get("schema_version") != "3.0":
         raise ValueError("User-selected ROI bundles require schema 3.0.")
+    if getattr(args, "evidence_policy", None):
+        if "evidence_policy" in context:
+            raise ValueError("The context already declares an evidence_policy; use one source.")
+        context["evidence_policy"] = read_json(args.evidence_policy)
     source_sampling = deepcopy(context.get("sampling", {}))
     missing = list(dict.fromkeys([*source_sampling.get("missing_populations", []), "outside the user-selected ROI"]))
     context["sampling"] = dict(design="subsampled", description="ROI explicitly chosen by the user from a recorded composition catalog.",
@@ -426,7 +474,8 @@ def cmd_select_roi(args):
         measurement.pop("mean_transcripts_per_unit", None)
     annotation["roi_selection"] = selection
     bundle = prepare(selected, context, assayed_genes=genes, gene_sets=gene_sets,
-                     measurement=measurement, annotation_provenance=annotation)
+                     measurement=measurement, annotation_provenance=annotation,
+                     measured_evidence=deepcopy(source.get("measured_evidence")))
     preflight_result = preflight(bundle)
     sidecar = Path(args.output).with_suffix(".guidebook.json")
     if Path(args.output).exists() or sidecar.exists():
@@ -444,6 +493,88 @@ def cmd_expression_audit(args):
     result = audit_expression(read_json(args.prepared), seed=args.seed)
     write_json(args.output, result)
     return result
+
+
+def cmd_decisions(args):
+    """Export a run's decisions in the inline v4 layout; reads saved files only."""
+    from .simulation import read_decisions
+    directory, output = Path(args.run_directory), Path(args.output)
+    if output.exists() or output.is_symlink():
+        raise ValueError("Decision export exists; choose a new path.")
+    if output.resolve().parent == directory.resolve() and output.name in ("decisions.jsonl", "guidebook.json", "frames.jsonl"):
+        raise ValueError("Choose an export path that is not a saved run artifact.")
+    count = 0
+    with output.open("x", encoding="utf8") as handle:
+        try:
+            for decision in read_decisions(directory, expand=not args.as_stored):
+                handle.write(json.dumps(decision, allow_nan=False) + "\n")
+                count += 1
+        except BaseException:
+            handle.close()
+            output.unlink(missing_ok=True)
+            raise
+    return dict(decisions=count, output=str(output.resolve()), source=str(directory.resolve()),
+                layout="as stored" if args.as_stored else "inline t0 evidence (v4 layout), verified against guidebook.json")
+
+
+def cmd_evidence_decisions(args):
+    """Compare the declared evidence of selected decisions with that of offered decisions; saved files only."""
+    from ..v5.evidence import decision_evidence_association
+    if Path(args.output).exists():
+        raise ValueError("Output exists; choose a new path.")
+    result = dict(runs=[decision_evidence_association(run) for run in args.runs])
+    write_json(args.output, result)
+    return result
+
+
+def cmd_evidence_policy(args):
+    """Write the implicit v4 action-to-signature table as an editable policy file."""
+    from ..v5.evidence import v4_equivalent_policy
+    if Path(args.output).exists():
+        raise ValueError("Policy output exists; choose a new path.")
+    policy = v4_equivalent_policy()
+    write_json(args.output, policy)
+    return dict(policy=args.output, rules=len(policy["rules"]),
+                note="Unedited, this policy gives the v4 hazards and trajectory (with the packaged gene sets). Edit rules, "
+                     "lineages and evidence explicitly; every rule is a modelling assumption that requires biological review.")
+
+
+def cmd_jev_probe(args):
+    """Frozen-state provider probe: plan (no API), run (paid, explicit budget), analyze (offline)."""
+    from ..v5 import probe
+    bundle = read_json(args.prepared) if args.prepared else None
+    if args.step == "plan":
+        if bundle is None:
+            raise ValueError("jev-probe plan requires --prepared.")
+        donor = read_json(args.donor_context) if args.donor_context else None
+        arms = args.arms or ["baseline", "evidence_masked", "evidence_exchanged", "neighbourhood_exchanged",
+                             *(["context_exchanged"] if donor is not None else [])]
+        result = probe.plan(bundle, args.directory, cells_per_lineage=args.cells_per_lineage, seed=args.seed, arms=arms,
+                            prior_modes=args.priors, repeats=args.repeats, donor_context=donor, model=args.model,
+                            max_questions=args.max_questions, pooling=args.jev_pooling, prepared_path=args.prepared)
+        return dict(plan=str(Path(args.directory).resolve() / "plan.json"), cells=len(result["cells"]),
+                    request_groups=len(result["groups"]), arms=result["arms"], prompt_versions=result["prompt_versions"],
+                    estimate=result["estimate"], requests_sent=0,
+                    next=f"Review payloads.json, then: jev-probe run {args.directory} --max-http-attempts {result['estimate']['http_requests']}")
+    if args.step == "run":
+        key = os.environ.get("TYPESAFE_API_KEY") or os.environ.get("JEV_API_KEY")
+        if not key:
+            raise ValueError("Set TYPESAFE_API_KEY or JEV_API_KEY before sending probe requests.")
+        if args.max_http_attempts is None:
+            raise ValueError("State --max-http-attempts explicitly; plan.json lists the requests the probe needs.")
+        return probe.run_probe(args.directory, key, max_http_attempts=args.max_http_attempts, bundle=bundle, workers=args.workers)
+    result = probe.analyze(args.directory, bundle=bundle, bootstrap_replicates=args.bootstrap_replicates, output=args.output)
+    return dict(analysis=str(Path(args.output).resolve() if args.output else Path(args.directory).resolve() / "analysis.json"),
+                n_cells=result["n_cells"], repeats=result["repeats"],
+                request_groups_excluded=result["request_groups_excluded"],
+                summary={prior: dict(replicate_noise_mean_js=section["replicate_noise"]["mean"],
+                                     arms={arm: dict(js_between=row["js_between_arm_and_baseline"]["mean"],
+                                                     js_excess=row["js_excess_over_replicates"]["mean"],
+                                                     ci95=row["js_excess_over_replicates"]["bootstrap_ci95_over_request_groups"],
+                                                     modal_agreement=row["modal_action_agreement_with_baseline"])
+                                           for arm, row in section["arms"].items()})
+                         for prior, section in result["by_prior"].items()},
+                interpretation=result["interpretation"])
 
 
 def cmd_replay(args):
@@ -484,9 +615,13 @@ def cmd_replay(args):
 
 def parser():
     invoked = Path(sys.argv[0]).name
-    p = argparse.ArgumentParser(prog=invoked if invoked in {"vtx2", "vtx4"} else "vtx4", description=__doc__)
+    p = argparse.ArgumentParser(prog=invoked if invoked in {"vtx2", "vtx4", "vtx5"} else "vtx5", description=__doc__)
     p.add_argument("--version", action="version", version=f"virtualtissue-xenium {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
+    s = sub.add_parser("context-init", help="Collect sample tissue, disease and explicit action restrictions in English; no API use.")
+    s.add_argument("output")
+    s.add_argument("--template", required=True, help="Schema-3.0 context whose declared simulation settings are retained.")
+    s.set_defaults(func=cmd_context_init)
     for name in ("prepare", "prepare-xenium"):
         s = sub.add_parser(name, help="Build a reviewed context-conditioned guidebook and prepared JSON.")
         s.add_argument("input"); s.add_argument("context"); s.add_argument("output")
@@ -496,6 +631,8 @@ def parser():
         s.add_argument("--polygon-scale", type=float, default=1.0, help="Convert external polygon coordinates to micrometres.")
         s.set_defaults(polygon_key=None)
         s.add_argument("--platform", choices=("xenium", "scrna", "snrna", "atera", "visium_hd", "stereo_seq"))
+        s.add_argument("--evidence-policy", help="v5: JSON evidence-to-action rules (schema 3.0). Omit for the v4 rulebook.")
+        s.add_argument("--measured-evidence", help="v5: JSON manifest describing imported per-cell scores (method, definition, genes).")
         if name == "prepare-xenium":
             s.add_argument("--annotations", required=True)
             s.add_argument("--center", nargs=2, type=float); s.add_argument("--radius-um", type=float)
@@ -504,6 +641,7 @@ def parser():
             s.add_argument("--sample-key"); s.add_argument("--layer"); s.add_argument("--coordinate-scale", type=float, default=1)
             s.add_argument("--annotations")
             s.add_argument("--polygon-key", help="AnnData.uns/obs key containing polygons; uses coordinate-scale.")
+            s.add_argument("--score-key", action="append", help="v5: AnnData obs column with a measured per-cell score; repeatable. NaN stays null.")
             s.add_argument("--center", nargs=2, type=float); s.add_argument("--radius-um", type=float)
         s.set_defaults(func=cmd_prepare)
     s = sub.add_parser("inspect", help="Validate a prepared bundle; estimate first-round calls, no API use.")
@@ -516,7 +654,20 @@ def parser():
     s.add_argument("--workers", type=int, default=2); s.add_argument("--max-questions", type=int, default=20)
     s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown",
                    help="hidden omits the guidebook prior from the prompt (anchoring control); journals never mix modes.")
+    s.add_argument("--decision-log", choices=("reference", "inline"), default="reference",
+                   help="reference stores t0 evidence once (guidebook.json) and is restored exactly by 'decisions'; inline is the v4 layout.")
+    s.add_argument("--jev-pooling", choices=("full_distribution", "event_share"), default="full_distribution",
+                   help="full_distribution is the v4 rule. event_share (opt-in) keeps the kernel's event probability and lets Jev choose only among events.")
     s.add_argument("--resume", action="store_true"); s.set_defaults(func=cmd_run)
+    s = sub.add_parser("decisions", help="Export a saved run's decisions with inline t0 evidence (v4 layout); no simulation, no API.")
+    s.add_argument("run_directory"); s.add_argument("--output", required=True)
+    s.add_argument("--as-stored", action="store_true", help="Copy records as stored instead of restoring inline evidence.")
+    s.set_defaults(func=cmd_decisions)
+    s = sub.add_parser("evidence-decisions", help="Per run: did selected actions carry more of their declared evidence than offered ones? No API.")
+    s.add_argument("runs", nargs="+"); s.add_argument("--output", required=True)
+    s.set_defaults(func=cmd_evidence_decisions)
+    s = sub.add_parser("evidence-policy", help="Write the v4 action-to-signature table as an explicit, editable v5 policy.")
+    s.add_argument("output"); s.set_defaults(func=cmd_evidence_policy)
     s = sub.add_parser("replay", help="Refresh a saved run's offline replay without rerunning the simulation or calling Jev.")
     s.add_argument("run_directory", help="Saved run folder containing report.json and frames.jsonl (v3) or frames.json (v2).")
     s.add_argument("--output", help="Replay HTML destination; defaults to RUN_DIRECTORY/replay.html.")
@@ -525,7 +676,9 @@ def parser():
     s.add_argument("prepared"); s.add_argument("--steps", type=int, default=12); s.add_argument("--seed", type=int, default=21)
     s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--max-questions", type=int, default=20)
     s.add_argument("--max-http-attempts", type=int, default=100)
-    s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown"); s.set_defaults(func=cmd_cost)
+    s.add_argument("--jev-prior", choices=("shown", "hidden"), default="shown")
+    s.add_argument("--jev-pooling", choices=("full_distribution", "event_share"), default="full_distribution")
+    s.set_defaults(func=cmd_cost)
     s = sub.add_parser("compare", help="Compare matched arms at their latest common completed step.")
     s.add_argument("runs", nargs="+")
     s.add_argument("--allow-ontology-diff", action="store_true",
@@ -576,6 +729,20 @@ def parser():
     s = sub.add_parser("jev-audit", help="Measure repeated-payload and batch-order variance from existing journals; no API calls.")
     s.add_argument("journals", nargs="+"); s.add_argument("--output", required=True)
     s.set_defaults(func=lambda a: __import__("virtualtissue_xenium.v2.provider_audit", fromlist=["audit_journals"]).audit_journals(a.journals, a.output))
+    s = sub.add_parser("jev-probe", help="Frozen-state probe of Jev: plan (no API), run (explicit budget), analyze (offline).")
+    s.add_argument("step", choices=("plan", "run", "analyze")); s.add_argument("directory")
+    s.add_argument("--prepared", help="Prepared bundle; required for plan, optional later if the planned path moved.")
+    s.add_argument("--cells-per-lineage", type=int, default=6); s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--arms", nargs="+", help="Default: baseline evidence_masked evidence_exchanged neighbourhood_exchanged (+ context_exchanged with a donor).")
+    s.add_argument("--priors", nargs="+", choices=("shown", "hidden"), default=["shown", "hidden"])
+    s.add_argument("--repeats", type=int, default=3, help="Independent journals per arm; at least 2 to measure replicate noise.")
+    s.add_argument("--donor-context", help="Context whose tissue/disease/perturbation text is used by context_exchanged.")
+    s.add_argument("--model", default="jev-1.14.0"); s.add_argument("--max-questions", type=int, default=10)
+    s.add_argument("--jev-pooling", choices=("full_distribution", "event_share"), default="full_distribution")
+    s.add_argument("--max-http-attempts", type=int, help="run only: must cover the whole plan or nothing is sent.")
+    s.add_argument("--workers", type=int, default=1); s.add_argument("--bootstrap-replicates", type=int, default=2000)
+    s.add_argument("--output", help="analyze only: analysis path; defaults to DIRECTORY/analysis.json.")
+    s.set_defaults(func=cmd_jev_probe)
     s = sub.add_parser("platform-template", help="Export blank annotation rows from native Atera, Visium HD or Stereo-seq geometry.")
     s.add_argument("platform", choices=("atera", "visium_hd", "stereo_seq"))
     s.add_argument("input"); s.add_argument("output"); s.add_argument("--measurement")
@@ -589,6 +756,7 @@ def parser():
     s = sub.add_parser("select-roi", help="Verify an explicit catalog selection and prepare only the selected ROI.")
     s.add_argument("input"); s.add_argument("selection"); s.add_argument("output")
     s.add_argument("--context"); s.add_argument("--measurement"); s.add_argument("--gene-sets")
+    s.add_argument("--evidence-policy", help="v5: JSON evidence-to-action rules applied when the selected ROI is prepared.")
     s.add_argument("--lineage-map", help="Use the same label mapping used to generate the raw-object catalogue.")
     s.set_defaults(func=cmd_select_roi)
     s = sub.add_parser("expression-audit", help="Measure fixed-state expression effects versus label-only and shuffle controls; no API calls.")

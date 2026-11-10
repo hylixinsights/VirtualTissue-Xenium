@@ -10,11 +10,11 @@ from virtualtissue_xenium.v2.inputs import write_json, read_json
 from test_v3_contracts import cells, context
 
 
-def test_primary_v4_entrypoint_keeps_legacy_commands_and_shared_package_version():
+def test_primary_entrypoint_keeps_legacy_commands_and_shared_package_version():
     project = tomllib.loads((Path(__file__).resolve().parents[1] / "pyproject.toml").read_text())["project"]
     assert project["version"] == virtualtissue_xenium.__version__
-    assert project["version"].split(".")[0] == "4"
-    assert project["scripts"]["vtx4"] == project["scripts"]["vtx2"] == "virtualtissue_xenium.v2.cli:main"
+    assert project["version"].split(".")[0] == "5"  # the release major; v4 commands stay available below
+    assert project["scripts"]["vtx5"] == project["scripts"]["vtx4"] == project["scripts"]["vtx2"] == "virtualtissue_xenium.v2.cli:main"
     assert project["scripts"]["vtx"] == "virtualtissue_xenium.cli:main"
 
 

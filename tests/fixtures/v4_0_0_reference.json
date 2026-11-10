@@ -1,0 +1,175 @@
+{
+  "demo270": {
+    "beta_zero_fingerprint": "58d76077bbb7d500b9a4c1d3b9547997ad0c0774c5b1703e286107d7c8c7a8b2",
+    "coordinate_shuffle_fingerprint": "47366cc6d39dd55a4f6a438181243b57a667a03f8c13b332cd24b4470582912c",
+    "expression_audit_fingerprint": "ef6bedc3019b5b491e6d0fc61b3ffa72eabb964b406772da29d103720782ced7",
+    "fingerprint": "0d329e655d4b4992e8133028ba261b9dcd1d7afc2e52b87a5b858c1a149b26c9",
+    "global_shuffle_fingerprint": "2da17f49006e296697eee28e59378c06c06876c7b75fc0fcf7a875481036e8dc",
+    "jev_hidden": {
+      "completed": false,
+      "config_hash": "76df7cc565c649a0196fbdbaae3cd98cc6b38616297cfc2170b3a4ac77e1634e",
+      "config_sha256": "cb977e949f8e1a7aafa293f411c16c1b0f4883aa47a231a22f5eb2b05dfd0ac2",
+      "decisions_inline_sha256": "7be6d4271cc51118d7742e06c8b140b4e5ae8c20cfb29ac291c6581f39d98bc8",
+      "events": {
+        "activate": 26,
+        "apoptosis": 60,
+        "division": 34,
+        "move": 33
+      },
+      "frames_sha256": "fc9af123b2af2463c74e505dfdef02c1729d058350ef993b1133fb52dd355936",
+      "guidebook_sha256": "667cb76c461efa6331d96128ee2d968229a8354a1d84a3069f50f2821d5a0ca9",
+      "jev_prior_divergence": {
+        "T_CD8": {
+          "max": 0.8060938450425084,
+          "mean": 0.5062856529604686,
+          "n": 90
+        },
+        "malignant": {
+          "max": 0.8520875230386125,
+          "mean": 0.4706940998409768,
+          "n": 90
+        },
+        "myeloid": {
+          "max": 0.801540204543606,
+          "mean": 0.5174381444745222,
+          "n": 90
+        }
+      },
+      "jev_request_hashes_sha256": "edfdf37a10a5bea6f4de997c11d16dd54e58ad76aff4dfcb9683ec55e7712974",
+      "jev_requests": 20,
+      "living": 244
+    },
+    "jev_shown": {
+      "completed": false,
+      "config_hash": "09d31a755dc9b147bf319405110d614f29f5c98702beadc442a1600b4bc57cf3",
+      "config_sha256": "bb337f9a02e708bb3319891ad69b3eb1f6c2bfe945cbed9d6016ba06c448cf2f",
+      "decisions_inline_sha256": "815ca85257290dec765ba69656532d97f4a598584860318fb3aa5c15911f3e9f",
+      "events": {
+        "activate": 29,
+        "apoptosis": 15,
+        "clear_corpse": 5,
+        "conflict_blocked": 5,
+        "division": 17,
+        "move": 44
+      },
+      "frames_sha256": "04b0377cf8ceaef337e703d21dbb6d04ed1f92ac066d50ef0d1b2182d946cb38",
+      "guidebook_sha256": "667cb76c461efa6331d96128ee2d968229a8354a1d84a3069f50f2821d5a0ca9",
+      "jev_prior_divergence": {
+        "T_CD8": {
+          "max": 0.8308626027319692,
+          "mean": 0.48828154712466,
+          "n": 177
+        },
+        "malignant": {
+          "max": 0.9111266138666225,
+          "mean": 0.5251015858242805,
+          "n": 183
+        },
+        "myeloid": {
+          "max": 0.8238728611045336,
+          "mean": 0.5050691627852457,
+          "n": 180
+        }
+      },
+      "jev_request_hashes_sha256": "74d6ca216f0ac350441dccc37bdf7e141a126e4767ba748c47fbf4511767bada",
+      "jev_requests": 44,
+      "living": 272
+    },
+    "label_permutation_fingerprint": "4545c838b5c2749e870d13709c480776ae771c14893a904dc707c5db0cbbf2cd",
+    "local": {
+      "completed": true,
+      "config_hash": "0f6a2e76ff51790e8aed4abdea5f3661d880d0be18a1a3b533361dd4ac63976b",
+      "config_sha256": "58ebee7aa38727fe77c3a80cb8cd8c5b857599933bc9a471b82daf55eda5b017",
+      "decisions_inline_sha256": "28248e1b2b15ba6a8ff6e55747006e775a35328b08c8efbfb04dbcee57f45679",
+      "events": {
+        "activate": 63,
+        "apoptosis": 2,
+        "deactivate": 1,
+        "division": 7,
+        "exhaust": 1,
+        "move": 103
+      },
+      "frames_sha256": "9ed8b190df133ad7c9a38076afdab345a7d343c9f042a238a8687eb3ad38b39c",
+      "guidebook_sha256": "667cb76c461efa6331d96128ee2d968229a8354a1d84a3069f50f2821d5a0ca9",
+      "living": 275
+    },
+    "within_type_shuffle_fingerprint": "0c473a74d66b95eae9c30f595a8a74bf77578f5b21820da2c728ff3db22d60ef"
+  },
+  "object96": {
+    "expression_audit_fingerprint": "3cf06e19a1f514b03be6cfffdffa971763cd8ab5841bc95cc9744c439728836c",
+    "fingerprint": "404e58bf36879c9fa1315d2c7e1dff8b1b7777ebeb334e0d3e3da31db7b03d29",
+    "jev_shown": {
+      "completed": true,
+      "config_hash": "8fdd1280660488de6c45842c83a42115264577d2d82ce64088d3d3eef3aa67fe",
+      "config_sha256": "ae793b298fad1fb52a22092dfcd1f2b161f0a1a9087bdb4ffb0785d556b9b3d7",
+      "decisions_inline_sha256": "78cb4d81fa78b5f563e2995728b8f88a15f457ef8addb5f51a0d59e8f458974f",
+      "events": {
+        "activate": 10,
+        "apoptosis": 5,
+        "division": 5,
+        "move": 7
+      },
+      "frames_sha256": "e53f21b15aa1ad885bdd215d1e45d8221b5157f109a9d319326d5e2359fd212b",
+      "guidebook_sha256": "c3a778f238b3994e50a6b867160bacd6da3b5be01370703270b744ce89db5bf3",
+      "jev_prior_divergence": {
+        "B": {
+          "max": 0.6770792252965976,
+          "mean": 0.5919125474712083,
+          "n": 7
+        },
+        "NK": {
+          "max": 0.8155689668410346,
+          "mean": 0.5708957725679894,
+          "n": 8
+        },
+        "T_CD8": {
+          "max": 0.841634698543937,
+          "mean": 0.5211609578589123,
+          "n": 36
+        },
+        "T_reg": {
+          "max": 0.7563674119747652,
+          "mean": 0.6132974849354946,
+          "n": 8
+        },
+        "endothelial": {
+          "max": 0.6658089368075413,
+          "mean": 0.42460129584798106,
+          "n": 10
+        },
+        "fibroblast": {
+          "max": 0.7555086384558787,
+          "mean": 0.5169428857213838,
+          "n": 16
+        },
+        "malignant": {
+          "max": 0.8889733941511391,
+          "mean": 0.5457265481710905,
+          "n": 83
+        },
+        "myeloid": {
+          "max": 0.7794323071130256,
+          "mean": 0.5856390249796576,
+          "n": 24
+        }
+      },
+      "jev_request_hashes_sha256": "4d535267db0ea1d168a05c4f9aa5d4d860881569a889f855ac4c25c8c9bbdda9",
+      "jev_requests": 18,
+      "living": 96
+    },
+    "local": {
+      "completed": true,
+      "config_hash": "622ee65b7de7767c60760c59a409311b4630b6db8d4603207212881ea91c9c00",
+      "config_sha256": "d4015490a453be5721c6cafb7bec3b5f1fa1390fe4353d32f1001f187c59f82d",
+      "decisions_inline_sha256": "ebcdce838c2622e043e2ee65036ca70d824ceb81e02eae3a2e6d14e863a7ab95",
+      "events": {
+        "activate": 5,
+        "division": 2,
+        "move": 17
+      },
+      "frames_sha256": "3d64d3105ca4167ac89c09dd0467616e69cf369389e45621f1c691344a18a6b5",
+      "guidebook_sha256": "c3a778f238b3994e50a6b867160bacd6da3b5be01370703270b744ce89db5bf3",
+      "living": 98
+    }
+  }
+}

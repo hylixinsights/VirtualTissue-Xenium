@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "virtualtissue-xenium"
-version = "4.0.0"
+version = "5.0.0"
 description = "Context-conditioned virtual tissue research simulations from annotated Xenium and single-cell objects, with auditable guidebooks and Jev decisions."
 readme = "README.md"
 license = "MIT"
@@ -59,6 +59,7 @@ acceptance = ["hatchling>=1.24", "shapely>=2,<3", "decoupler==2.3.0", "marsilea=
 vtx = "virtualtissue_xenium.cli:main"
 vtx2 = "virtualtissue_xenium.v2.cli:main"
 vtx4 = "virtualtissue_xenium.v2.cli:main"
+vtx5 = "virtualtissue_xenium.v2.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/hylixinsights/VirtualTissue-Xenium"

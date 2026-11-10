@@ -1,0 +1,72 @@
+{
+  "policy_version": "v5-evidence-policy-1",
+  "name": "luad3_tls_go20_v1",
+  "review_status": "requires_biological_review",
+  "description": "Connects saved per-cell GO Biological Process UCell scores (MSigDB 2026.1.Hs, scored on the 302-gene panel) to actions the lineage is already permitted. Every rule is a modelling assumption. Declared label-only: APOPTOSIS (the assayed apoptotic-signaling genes mix pro- and anti-apoptotic regulators, so the score has no clear direction), EXHAUST (no GO20 set; only 4 of 6 packaged marker genes are assayed), SECRETE outside T cells, MOVE, CLEAR_CORPSE and RECOVER.",
+  "provider_evidence": "all",
+  "rules": [
+    {
+      "action": "PROLIFERATE",
+      "lineages": "*",
+      "evidence": "GOBP_MITOTIC_CELL_CYCLE_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "Mitotic cell cycle is the declared proliferation proxy of the scoring analysis. On this panel the 18 scored genes include canonical cycling markers (MKI67, UBE2C, CCND1, WEE1) and broad regulators (EGFR, CTNNB1, TP53, RHOA, TGFB1), so within-type differences may reflect signalling state as much as cycling.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "ACTIVATE",
+      "lineages": ["T_CD4", "T_CD8"],
+      "evidence": "GOBP_T_CELL_ACTIVATION_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "T cell activation (58 scored genes) as within-type evidence for the simulated activation state of T cells. Not used for other lineages, unlike the v4 global table.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "ACTIVATE",
+      "lineages": ["B"],
+      "evidence": "GOBP_B_CELL_ACTIVATION_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "B cell activation (22 scored genes) for B cells; the v4 table applied a T-cell marker set here.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "ACTIVATE",
+      "lineages": ["myeloid"],
+      "evidence": "GOBP_INFLAMMATORY_RESPONSE_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "Inflammatory response (57 scored genes) as within-type evidence for myeloid activation. Broad process; includes regulators of both signs.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "ACTIVATE",
+      "lineages": ["dendritic"],
+      "evidence": "GOBP_ANTIGEN_PROCESSING_AND_PRESENTATION_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "Antigen processing and presentation (16 scored genes) as within-type evidence for dendritic-cell activation or maturation.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "KILL",
+      "lineages": ["T_CD8"],
+      "evidence": "GOBP_T_CELL_MEDIATED_CYTOTOXICITY_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "T cell mediated cytotoxicity (8 scored genes) for CD8 killing. KILL still requires declared recognition, an activated non-exhausted state and a live malignant neighbour; the score only redistributes the assumed hazard among CD8 cells.",
+      "review_status": "requires_biological_review"
+    },
+    {
+      "action": "SECRETE",
+      "lineages": ["T_CD4", "T_CD8"],
+      "evidence": "GOBP_TYPE_II_INTERFERON_PRODUCTION_UCell",
+      "kind": "measured_score",
+      "direction": "supports",
+      "rationale": "Type II interferon production (12 scored genes) for T-cell emission of the abstract inflammatory signal. It is a production set, not an interferon-response signature.",
+      "review_status": "requires_biological_review"
+    }
+  ]
+}

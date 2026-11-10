@@ -70,17 +70,35 @@ def validate_cells(cells):
         initial = c.get("initial_state", {})
         if not isinstance(initial, dict) or set(initial) - {"activated", "exhausted"} or any(type(x) is not bool for x in initial.values()):
             raise ValueError("initial_state accepts only boolean activated/exhausted assumptions.")
+        if "measured_scores" in c:
+            scores = c["measured_scores"]
+            if not isinstance(scores, dict) or any(
+                    not isinstance(name, str) or not name
+                    or (value is not None and (type(value) not in (int, float) or not math.isfinite(value)))
+                    for name, value in scores.items()):
+                raise ValueError("measured_scores must map score names to finite numbers, or null when not calculated.")
         result.append(c)
     return sorted(result, key=lambda c: c["cell_id"])
 
 
 def from_anndata(adata, *, cell_type_key="cell_type", lineage_key="lineage", sample_key=None,
-                 layer=None, spatial_key="spatial", coordinate_scale=1.0, max_cells=1000, lineage_map=None, polygon_key=None):
+                 layer=None, spatial_key="spatial", coordinate_scale=1.0, max_cells=1000, lineage_map=None, polygon_key=None,
+                 score_keys=None):
     """Accept an in-memory annotated object. Never infer lineage, malignancy, or XY.
 
     X (or the chosen layer) must hold nonnegative counts, with unique gene symbols
     in var_names. No densification of the full matrix is performed.
+
+    ``score_keys`` names numeric ``obs`` columns holding per-cell scores computed
+    outside the simulator. NaN means not calculated and is kept as null, never
+    as zero. Their meaning comes from the measured-evidence manifest, not here.
     """
+    score_keys = list(score_keys or [])
+    if len(set(score_keys)) != len(score_keys):
+        raise ValueError("score_keys must be unique obs column names.")
+    for key in score_keys:
+        if key not in adata.obs:
+            raise ValueError(f"Missing measured-score column: {key}")
     if adata.n_obs > max_cells:
         raise ValueError(f"Select a region/subset first: {adata.n_obs} cells exceeds max_cells={max_cells}.")
     if not adata.obs_names.is_unique or not adata.var_names.is_unique:
@@ -111,6 +129,23 @@ def from_anndata(adata, *, cell_type_key="cell_type", lineage_key="lineage", sam
                  sample_id=str(adata.obs.iloc[i][sample_key]) if sample_key else "sample")
         if coords is not None:
             c.update(x=float(coords[i, 0]) * coordinate_scale, y=float(coords[i, 1]) * coordinate_scale)
+        if score_keys:
+            scores = {}
+            for key in score_keys:
+                value = adata.obs.iloc[i][key]
+                if type(value).__name__ in ("bool", "bool_"):
+                    raise ValueError(f"Measured-score column {key} must be numeric, not boolean.")
+                if value is None or type(value).__name__ in ("NAType", "NaTType"):
+                    scores[key] = None  # pandas missing value: not calculated
+                    continue
+                try:
+                    value = float(value)
+                except (TypeError, ValueError):
+                    raise ValueError(f"Measured-score column {key} must be numeric.") from None
+                if math.isinf(value):
+                    raise ValueError(f"Measured-score column {key} contains an infinite value.")
+                scores[key] = None if math.isnan(value) else value
+            c["measured_scores"] = scores
         cells.append(c)
     if polygon_key:
         from ..v3.object_input import attach_anndata_polygons
@@ -140,8 +175,8 @@ def load_cells(path, **kwargs):
         finally:
             obj.file.close()
     obj = read_json(path)
-    if not isinstance(obj, dict) or set(obj) - {"cells", "assayed_genes", "description", "measurement", "annotation_provenance", "context"}:
-        raise ValueError("JSON input requires cells, with optional assayed_genes, description, measurement, annotation_provenance and context.")
+    if not isinstance(obj, dict) or set(obj) - {"cells", "assayed_genes", "description", "measurement", "annotation_provenance", "context", "measured_evidence"}:
+        raise ValueError("JSON input requires cells, with optional assayed_genes, description, measurement, annotation_provenance, context and measured_evidence.")
     cells = obj.get("cells")
     if kwargs.get("lineage_map"):
         from .measurement import apply_lineage_map
@@ -149,7 +184,8 @@ def load_cells(path, **kwargs):
     return validate_cells(cells), obj.get("assayed_genes")
 
 
-def prepare(cells, context, *, assayed_genes=None, gene_sets=None, measurement=None, lineage_map=None, annotation_provenance=None):
+def prepare(cells, context, *, assayed_genes=None, gene_sets=None, measurement=None, lineage_map=None, annotation_provenance=None,
+            measured_evidence=None):
     from .context import validate_context
     from .guidebook import build_guidebook
     if lineage_map is not None:
@@ -182,8 +218,16 @@ def prepare(cells, context, *, assayed_genes=None, gene_sets=None, measurement=N
                     cell.setdefault("annotation_before_purity_gate", {k: cell[k] for k in ("cell_type", "lineage")})
                     cell["cell_type"] = cell["lineage"] = "unknown"
                     cell["annotation_gate"] = "insufficient_or_undeclared_bin_purity"
-    guidebook = build_guidebook(cells, context, gene_sets=gene_sets)
+    if measured_evidence is not None or any("measured_scores" in cell for cell in cells):
+        if not v3:
+            raise ValueError("Measured scores require schema 3.0.")
+        from ..v5.evidence import validate_measured_evidence
+        measured_evidence = validate_measured_evidence(measured_evidence, cells)
+    guidebook = build_guidebook(cells, context, gene_sets=gene_sets, measured_evidence=measured_evidence)
     content = dict(schema_version=context["schema_version"], cells=cells, context=guidebook["context"], guidebook=guidebook)
+    if measured_evidence is not None:
+        content["measured_evidence"] = measured_evidence
+        guidebook["provenance"]["measured_evidence_sha256"] = digest(measured_evidence)
     if v3:
         from .measurement import validate_measurement
         content["measurement"] = measurement
@@ -231,6 +275,16 @@ def validate_prepared(bundle):
             raise ValueError("A normalized measurement record is required for v3.")
         if digest(measurement) != bundle["guidebook"]["provenance"].get("measurement_sha256"):
             raise ValueError("Measurement provenance does not match the guidebook.")
+        if "measured_evidence" in bundle or any("measured_scores" in cell for cell in cells):
+            from ..v5.evidence import validate_measured_evidence
+            manifest = bundle.get("measured_evidence")
+            if (manifest is None or validate_measured_evidence(manifest, cells) != manifest
+                    or digest(manifest) != bundle["guidebook"]["provenance"].get("measured_evidence_sha256")):
+                raise ValueError("Measured-evidence manifest is missing, not normalized or differs from the guidebook provenance.")
+        policy = bundle["context"].get("evidence_policy")
+        if (policy is None) != ("evidence_policy_sha256" not in bundle["guidebook"]["provenance"]) or (
+                policy is not None and digest(policy) != bundle["guidebook"]["provenance"]["evidence_policy_sha256"]):
+            raise ValueError("Evidence policy differs from the one recorded in the guidebook; rebuild the bundle.")
         if "geometry" in bundle:
             from ..v3.geometry import normalize_geometry
             normalized, geometry = normalize_geometry(cells)

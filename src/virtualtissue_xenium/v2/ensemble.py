@@ -230,10 +230,15 @@ must produce an independently journaled provider. No provider is created in
     settings = {}
     for name in bundles:
         options = arm_options.get(name, {})
-        if not isinstance(options, dict) or set(options) - {"mode", "jev_weight"}:
-            raise ValueError("arm_options accepts only mode and jev_weight.")
+        if not isinstance(options, dict) or set(options) - {"mode", "jev_weight", "jev_pooling"}:
+            raise ValueError("arm_options accepts only mode, jev_weight and jev_pooling.")
         setting = dict(mode=mode, jev_weight=jev_weight)
         setting.update(options)
+        # The default pooling is not recorded, so v4 ensemble configurations keep their fingerprints.
+        if setting.get("jev_pooling", "full_distribution") == "full_distribution":
+            setting.pop("jev_pooling", None)
+        elif setting["jev_pooling"] != "event_share" or setting["mode"] != "jev":
+            raise ValueError("jev_pooling must be full_distribution or event_share, and applies only to Jev arms.")
         if setting["mode"] not in ("local", "jev") or type(setting["jev_weight"]) not in (int, float) or not math.isfinite(setting["jev_weight"]) or not 0 <= setting["jev_weight"] <= 1:
             raise ValueError("Each arm needs local/jev mode and a finite jev_weight in [0,1].")
         settings[name] = setting
@@ -275,10 +280,11 @@ must produce an independently journaled provider. No provider is created in
             record = dict(arm=arm, seed=seed, directory=str(output.relative_to(directory)), completed=False)
             try:
                 setting = settings[arm]
+                pooling = {"jev_pooling": setting["jev_pooling"]} if "jev_pooling" in setting else {}
                 provider = provider_factory(arm=arm, bundle=bundle, output_dir=output, seed=seed,
-                                            steps=arm_steps[arm], jev_weight=setting["jev_weight"]) if setting["mode"] == "jev" else None
+                                            steps=arm_steps[arm], jev_weight=setting["jev_weight"], **pooling) if setting["mode"] == "jev" else None
                 report = run(bundle, output, steps=arm_steps[arm], seed=seed, mode=setting["mode"], provider=provider,
-                             jev_weight=setting["jev_weight"], max_population=max_population)
+                             jev_weight=setting["jev_weight"], max_population=max_population, **pooling)
                 record.update(completed=bool(report["completed"]), completed_steps=report["completed_steps"],
                               requested_steps=arm_steps[arm], stop_reason=report["stop_reason"],
                               error=report.get("error"), usage=report.get("usage", {}),

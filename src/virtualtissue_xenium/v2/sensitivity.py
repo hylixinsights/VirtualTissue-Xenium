@@ -211,7 +211,8 @@ separately costed Jev design. Every failed or undefined point blocks indices.
             context = _override_context(bundle["context"], point["parameters"])
             extra = {}
             if bundle.get("schema_version") == "3.0":
-                extra = dict(measurement=bundle.get("measurement"), annotation_provenance=bundle.get("annotation_provenance"))
+                extra = dict(measurement=bundle.get("measurement"), annotation_provenance=bundle.get("annotation_provenance"),
+                             measured_evidence=bundle.get("measured_evidence"))
             prepared = prepare(bundle["cells"], context, assayed_genes=context.get("assayed_genes"),
                 gene_sets=bundle["guidebook"]["provenance"]["gene_sets"], **extra)
             folder = output/"points"/point["id"]

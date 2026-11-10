@@ -172,15 +172,24 @@ def _rank_evidence(expression, panel, gene_sets):
     return result
 
 
-def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = None) -> dict:
+def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = None,
+                    measured_evidence: dict | None = None) -> dict:
     """Build auditable per-cell action weights and per-type summaries.
 
     A diagnosis or intervention is passed to Jev as context, but changes these
     weights only through an explicit ``context_modifiers`` rule. Missing panel
     support remains null and cannot be interpreted as biological inactivity.
+
+    With ``context.evidence_policy`` (v5, schema 3.0) the declared rules replace
+    the global ACTION_SIGNATURE table and may use ``measured_evidence``: per-cell
+    scores imported with a provenance manifest. Without a policy the result is
+    the v4 guidebook.
     """
     c = validate_context(context)
     v3 = c["schema_version"] == "3.0"
+    policy = c.get("evidence_policy")
+    if measured_evidence is not None and policy is None:
+        raise ValueError("Measured scores are used only through a declared evidence_policy; add one to the context.")
     ontology, profile, signature_source = None, None, None
     if v3:
         from ..v3.ontology import kinetics_for, load_platform, load_signatures
@@ -223,6 +232,16 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
                if depth_mode and sum(cell["expression"].values()) < scoring["min_transcripts"]}
     if depth_mode:
         population, references = score_population(checked, panel, signatures, dict(scoring, _qc_fail=qc_fail))
+    rules = None
+    if policy is not None:
+        from ..v5 import evidence as v5_evidence
+        v5_evidence.check_references(policy, signatures, measured_evidence)
+        rules = v5_evidence.rule_index(policy, lineages)
+        if measured_evidence is not None:
+            measured, measured_references = v5_evidence.score_measured(checked, measured_evidence, scoring, qc_fail)
+            for cell_id, scores in measured.items():
+                population[cell_id].update(scores)
+            references.update(measured_references)
     records, grouped, worst_case_burden = {}, defaultdict(list), 0.0
     for cell in sorted(checked, key=lambda x: x["cell_id"]):
         lineage = cell["lineage"]
@@ -254,20 +273,27 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             audit.append({"source": "qc_gate", "applied": True, "min_transcripts": scoring["min_transcripts"],
                           "assumption": "Below min_transcripts the cell is REST-only; not evidence of quiescence."})
         for action, weight in list(weights.items()):
-            signature = ACTION_SIGNATURE.get(action)
+            rule = rules.get((lineage, action)) if rules is not None else None
+            signature = ACTION_SIGNATURE.get(action) if rules is None else (rule["evidence"] if rule else None)
             if weight is None or signature not in evidence:
                 continue
             if depth_mode:
                 beta = beta_for(scoring, action)
+                if rule is not None and rule["direction"] == "opposes":
+                    beta = -beta
                 multiplier, normaliser = expression_multiplier(evidence[signature], references[signature], beta)
                 weights[action] = weight * multiplier
-                audit.append({"action": action, "source": scoring["method"], "signature": signature,
+                audit.append({"action": action,
+                              "source": "measured_score" if rule is not None and rule["kind"] == "measured_score" else scoring["method"],
+                              "signature": signature,
                               "z": evidence[signature]["z"], "status": evidence[signature]["status"],
                               "reference": evidence[signature]["reference"], "beta": beta,
                               "normaliser": normaliser, "multiplier": multiplier,
                               "assumption": ("Bounded within-cell panel-rank heuristic; no population mean preservation or biological calibration"
                                   if evidence[signature].get("status") == "available_panel_heuristic" else
-                                  "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta")})
+                                  "m = exp(beta*z)/mean_ref(exp(beta*z)); preserves the reference-group mean; uncalibrated beta"),
+                              **({"evidence_rule": {k: rule[k] for k in ("kind", "direction", "rationale", "review_status")}}
+                                 if rule is not None else {})})
                 continue
             score = evidence[signature].get("score")
             if score is not None:
@@ -399,4 +425,24 @@ def build_guidebook(cells: list[dict], context: dict, gene_sets: dict | None = N
             record["local_gates_required"][-1] = "PROLIFERATE is subject to declared local crowding and living population capacity."
             if "PROLIFERATE" in record["actions"]:
                 record["actions"]["PROLIFERATE"]["description"] = "Attempt one daughter cell with declared radius, local crowding and soft repulsion."
+        if policy is not None:
+            provenance.update(
+                guidebook_version=v5_evidence.GUIDEBOOK_VERSION, evidence_policy=deepcopy(policy),
+                evidence_policy_sha256=_digest(policy),
+                evidence_policy_semantics="Declared rules replace the v4 action-to-signature table; one evidence source per "
+                                          "lineage and action; gates, kinetics, beta and the multiplier law are unchanged.",
+                measured_scores=sorted(measured_evidence["scores"]) if measured_evidence is not None else [])
+            if measured_evidence is not None:
+                # What the provider is told about each imported score; the full manifest stays in the bundle.
+                provenance["measured_definitions"] = dict(
+                    scores={name: {k: spec[k] for k in ("method", "description", "genes_scored", "n_genes_set", "caveat")
+                                   if spec.get(k) is not None}
+                            for name, spec in sorted(measured_evidence["scores"].items())},
+                    **({"caveat": measured_evidence["caveat"]} if measured_evidence.get("caveat") else {}))
+                provenance["measured_coverage"] = {
+                    name: dict(Counter(population[cid][name]["status"] for cid in population))
+                    for name in sorted(measured_evidence["scores"])}
+                provenance["limitations"].append(
+                    "Measured scores were computed outside the simulator from the same t0 counts; their definitions and "
+                    "limitations are those of the declared manifest, and they are standardised within sample and type here.")
     return result
