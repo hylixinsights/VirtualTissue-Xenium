@@ -2,7 +2,7 @@
 
 ## 5.0.0 — 2026-11-10
 
-Simulation mechanisms, kinetic and beta tables, gates, replay and rendering are unchanged from 4.0.0. Existing contexts without an evidence policy or the new optional sample-context fields produce byte-identical frames, expanded decisions, `config.json`, fingerprints and Jev requests; `tests/test_v5_v4_equivalence.py` checks this against hashes recorded on the v4.0.0 tag.
+Simulation mechanisms, kinetic and beta tables, gates, replay and rendering are unchanged from 4.0.0. Existing contexts without an evidence policy or the new optional sample-context fields produce byte-identical frames, expanded decisions, `config.json`, fingerprints and Jev requests; `tests/test_v5_v4_equivalence.py` checks this against the pinned immutable v4 commit under the same interpreter and platform.
 
 - Add `vtx5` as the recommended command; `vtx4` and `vtx2` remain aliases.
 - Add `vtx5 context-init OUTPUT --template CONTEXT`: English questions about sample tissue, pathology, anatomical region, stage, cell states and secretory populations. Optional `sample_context` metadata are validated, retained in the guidebook and sent to Jev. Separately declared, reasoned lineage/action restrictions use the existing zero-multiplier context modifiers. Existing inputs remain noninteractive and unchanged. Context-exchange controls replace optional sample details along with the donor's tissue/disease text.
@@ -16,6 +16,7 @@ Simulation mechanisms, kinetic and beta tables, gates, replay and rendering are 
 - Add `vtx5 jev-probe plan|run|analyze`: a frozen t0 question bank asked under baseline, masked evidence, exchanged evidence, exchanged neighbourhood and exchanged context text, with independent repeats; reports divergence between arms next to divergence between identical repeats (bootstrap over request groups), modal-action agreement and evidence tracking. A failed request is never resent; its request group is excluded from every arm. `plan` and `analyze` make no request; `run` needs a key and a budget covering the whole plan.
 - Add `vtx5 evidence-decisions RUN... --output FILE`: per lineage and action with declared evidence, the mean evidence z of decisions that selected the action against decisions that were offered it. Evidence redistributes events among cells without changing group mean rates, so this cell-level readout, not aggregate counts, shows its effect.
 - Add `vtx5 evidence-policy OUTPUT` (the v4 table as an editable policy), `tools/v4_equivalence.py`, and `examples/v5/luad_tls` (input builder, conservative lineage maps, context and a GO-score evidence policy for a LUAD TLS region; data not packaged).
+- Use `python tools/v4_equivalence.py compare --same-platform-v4` for strict compatibility checks. CI exposed a cross-platform mismatch against the fixed macOS-recorded hash file, retained as a historical environment-specific artifact. Numerical logic is unchanged. Full Git history is required; run `git fetch --unshallow` in shallow clones.
 - A plain `pytest` no longer aborts at collection without the `legacy` extra: legacy-engine test modules are left out, with a header line naming the missing packages.
 
 ## 4.0.0 — 2026-11-06

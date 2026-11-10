@@ -14,13 +14,13 @@ V5 keeps the v4 simulation and its replay unchanged. It improves the evidence th
 - The replay, the dashboard and the cell renderer (`v2/web/`, `replay.py`).
 - The default behaviour of every v4 command.
 
-Existing contexts without an evidence policy or the new optional sample-context fields give byte-identical `frames.jsonl`, `config.json`, `guidebook.json`, prepared and control fingerprints, expression-audit fingerprints and Jev request bodies, and a decision log that expands to the v4 log byte for byte. This is checked against hashes recorded on the v4.0.0 tag:
+Existing contexts without an evidence policy or the new optional sample-context fields give byte-identical `frames.jsonl`, `config.json`, `guidebook.json`, prepared and control fingerprints, expression-audit fingerprints and Jev request bodies, and a decision log that expands to the v4 log byte for byte. Verify this against immutable v4 commit `20098224d06fddcc00f2683194622a60febb2b25`, executing both versions under the same interpreter and platform:
 
 ```bash
-python tools/v4_equivalence.py compare tests/fixtures/v4_0_0_reference.json
+python tools/v4_equivalence.py compare --same-platform-v4
 ```
 
-The same comparison runs in the test suite (`tests/test_v5_v4_equivalence.py`).
+The same strict comparison runs in the test suite (`tests/test_v5_v4_equivalence.py`). Full Git history is required; run `git fetch --unshallow` first in a shallow clone. The fixed `tests/fixtures/v4_0_0_reference.json` remains a historical macOS-recorded, environment-specific artifact. CI caught a mismatch when Linux outputs were compared to that snapshot. The correction changes the comparison environment, with no change to numerical logic. See [verification details](VALIDATION.md) for local results and release CI status.
 
 ## What is new
 

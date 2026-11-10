@@ -24,7 +24,7 @@ Existing prepared `V3_teste` folders retain their own top-level **START_TEST.com
 
 A passing result applies to the exact recorded source snapshot. Keep the scientific scope: expression influence, contextual Jev preferences and selected structural statistics must still be evaluated on appropriate real inputs. Existing labels are accepted; H&E and a new annotation review are not required. The model does not establish a proven prediction of tissue seven days later.
 
-**Commands and compatibility:** use `vtx5` for the current workflow. `vtx4` and `vtx2` remain aliases for the same workflow; the legacy physical engine keeps `vtx`. V5 retains simulation schema **3.0**, the existing ontologies and the `docs/v3` and `examples/v3` paths. Existing contexts without a v5 evidence policy or the new optional sample-context fields produce the same frames, decisions, configuration and Jev requests as v4.0.0; `tools/v4_equivalence.py` and the test suite check this against hashes recorded on the v4.0.0 tag.
+**Commands and compatibility:** use `vtx5` for the current workflow. `vtx4` and `vtx2` remain aliases for the same workflow; the legacy physical engine keeps `vtx`. V5 retains simulation schema **3.0**, the existing ontologies and the `docs/v3` and `examples/v3` paths. Existing contexts without a v5 evidence policy or the new optional sample-context fields produce the same frames, decisions, configuration and Jev requests as v4.0.0. The test suite verifies exact bytes against the pinned immutable v4 commit under the same interpreter and platform; see [verification details](docs/v5/VALIDATION.md).
 
 ## What v5 adds
 
@@ -137,8 +137,11 @@ Set `TYPESAFE_API_KEY` or `JEV_API_KEY` for live use and choose a budget from th
 ```bash
 make test
 make clock
+python tools/v4_equivalence.py compare --same-platform-v4
 vtx5 --help
 ```
+
+The equivalence check requires full Git history; run `git fetch --unshallow` first in a shallow clone. The fixed macOS-recorded hash file remains a historical, environment-specific artifact. CI exposed a mismatch when comparing Linux outputs to that snapshot; the same-platform check retains strict equality without changing numerical logic.
 
 The CI checks the current replay and the retained v2/v3 simulation contracts, exports coverage and produces the restricted local clock-validation figure. `make figures` regenerates PNG/SVG outputs with a hash manifest. No clinical or treatment-efficacy results are claimed by these software checks.
 

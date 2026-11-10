@@ -8,6 +8,14 @@ request payloads are unchanged when no v5 evidence policy is declared:
   python tools/v4_equivalence.py record  REFERENCE.json
   python tools/v4_equivalence.py compare REFERENCE.json
 
+For strict compatibility across operating systems/Python builds, compare with
+the immutable v4 commit under this same interpreter (requires Git history):
+
+  python tools/v4_equivalence.py compare --same-platform-v4
+
+Historical hash snapshots are environment-specific: last-bit libm differences
+can change serialized float hashes and therefore the content-seeded mock answers.
+
 Optional real-data scenario (never packaged):
   --h5ad ROI.h5ad --context CONTEXT.json --lineage-map MAP.csv \
   --cell-type-key first_type --layer purified_raw
@@ -19,12 +27,17 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tarfile
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+V4_REFERENCE_COMMIT = "20098224d06fddcc00f2683194622a60febb2b25"
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "examples" / "v3"))
 
@@ -126,25 +139,70 @@ def scenarios(args, work):
     return result
 
 
+def same_platform_reference(args, work):
+    """Run the same harness against immutable v4 source with this interpreter.
+
+    No snapshot is regenerated from the candidate code. Missing history fails
+    explicitly; numeric/hash equality is never relaxed to accommodate a host.
+    """
+    archive = subprocess.run(["git", "archive", "--format=tar", V4_REFERENCE_COMMIT],
+                             cwd=ROOT, capture_output=True)
+    if archive.returncode:
+        raise ValueError("The pinned v4 baseline is unavailable. Use a Git clone with full history "
+                         "(git fetch --unshallow for a shallow clone), then retry.")
+    source = work / "v4_source"
+    source.mkdir()
+    with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as saved:
+        saved.extractall(source, filter="data")
+    harness = source / "tools" / "v4_equivalence.py"
+    harness.write_bytes(Path(__file__).read_bytes())
+    reference = work / "v4_same_platform.json"
+    command = [sys.executable, str(harness), "record", str(reference)]
+    if args.h5ad:
+        for key in ("h5ad", "context", "lineage_map"):
+            command.extend(["--" + key.replace("_", "-"), str(Path(getattr(args, key)).resolve())])
+        command.extend(["--cell-type-key", args.cell_type_key, "--max-cells", str(args.max_cells)])
+        if args.layer:
+            command.extend(["--layer", args.layer])
+    environment = dict(os.environ, PYTHONPATH=str(source / "src"))
+    result = subprocess.run(command, cwd=source, env=environment, capture_output=True, text=True, timeout=300)
+    if result.returncode:
+        raise ValueError("The pinned v4 baseline harness failed: " + result.stderr[-4000:])
+    return json.loads(reference.read_text(encoding="utf8"))
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("action", choices=("record", "compare"))
-    p.add_argument("reference", type=Path)
+    p.add_argument("reference", type=Path, nargs="?")
+    p.add_argument("--same-platform-v4", action="store_true",
+                   help="Compare against immutable v4 source under this interpreter; requires full Git history.")
     p.add_argument("--h5ad"); p.add_argument("--context"); p.add_argument("--lineage-map")
     p.add_argument("--cell-type-key", default="cell_type"); p.add_argument("--layer")
     p.add_argument("--max-cells", type=int, default=1000)
     args = p.parse_args(argv)
+    if args.same_platform_v4:
+        if args.action != "compare" or args.reference is not None:
+            p.error("--same-platform-v4 requires compare without a reference file.")
+    elif args.reference is None:
+        p.error("A reference file is required unless using compare --same-platform-v4.")
     if args.h5ad and not (args.context and args.lineage_map):
         p.error("--h5ad requires --context and --lineage-map.")
     with tempfile.TemporaryDirectory() as temporary:
         observed = scenarios(args, Path(temporary))
+        if args.same_platform_v4:
+            try:
+                reference = same_platform_reference(args, Path(temporary))
+            except (ValueError, subprocess.TimeoutExpired) as exc:
+                p.error(str(exc))
     if args.action == "record":
         if args.reference.exists():
             p.error("Reference exists; choose a new path.")
         args.reference.write_text(json.dumps(observed, indent=2, sort_keys=True) + "\n", encoding="utf8")
         print(json.dumps(dict(recorded=str(args.reference), scenarios=sorted(observed)), indent=2))
         return 0
-    reference = json.loads(args.reference.read_text(encoding="utf8"))
+    if not args.same_platform_v4:
+        reference = json.loads(args.reference.read_text(encoding="utf8"))
     differences = []
 
     def walk(expected, actual, path):
